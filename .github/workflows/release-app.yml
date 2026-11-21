@@ -1,0 +1,135 @@
+name: Release app
+
+# Builds the Android APK and macOS app and publishes them on a GitHub
+# release. Run it from the Actions tab with a version, or push a tag like
+# app-v0.2.0.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release, like 0.2.0
+        required: true
+  push:
+    tags: ['app-v*']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-app
+  cancel-in-progress: false
+
+env:
+  VERSION: ${{ inputs.version || github.ref_name }}
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    strategy:
+      matrix:
+        include:
+          - name: Android
+            os: ubuntu-latest
+          - name: macOS
+            os: macos-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Read version
+        id: version
+        shell: bash
+        run: |
+          version="${VERSION#app-v}"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Version must look like 1.2.3, got '$version'"
+            exit 1
+          fi
+          echo "name=$version" >> "$GITHUB_OUTPUT"
+
+      - if: matrix.name == 'Android'
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.50.1
+          cache: true
+
+      - run: flutter pub get
+
+      # Optional: with these secrets set, every release is signed with the
+      # same key, so a new APK installs over the old one and keeps progress.
+      - name: Set up Android signing
+        if: matrix.name == 'Android'
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE" ]; then
+            echo "::warning::ANDROID_KEYSTORE_BASE64 isn't set, so this APK uses a throwaway debug key and won't install over an earlier release."
+            exit 0
+          fi
+          echo "$KEYSTORE" | base64 --decode > android/release.jks
+          cat > android/key.properties <<EOF
+          storeFile=release.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=release
+          keyPassword=$KEYSTORE_PASSWORD
+          EOF
+
+      - name: Build Android
+        if: matrix.name == 'Android'
+        run: |
+          flutter build apk --release \
+            --build-name ${{ steps.version.outputs.name }} \
+            --build-number ${{ github.run_number }}
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk \
+            dist/cli-flashcards-${{ steps.version.outputs.name }}.apk
+
+      - name: Build macOS
+        if: matrix.name == 'macOS'
+        run: |
+          flutter build macos --release \
+            --build-name ${{ steps.version.outputs.name }} \
+            --build-number ${{ github.run_number }}
+          mkdir -p dist
+          # ditto keeps the bundle's symlinks and permissions.
+          ditto -c -k --keepParent build/macos/Build/Products/Release/cliflashcards.app \
+            dist/cli-flashcards-${{ steps.version.outputs.name }}-macos.zip
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-${{ matrix.name }}
+          path: app/dist/*
+          retention-days: 7
+
+  publish:
+    name: Publish release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: dist
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          version="${VERSION#app-v}"
+          gh release create "app-v$version" dist/* \
+            --target "$GITHUB_SHA" \
+            --title "CLI Flashcards $version" \
+            --notes "Android APK and macOS app. Install steps: https://github.com/$GH_REPO/blob/main/app/README.md#install"

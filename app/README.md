@@ -43,6 +43,49 @@ Scheduling, card IDs and typed-answer checks must match the web app exactly, so 
 
 ## Builds
 
-The app ID is `dev.seafarer.cliflashcards` on every platform. CI builds a release APK, an unsigned iOS build and a macOS app on every PR, and keeps the APK and the zipped macOS app as workflow artifacts for 14 days. Signed store builds (TestFlight first) aren't set up yet.
+The app ID is `dev.seafarer.cliflashcards` on every platform. CI builds a release APK, an unsigned iOS build and a macOS app on every PR, and keeps the APK and the zipped macOS app as workflow artifacts for 14 days.
+
+To publish a release, run **Release app** from the Actions tab with a version like `0.2.0`, or push a tag like `app-v0.2.0`. It attaches the APK and the zipped macOS app to a GitHub release.
 
 To point a build at another deck host, pass `--dart-define=DECKS_URL=https://example.com/data/decks/`.
+
+### Android signing (optional)
+
+Without a signing key, each release APK is signed with a throwaway debug key. Android then refuses to install a new release over an old one, and you'd have to uninstall first, which deletes your progress unless you export a backup. To sign every release with the same key, make one once:
+
+```sh
+keytool -genkeypair -v -keystore release.jks -alias release \
+  -keyalg RSA -keysize 4096 -validity 10000
+base64 -i release.jks | pbcopy   # macOS; on Linux: base64 -w0 release.jks
+```
+
+Then add two repository secrets: `ANDROID_KEYSTORE_BASE64` (the copied text) and `ANDROID_KEYSTORE_PASSWORD`. Keep `release.jks` and its password somewhere safe. Losing them means the next release won't install over the old one.
+
+## Install
+
+There's no App Store or Play Store listing. Every platform below is free.
+
+### iPhone and iPad
+
+**Web app (simplest).** Open the site in Safari, tap **Share**, then **Add to Home Screen**. It opens full screen, works offline, and doesn't expire.
+
+**Native app from Xcode.** This needs a Mac with Xcode, but no paid developer account:
+
+1. In Xcode, go to **Settings → Accounts** and add your Apple ID. That creates a free "Personal Team".
+2. Connect the iPhone or iPad with a cable. On the device, turn on **Settings → Privacy & Security → Developer Mode** and restart when asked.
+3. Open `app/ios/Runner.xcworkspace`. Select the **Runner** target, then **Signing & Capabilities**. Tick **Automatically manage signing** and choose your Personal Team. If Xcode says the bundle ID is taken, change it to something unique, like `dev.seafarer.cliflashcards.yourname`.
+4. From `app/`, run `flutter run --release` and pick the device.
+5. On the device, go to **Settings → General → VPN & Device Management** and trust your developer certificate.
+
+Free builds expire after 7 days. Run step 4 again to renew; progress is kept as long as you don't delete the app. Apple allows up to 3 apps this way per device.
+
+### Android
+
+Download the `.apk` from the latest [release](https://github.com/htunnicliff/cli-flashcards/releases) on the phone and open it. Allow your browser to install unknown apps when Android asks.
+
+### macOS
+
+Download the `-macos.zip` from the latest [release](https://github.com/htunnicliff/cli-flashcards/releases), unzip it, and move the app to Applications. It isn't notarized (that needs a paid account), so macOS blocks the first launch. To allow it, either:
+
+- Open it once, then go to **System Settings → Privacy & Security** and choose **Open Anyway**, or
+- Run `xattr -dr com.apple.quarantine /Applications/cliflashcards.app`.
