@@ -46,6 +46,10 @@ decks/      Generated and curated deck data
 
 `src/schema/` and `src/core/` must not import Vue or browser APIs, so the Node tools in `tools/` can import them too. The `@/` alias points at `src/`.
 
+### Storage
+
+All persistent state lives in IndexedDB through [Dexie](https://dexie.org/), behind the typed repository in `src/core/storage/`. The rest of the app gets it with `useRepository()` (or `getRepository()` outside components) and never touches Dexie directly. Browser globals are injected, so the repository runs in Node tests against [fake-indexeddb](https://github.com/dumbmatter/fakeIndexedDB). The review log is append-only and is only cleared by an explicit progress reset. Schema changes follow the steps documented on `SCHEMA_VERSIONS` in `src/core/storage/database.ts`.
+
 ## Tests
 
 Tests sit next to the code they cover as `*.test.ts`. Vitest runs two projects:
