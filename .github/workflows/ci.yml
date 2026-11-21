@@ -221,21 +221,17 @@ jobs:
             test-results/
           retention-days: 14
 
-  deploy:
-    name: Deploy to GitHub Pages
+  # Building and deploying are separate jobs, as in GitHub's Pages starter
+  # workflow: deploy-pages lists the run's artifacts, and from the job that
+  # just uploaded github-pages it didn't see it ("No artifacts named
+  # github-pages"). From a later job it sees artifacts of finished jobs.
+  pages:
+    name: Build GitHub Pages site
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [check, decks, e2e, flutter]
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    concurrency:
-      group: pages
-      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v7
 
@@ -287,11 +283,25 @@ jobs:
       - name: Add SPA fallback
         run: cp site/index.html site/404.html
 
-      - uses: actions/configure-pages@v6
-
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: pages
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/configure-pages@v6
 
       - id: deployment
         uses: actions/deploy-pages@v5
