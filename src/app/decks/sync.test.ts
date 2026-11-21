@@ -107,6 +107,14 @@ describe('syncDecks', () => {
     expect(describeSync(result)).toBe('Switched sed to GNU / Linux.')
   })
 
+  it('drops the other flavor when someone with both picks one', async () => {
+    await repo.decks.install(sedDeck('bsd'))
+    await repo.decks.install(sedDeck('gnu'))
+    const fetch = fakeFetch([sedDeck('gnu'), sedDeck('bsd')])
+    await setDeckFlavor(repo, 'bsd', { fetch, userAgent: LINUX })
+    expect(await ids()).toEqual(['sed-bsd'])
+  })
+
   it('installs decks a backup queued, with their settings, and keeps unknown ones queued', async () => {
     await repo.decks.install(jqDeck())
     await repo.settings.set('pendingDeckInstalls', [

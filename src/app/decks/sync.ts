@@ -151,6 +151,8 @@ async function sync(repository: Repository, options: SyncOptions): Promise<SyncR
   const startPaused = installed.some((d) => !d.paused)
 
   const steps: Step[] = []
+  /** Decks of the other flavor to drop, where the picked one is already here. */
+  const extras: { deck: StoredDeck; to: DeckManifestEntry }[] = []
   const planned = new Set<string>()
   const plan = (step: Step) => {
     steps.push(step)
@@ -184,6 +186,11 @@ async function sync(repository: Repository, options: SyncOptions): Promise<SyncR
     const wanted = group.variants.find((v) => v.variant === wantedName)!
     if (here.length === 0) {
       plan({ entry: wanted, initial: { paused: startPaused } })
+    } else if (chosen && byId.has(wanted.id)) {
+      for (const v of here) {
+        const other = byId.get(v.id)
+        if (v.id !== wanted.id && other) extras.push({ deck: other, to: wanted })
+      }
     } else if (chosen && !here.includes(wanted)) {
       // The user picked a flavor: swap the other one for it, keeping its settings.
       const old = here.map((v) => byId.get(v.id)).find((d) => d !== undefined)
@@ -220,6 +227,12 @@ async function sync(repository: Repository, options: SyncOptions): Promise<SyncR
     } finally {
       state.done++
     }
+  }
+
+  for (const { deck, to } of extras) {
+    // Progress stays with the deck's ID, should the user switch back.
+    await repository.decks.remove(deck.id)
+    result.switched.push({ from: deck.id, to })
   }
 
   const remaining = queued.filter((item) => !restoredIds.has(item.id))
