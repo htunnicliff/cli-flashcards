@@ -23,14 +23,15 @@ export default defineConfig({
       workbox: {
         // App shell. Decks are fetched on demand and cached at runtime instead.
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
-        globIgnores: ['decks/**'],
+        globIgnores: ['data/**'],
         navigateFallback: 'index.html',
-        navigateFallbackDenylist: [/\/decks\//],
+        // Deck data lives under data/ so it never collides with the /decks routes.
+        navigateFallbackDenylist: [/\/data\//],
         runtimeCaching: [
           {
             // The deck list should be fresh when online, and still work offline.
             urlPattern: ({ url, sameOrigin }) =>
-              sameOrigin && url.pathname.endsWith('/decks/index.json'),
+              sameOrigin && url.pathname.endsWith('/data/decks/index.json'),
             handler: 'NetworkFirst',
             options: { cacheName: 'deck-index', networkTimeoutSeconds: 4 },
           },
@@ -39,7 +40,7 @@ export default defineConfig({
             // IndexedDB, so this is only a fallback for reinstalling while offline.
             urlPattern: ({ url, sameOrigin }) =>
               sameOrigin &&
-              /\/decks\/.+\.json$/.test(url.pathname) &&
+              /\/data\/decks\/.+\.json$/.test(url.pathname) &&
               !url.pathname.endsWith('/index.json'),
             handler: 'NetworkFirst',
             options: {

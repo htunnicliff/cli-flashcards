@@ -12,5 +12,5 @@ const outDir = fileURLToPath(new URL('../dist-e2e', import.meta.url))
 const fixtures = fileURLToPath(new URL('./fixtures/decks', import.meta.url))
 
 await build({ root, logLevel: 'warn', build: { outDir, emptyOutDir: true } })
-await rm(`${outDir}/decks`, { recursive: true, force: true })
-await cp(fixtures, `${outDir}/decks`, { recursive: true })
+await rm(`${outDir}/data/decks`, { recursive: true, force: true })
+await cp(fixtures, `${outDir}/data/decks`, { recursive: true })

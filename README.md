@@ -17,29 +17,29 @@ pnpm install
 
 ## Scripts
 
-| Command              | What it does                                                    |
-| -------------------- | --------------------------------------------------------------- |
-| `pnpm dev`           | Start the Vite dev server with hot reload.                      |
-| `pnpm build`         | Type check, then build the production bundle into `dist/`.      |
-| `pnpm preview`       | Serve the built `dist/` locally.                                |
-| `pnpm typecheck`     | Run `vue-tsc` across the app, Node scripts and tests.           |
-| `pnpm lint`          | Run ESLint and check formatting with Prettier.                  |
-| `pnpm lint:fix`      | Fix what ESLint can and rewrite files with Prettier.            |
-| `pnpm format`        | Rewrite files with Prettier.                                    |
-| `pnpm test`          | Run all Vitest tests once.                                      |
-| `pnpm test:watch`    | Run Vitest in watch mode.                                       |
-| `pnpm test:coverage` | Run tests with a coverage report for `src/core/` and `tools/`.  |
-| `pnpm test:e2e`      | Build the app and run the Playwright E2E tests against it.      |
-| `pnpm test:e2e --ui` | Open Playwright's UI mode to run and debug E2E tests.           |
-| `pnpm schema:export` | Regenerate `schemas/deck.schema.json` from the Zod deck schema. |
-| `pnpm deck:generate` | Generate a deck from a tool's manpage (see below).              |
-| `pnpm decks:check`   | Validate the built decks in `public/decks/` against the schema. |
+| Command              | What it does                                                         |
+| -------------------- | -------------------------------------------------------------------- |
+| `pnpm dev`           | Start the Vite dev server with hot reload.                           |
+| `pnpm build`         | Type check, then build the production bundle into `dist/`.           |
+| `pnpm preview`       | Serve the built `dist/` locally.                                     |
+| `pnpm typecheck`     | Run `vue-tsc` across the app, Node scripts and tests.                |
+| `pnpm lint`          | Run ESLint and check formatting with Prettier.                       |
+| `pnpm lint:fix`      | Fix what ESLint can and rewrite files with Prettier.                 |
+| `pnpm format`        | Rewrite files with Prettier.                                         |
+| `pnpm test`          | Run all Vitest tests once.                                           |
+| `pnpm test:watch`    | Run Vitest in watch mode.                                            |
+| `pnpm test:coverage` | Run tests with a coverage report for `src/core/` and `tools/`.       |
+| `pnpm test:e2e`      | Build the app and run the Playwright E2E tests against it.           |
+| `pnpm test:e2e --ui` | Open Playwright's UI mode to run and debug E2E tests.                |
+| `pnpm schema:export` | Regenerate `schemas/deck.schema.json` from the Zod deck schema.      |
+| `pnpm deck:generate` | Generate a deck from a tool's manpage (see below).                   |
+| `pnpm decks:check`   | Validate the built decks in `public/data/decks/` against the schema. |
 
 CI runs lint, typecheck, tests with coverage and a build on every pull request and every push to `main`. Separate jobs check the decks and run the E2E tests (uploading the Playwright report and traces when they fail).
 
 ## Offline and updates
 
-Production builds register a service worker ([vite-plugin-pwa](https://vite-pwa-org.netlify.app/), `generateSW`). It precaches the app shell, so the app loads and reviews work with no network once it has been opened. `decks/index.json` is network-first with a cache fallback, and deck files are cached as they are fetched; installed decks themselves live in IndexedDB.
+Production builds register a service worker ([vite-plugin-pwa](https://vite-pwa-org.netlify.app/), `generateSW`). It precaches the app shell, so the app loads and reviews work with no network once it has been opened. `data/decks/index.json` is network-first with a cache fallback, and deck files are cached as they are fetched; installed decks themselves live in IndexedDB.
 
 A new deploy never takes over mid-session: the app shows an "Update available" banner and switches only when the user picks Reload. Long-open tabs check for a new version hourly. The header shows "Offline" while the browser has no connection. The manifest is the hand-written `public/manifest.webmanifest`. There is no service worker in `pnpm dev`; use the production build (`pnpm build && pnpm preview`) or the E2E tests in `e2e/offline.spec.ts`.
 
@@ -100,7 +100,7 @@ tldr pages are vendored in `vendor/tldr/` at a pinned commit so builds are repro
 
 ### Curating with overrides
 
-Generated decks are never edited by hand. Fixes go in `decks/<tool>/<variant>.overrides.yaml`, which `pnpm deck:build` applies on top of the generated deck to produce `public/decks/<tool>-<variant>.json` (the file the app loads) and the `public/decks/index.json` manifest. Regenerating a deck keeps every override.
+Generated decks are never edited by hand. Fixes go in `decks/<tool>/<variant>.overrides.yaml`, which `pnpm deck:build` applies on top of the generated deck to produce `public/data/decks/<tool>-<variant>.json` (the file the app loads) and the `public/data/decks/index.json` manifest. Regenerating a deck keeps every override.
 
 ```yaml
 # yaml-language-server: $schema=../../schemas/overrides.schema.json
@@ -131,7 +131,7 @@ Tests sit next to the code they cover as `*.test.ts`. Vitest runs two projects:
 
 ## End-to-end tests
 
-E2E tests live in `e2e/` and use [Playwright](https://playwright.dev/). They run against the production build (`vite build` + `vite preview`), because the service worker only exists there. `e2e/build.ts` builds into `dist-e2e/` and replaces the real decks with the fixture decks in `e2e/fixtures/decks/`, so deck content changes don't break E2E tests.
+E2E tests live in `e2e/` and use [Playwright](https://playwright.dev/). They run against the production build, because the service worker only exists there. `e2e/build.ts` builds into `dist-e2e/` and replaces the real decks with the fixture decks in `e2e/fixtures/decks/`, and `e2e/serve.ts` serves it (it can also simulate a new deploy or a network outage per browser context; see `e2e/support/pwa.ts`), so deck content changes don't break E2E tests.
 
 ```sh
 pnpm exec playwright install chromium webkit   # once
@@ -147,5 +147,7 @@ Import `test` and `expect` from `e2e/support/test.ts`, which fails a test on any
 - `expectNoA11yViolations(page)` in `e2e/support/a11y.ts` fails on serious or critical axe violations.
 - `seedIndexedDB(page, seed)` in `e2e/support/storage.ts` creates a database with records before the app loads, for tests that need existing progress. `readStore()` reads one back.
 - `fixtureDeck()` in `e2e/support/fixtures.ts` returns a fixture deck's JSON.
+
+`page.route()` doesn't see requests the service worker answers, so a spec that stubs responses with it should add `test.use({ serviceWorkers: 'block' })`.
 
 Keep E2E tests few and focused on flows that cross boundaries (UI, storage, service worker). Logic edge cases belong in unit tests. Avoid screenshot comparisons.

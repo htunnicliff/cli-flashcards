@@ -3,8 +3,8 @@
  *
  *   decks/<tool>/<variant>.generated.json   (from `pnpm deck:generate`)
  * + decks/<tool>/<variant>.overrides.yaml   (hand-written, optional)
- * → public/decks/<tool>-<variant>.json      (what the app loads)
- * + public/decks/index.json                 (manifest of all decks)
+ * → public/data/decks/<tool>-<variant>.json      (what the app loads)
+ * + public/data/decks/index.json                 (manifest of all decks)
  *
  *   pnpm deck:build           build and write
  *   pnpm deck:build --check   fail if the built files are out of date or any
@@ -34,7 +34,7 @@ const strict = check || Boolean(process.env.CI)
 
 const root = process.cwd()
 const decksDir = resolve(root, 'decks')
-const outDir = resolve(root, 'public', 'decks')
+const outDir = resolve(root, 'public', 'data', 'decks')
 
 function readJson(path: string): unknown {
   return existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : undefined
@@ -138,13 +138,13 @@ if (check) {
   for (const [file, text] of outputs) {
     const path = join(outDir, file)
     if (!existsSync(path) || readFileSync(path, 'utf8') !== text) {
-      console.error(`error: public/decks/${file} is out of date. Run \`pnpm deck:build\`.`)
+      console.error(`error: public/data/decks/${file} is out of date. Run \`pnpm deck:build\`.`)
       failed = true
     }
   }
   for (const file of existing) {
     if (!outputs.has(file)) {
-      console.error(`error: public/decks/${file} has no source deck. Run \`pnpm deck:build\`.`)
+      console.error(`error: public/data/decks/${file} has no source deck. Run \`pnpm deck:build\`.`)
       failed = true
     }
   }

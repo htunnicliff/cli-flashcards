@@ -8,11 +8,13 @@ import type { DeckManifestEntry } from '@/schema/manifest'
 import { UiButton, UiChip } from '../components/ui'
 import { useLibrary, type LibraryOptions } from '../decks/useLibrary'
 import { fade, spring } from '../motion/tokens'
+import { useOnline } from '../pwa/online'
 
 const props = defineProps<{ libraryOptions?: LibraryOptions }>()
 
 const library = useLibrary(props.libraryOptions)
 const { tools, loading, error, tasks, status, chosen } = library
+const online = useOnline()
 
 /** Deck ID whose remove confirmation is open. */
 const confirmingRemove = ref<string>()
@@ -52,6 +54,9 @@ function onToggle(id: string, kind: 'obscure' | 'paused' | 'typed', event: Event
     </header>
 
     <p class="status" role="status" aria-live="polite">{{ status }}</p>
+    <p v-if="!online" class="offline-note">
+      You're offline. Installed decks still work; installing or updating a deck needs a connection.
+    </p>
     <p v-if="error" class="error" role="alert">{{ error }}</p>
 
     <p v-if="loading && tools.length === 0" class="hint">Loading decks…</p>
@@ -153,7 +158,7 @@ function onToggle(id: string, kind: 'obscure' | 'paused' | 'typed', event: Event
             <template v-if="!tool.stored">
               <UiButton
                 variant="primary"
-                :disabled="Boolean(tasks[tool.entry.id])"
+                :disabled="Boolean(tasks[tool.entry.id]) || !online"
                 @click="library.install(tool.entry)"
                 >Install</UiButton
               >
@@ -162,7 +167,7 @@ function onToggle(id: string, kind: 'obscure' | 'paused' | 'typed', event: Event
               <UiButton
                 v-if="tool.updateAvailable"
                 variant="primary"
-                :disabled="Boolean(tasks[tool.entry.id])"
+                :disabled="Boolean(tasks[tool.entry.id]) || !online"
                 @click="library.update(tool.entry)"
                 >Update to v{{ tool.entry.deckVersion }}</UiButton
               >
@@ -238,6 +243,14 @@ p {
 
 .error {
   color: var(--color-again);
+}
+
+.offline-note {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-small);
+  background: var(--color-sunken);
+  font-size: var(--text-sm);
 }
 
 .deck-list {

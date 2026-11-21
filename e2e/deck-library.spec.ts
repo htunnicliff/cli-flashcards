@@ -14,6 +14,11 @@ const v2 = DeckSchema.parse(JSON.parse(v2Text))
 
 const DB = 'recall'
 
+// These tests swap deck files with page.route(), which doesn't see requests the service
+// worker answers. Once the worker controls the page (after the reload below), the route
+// would race the worker, so keep it out of the way here; e2e/offline.spec.ts covers it.
+test.use({ serviceWorkers: 'block' })
+
 interface StoredCardState {
   cardId: string
   fsrs: { phase: string; reps: number }
