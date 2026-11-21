@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 
+import SchedulingSettings from '../components/settings/SchedulingSettings.vue'
 import StorageSettings from '../components/settings/StorageSettings.vue'
 import {
   useAppearanceStore,
@@ -67,6 +68,8 @@ const motionOptions: { value: MotionPreference; label: string }[] = [
         On keeps fades but drops movement. System follows your device's reduced motion setting.
       </p>
     </fieldset>
+
+    <SchedulingSettings />
 
     <StorageSettings />
   </section>
