@@ -17,6 +17,7 @@ import {
 } from '@/core/storage'
 import { deriveCards, isFlagPairCard, type Card, type Deck, type Option } from '@/schema'
 
+import { holdUpdatesDuring, holdUpdatesWhile } from '../pwa/update-holds'
 import { useRepository } from '../repository'
 
 export const RATINGS: { rating: Rating; label: string; key: string }[] = [
@@ -143,9 +144,12 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
   })
 
   function enqueue(work: () => Promise<unknown>) {
-    writes = writes.then(work).catch((cause) => {
-      error.value = cause instanceof Error ? cause.message : String(cause)
-    })
+    // A reload into a new version mid-write could lose a grade.
+    writes = writes
+      .then(() => holdUpdatesDuring(work))
+      .catch((cause) => {
+        error.value = cause instanceof Error ? cause.message : String(cause)
+      })
     return writes
   }
 
@@ -329,6 +333,9 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
 
   /** Resolves once every queued write has finished. Tests use it. */
   const settled = () => writes
+
+  // Never reload into a new version with cards left to review.
+  holdUpdatesWhile(() => !done.value)
 
   void enqueue(refresh)
 

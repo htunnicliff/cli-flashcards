@@ -3,6 +3,7 @@ import { readonly, ref } from 'vue'
 import type { PendingDeckInstall, Repository } from '@/core/storage'
 import type { DeckManifest } from '@/schema/manifest'
 
+import { holdUpdatesDuring } from '../pwa/update-holds'
 import { fetchDeck, fetchManifest, type FetchLike } from './catalog'
 
 export interface PendingResult {
@@ -36,7 +37,10 @@ export function installPendingDecks(
 ): Promise<PendingResult> {
   const running = inFlight.get(repository)
   if (running) return running
-  const run = installAll(repository, options).finally(() => inFlight.delete(repository))
+  // A reload into a new version would cut the downloads short.
+  const run = holdUpdatesDuring(() => installAll(repository, options)).finally(() =>
+    inFlight.delete(repository),
+  )
   inFlight.set(repository, run)
   return run
 }

@@ -30,3 +30,25 @@ export async function simulateOutage(context: BrowserContext, baseURL: string, d
   if (down) await context.addCookies([{ name: 'e2e-offline', value: '1', url: baseURL }])
   else await context.clearCookies({ name: 'e2e-offline' })
 }
+
+/** Marks the page, so a test can tell whether it reloaded. */
+export type Marked = Window & { e2eMarker?: boolean }
+export async function markPage(page: Page) {
+  await page.evaluate(() => ((window as Marked).e2eMarker = true))
+}
+
+/** Waits until the app knows a new version is installed and waiting to take over. */
+export async function waitForWaitingVersion(page: Page) {
+  await page.locator('html[data-update="waiting"]').waitFor({ state: 'attached' })
+}
+
+/** Pretends the app went to the background (or came back), as when switching apps. */
+export async function setHidden(page: Page, hidden: boolean) {
+  await page.evaluate((hidden) => {
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => (hidden ? 'hidden' : 'visible'),
+    })
+    document.dispatchEvent(new Event('visibilitychange'))
+  }, hidden)
+}

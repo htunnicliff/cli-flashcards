@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 
 import { UiButton, UiKbd } from '../components/ui'
 import { presets } from '../motion/tokens'
+import { holdUpdatesWhile } from '../pwa/update-holds'
 import { useOnboardingStore } from './onboarding'
 
 const STEPS = [
@@ -19,6 +20,9 @@ const STEPS = [
 const onboarding = useOnboardingStore()
 const { open, replay } = storeToRefs(onboarding)
 const router = useRouter()
+
+// Don't reload into a new version mid-tour.
+holdUpdatesWhile(open)
 
 const dialog = ref<HTMLDialogElement>()
 const heading = ref<HTMLElement>()

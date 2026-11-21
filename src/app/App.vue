@@ -8,12 +8,15 @@ import { useOnboardingStore } from './onboarding/onboarding'
 import OnboardingTour from './onboarding/OnboardingTour.vue'
 import OfflineIndicator from './pwa/OfflineIndicator.vue'
 import { useOnline } from './pwa/online'
-import UpdatePrompt from './pwa/UpdatePrompt.vue'
+import { useServiceWorker } from './pwa/service-worker'
 import { useRepository } from './repository'
 import { useAppearanceStore } from './stores/appearance'
 
 // Instantiated here so the saved theme and text size stay applied on every page.
 useAppearanceStore()
+
+// New versions install in the background and take over at a quiet moment.
+useServiceWorker()
 
 // Decks a backup import couldn't fetch (it was offline) install on the next
 // start or when the connection comes back, without a visit to Decks.
@@ -55,7 +58,6 @@ const links = [
     <main class="app-main">
       <RouterView />
     </main>
-    <UpdatePrompt />
     <OnboardingTour />
   </MotionRoot>
 </template>

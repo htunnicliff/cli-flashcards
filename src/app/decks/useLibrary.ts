@@ -11,6 +11,7 @@ import {
 import type { StoredDeck } from '@/core/storage'
 import type { DeckManifest, DeckManifestEntry } from '@/schema/manifest'
 
+import { holdUpdatesDuring } from '../pwa/update-holds'
 import { useRepository } from '../repository'
 import { fetchDeck, fetchManifest, type FetchLike } from './catalog'
 import { installPendingDecks } from './pending'
@@ -116,7 +117,8 @@ export function useLibrary(options: LibraryOptions = {}) {
     tasks[id] = { kind, progress: 0 }
     error.value = undefined
     try {
-      return await action(tasks[id]!)
+      // A reload into a new version would cut the download or write short.
+      return await holdUpdatesDuring(() => action(tasks[id]!))
     } catch (cause) {
       error.value = cause instanceof Error ? cause.message : String(cause)
       return undefined

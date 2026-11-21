@@ -15,6 +15,7 @@ import {
 
 import type { FetchLike } from '../../decks/catalog'
 import { installPendingDecks } from '../../decks/pending'
+import { holdUpdatesWhile } from '../../pwa/update-holds'
 import { useRepository } from '../../repository'
 import { UiButton } from '../ui'
 import { saveBackupFile } from './backup-file'
@@ -60,6 +61,9 @@ const summary = computed(() => {
     exportedAt: dateFormat.format(s.exportedAt),
   }
 })
+
+// Don't reload into a new version mid-export, mid-import, or with a backup chosen to import.
+holdUpdatesWhile(() => busy.value || pending.value !== undefined)
 
 async function onExport() {
   busy.value = true
