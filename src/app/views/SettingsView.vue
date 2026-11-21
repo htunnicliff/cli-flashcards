@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 
+import BackupSettings from '../components/settings/BackupSettings.vue'
 import SchedulingSettings from '../components/settings/SchedulingSettings.vue'
 import StorageSettings from '../components/settings/StorageSettings.vue'
 import {
@@ -72,6 +73,8 @@ const motionOptions: { value: MotionPreference; label: string }[] = [
     <SchedulingSettings />
 
     <StorageSettings />
+
+    <BackupSettings />
   </section>
 </template>
 

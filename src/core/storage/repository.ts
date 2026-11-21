@@ -29,6 +29,12 @@ export interface Repository {
    * them. The only operation that removes review history.
    */
   resetProgress(deckId?: string): Promise<void>
+  /**
+   * Runs `work` in one read-write transaction over every table, so a
+   * multi-step change (such as an import) lands completely or not at all.
+   * `work` may only await repository calls, not other async work such as fetch.
+   */
+  atomically<T>(work: () => Promise<T>): Promise<T>
   close(): void
   /** Deletes the whole database. Tests use it to clean up. */
   destroy(): Promise<void>
@@ -184,6 +190,8 @@ export function createRepository(
           ])
         }
       }),
+    atomically: (work) =>
+      db.transaction('rw', [db.decks, db.cardStates, db.reviewLog, db.settings], work),
     close: () => db.close(),
     destroy: () => db.delete(),
   }
