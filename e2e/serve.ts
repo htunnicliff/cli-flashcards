@@ -6,6 +6,11 @@
  * was deployed: with the cookie `e2e-build=<n>` set, `sw.js` gets a trailing comment,
  * which makes it byte-different, so the browser installs it as an update. Cookies are
  * per context, so other tests keep seeing the original build.
+ *
+ * To test offline behaviour, `e2e-offline=1` makes the server drop the connection for
+ * that context, like a network outage. Playwright's `context.setOffline()` isn't enough
+ * on its own: in WebKit it also blocks requests the service worker would answer from
+ * its cache, which a real offline device doesn't do.
  */
 import { createReadStream } from 'node:fs'
 import { readFile, stat } from 'node:fs/promises'
@@ -36,6 +41,10 @@ async function isFile(path: string) {
 }
 
 createServer(async (req, res) => {
+  if (/(?:^|;\s*)e2e-offline=1/.test(req.headers.cookie ?? '')) {
+    req.socket.destroy()
+    return
+  }
   const url = new URL(req.url ?? '/', 'http://localhost')
   let path = join(root, normalize(decodeURIComponent(url.pathname)))
   if (!path.startsWith(root)) {

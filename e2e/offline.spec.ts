@@ -1,29 +1,40 @@
-import { checkForUpdate, deployNewBuild, waitForServiceWorker } from './support/pwa'
+import { checkForUpdate, deployNewBuild, simulateOutage, waitForServiceWorker } from './support/pwa'
 import { expect, test } from './support/test'
 
-test('the app loads and navigates offline once it has been visited', async ({ page, context }) => {
+test('the app loads and navigates offline once it has been visited', async ({
+  page,
+  context,
+  baseURL,
+}) => {
   await page.goto('/')
   await waitForServiceWorker(page)
 
-  await context.setOffline(true)
+  await simulateOutage(context, baseURL!)
   await page.reload()
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-  await expect(page.getByRole('status').getByText('Offline')).toBeVisible()
 
   // Deep links fall back to the cached app shell.
   await page.goto('/settings')
   await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible()
+})
+
+test('the header says when the browser is offline', async ({ page, context }) => {
+  await page.goto('/')
+  await expect(page.getByText('Offline')).toBeHidden()
+
+  await context.setOffline(true)
+  await expect(page.getByRole('status').getByText('Offline')).toBeVisible()
 
   await context.setOffline(false)
   await expect(page.getByText('Offline')).toBeHidden()
 })
 
-test('the deck list falls back to the cache offline', async ({ page, context }) => {
+test('the deck list falls back to the cache offline', async ({ page, context, baseURL }) => {
   await page.goto('/')
   await waitForServiceWorker(page)
   const online = await page.evaluate(() => fetch('decks/index.json').then((r) => r.json()))
 
-  await context.setOffline(true)
+  await simulateOutage(context, baseURL!)
   const offline = await page.evaluate(() => fetch('decks/index.json').then((r) => r.json()))
   expect(offline).toEqual(online)
 })

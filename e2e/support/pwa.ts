@@ -20,3 +20,13 @@ export async function checkForUpdate(page: Page) {
     await registration?.update()
   })
 }
+
+/**
+ * Cuts this context off from the server (see e2e/serve.ts), so anything that still
+ * loads must come from the service worker. Works the same in every browser, unlike
+ * `context.setOffline()`, which WebKit also applies to service-worker cache hits.
+ */
+export async function simulateOutage(context: BrowserContext, baseURL: string, down = true) {
+  if (down) await context.addCookies([{ name: 'e2e-offline', value: '1', url: baseURL }])
+  else await context.clearCookies({ name: 'e2e-offline' })
+}
