@@ -22,6 +22,7 @@
     "schema:export": "jiti tools/export-schema.ts"
   },
   "dependencies": {
+    "dexie": "4.4.7",
     "pinia": "^4.1.0",
     "vue": "^3.5.46",
     "vue-router": "^5.5.1",
@@ -38,6 +39,7 @@
     "@vue/tsconfig": "^0.9.1",
     "eslint": "^10.15.0",
     "eslint-plugin-vue": "^10.12.1",
+    "fake-indexeddb": "6.2.8",
     "fast-check": "^4.10.3",
     "globals": "^17.14.0",
     "happy-dom": "^21.0.4",

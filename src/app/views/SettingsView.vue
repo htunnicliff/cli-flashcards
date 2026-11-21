@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 
+import StorageSettings from '../components/settings/StorageSettings.vue'
 import { useAppearanceStore, type FontSize, type ThemePreference } from '../stores/appearance'
 
 const { theme, fontSize } = storeToRefs(useAppearanceStore())
@@ -42,6 +43,8 @@ const fontSizeOptions: { value: FontSize; label: string }[] = [
         </label>
       </div>
     </fieldset>
+
+    <StorageSettings />
   </section>
 </template>
 
