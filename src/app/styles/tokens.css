@@ -1,0 +1,147 @@
+/*
+ * Design tokens (#22). Components use these custom properties only, never raw colours.
+ *
+ * Theme: follows prefers-color-scheme unless <html data-theme="light|dark"> overrides it.
+ * Text size: <html data-font-size="s|m|l"> scales the root size, and with it every rem below.
+ *
+ * Colour values are mirrored in palette.ts for the contrast tests; keep the two in sync.
+ */
+
+:root {
+  /* Type */
+  --font-family: 'Recursive', system-ui, sans-serif;
+  --font-family-mono: 'Recursive', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --font-sans: 'MONO' 0, 'CASL' 0;
+  --font-mono: 'MONO' 1, 'CASL' 0;
+  --font-casual: 'MONO' 0, 'CASL' 1, 'slnt' -15, 'CRSV' 1;
+  --font-mono-casual: 'MONO' 1, 'CASL' 1, 'slnt' -15, 'CRSV' 1;
+
+  --text-xs: 0.8125rem; /* 13px */
+  --text-sm: 0.9375rem; /* 15px */
+  --text-md: 1.0625rem; /* 17px */
+  --text-lg: 1.1875rem; /* 19px */
+  --text-xl: 1.375rem; /* 22px */
+  --text-2xl: 1.75rem; /* 28px */
+  --text-3xl: 2.5rem; /* 40px */
+  --text-flag: var(--text-3xl);
+  --measure: 65ch;
+  --line-height: 1.5;
+  --line-height-tight: 1.15;
+
+  /* Space: 4px grid */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Shape */
+  --radius-card: 20px;
+  --radius-button: 14px;
+  --radius-code: 10px;
+  --radius-small: 8px;
+  --radius-kbd: 5px;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  --content-width: 680px;
+
+  /* Focus */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* Motion (springs live in #20; these cover plain CSS transitions) */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Light (default) */
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-bg: #f6f5f2;
+  --color-surface: #ffffff;
+  --color-sunken: #efede8;
+  --color-border: #dedbd3;
+  --color-text: #1d1c1a;
+  --color-muted: #5f5c55;
+  --color-accent: #2b54c9;
+  --color-arg: #9a4a05;
+  --color-again: #a3203a;
+  --color-again-tint: #fbe8eb;
+  --color-again-border: #f2c9d0;
+  --color-on-primary: #ffffff;
+
+  --color-kbd: #efede8;
+  --color-kbd-on-primary: rgb(255 255 255 / 0.18);
+  --color-focus: var(--color-accent);
+  --shadow-card: 0 1px 2px rgb(29 28 26 / 0.06), 0 12px 32px rgb(29 28 26 / 0.07);
+}
+
+/* Dark, chosen explicitly */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg: #121315;
+  --color-surface: #1a1b1e;
+  --color-sunken: #232428;
+  --color-border: #303237;
+  --color-text: #eceae5;
+  --color-muted: #a19e96;
+  --color-accent: #94b2ff;
+  --color-arg: #f2a65e;
+  --color-again: #ff94a6;
+  --color-again-tint: #3a1c23;
+  --color-again-border: #55283a;
+  --color-on-primary: #0f1730;
+
+  --color-kbd: #26272b;
+  --color-kbd-on-primary: rgb(15 23 48 / 0.16);
+  --color-focus: var(--color-accent);
+  --shadow-card: none;
+}
+
+/* Dark, following the system (no override, or "system") */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --color-bg: #121315;
+    --color-surface: #1a1b1e;
+    --color-sunken: #232428;
+    --color-border: #303237;
+    --color-text: #eceae5;
+    --color-muted: #a19e96;
+    --color-accent: #94b2ff;
+    --color-arg: #f2a65e;
+    --color-again: #ff94a6;
+    --color-again-tint: #3a1c23;
+    --color-again-border: #55283a;
+    --color-on-primary: #0f1730;
+
+    --color-kbd: #26272b;
+    --color-kbd-on-primary: rgb(15 23 48 / 0.16);
+    --color-focus: var(--color-accent);
+    --shadow-card: none;
+  }
+}
+
+/* Text size setting */
+:root[data-font-size='s'] {
+  font-size: 87.5%;
+}
+
+:root[data-font-size='l'] {
+  font-size: 112.5%;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --text-flag: 1.875rem; /* 30px on phones */
+  }
+}
