@@ -8,3 +8,6 @@ dist-e2e
 playwright-report
 test-results
 blob-report
+
+# Parser fixtures and snapshots
+**/__snapshots__/**

@@ -20,7 +20,9 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "schema:export": "jiti tools/export-schema.ts"
+    "schema:export": "jiti tools/export-schema.ts",
+    "deck:generate": "jiti tools/deck-generate.ts",
+    "decks:check": "jiti tools/check-decks.ts"
   },
   "dependencies": {
     "dexie": "^4.4.7",

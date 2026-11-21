@@ -60,6 +60,27 @@ jobs:
       - name: Build
         run: pnpm exec vite build
 
+  decks:
+    name: Build and check decks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build decks
+        run: pnpm run --if-present decks:build
+
+      - name: Check decks
+        run: pnpm decks:check
+
   e2e:
     name: End-to-end tests
     runs-on: ubuntu-latest
@@ -91,3 +112,55 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 14
+
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [check, decks, e2e]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build decks
+        run: pnpm run --if-present decks:build
+
+      # Fails the deploy if a deck is invalid.
+      - name: Check decks
+        run: pnpm decks:check
+
+      - name: Build app
+        run: pnpm exec vite build
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/
+
+      # Pages has no SPA fallback: serve the app for deep links such as /decks.
+      - name: Add SPA fallback
+        run: cp dist/index.html dist/404.html
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+      - id: deployment
+        uses: actions/deploy-pages@v5

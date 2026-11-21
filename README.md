@@ -2,6 +2,8 @@
 
 A spaced repetition web app for learning the flags of well-known command-line tools (git, ripgrep, sed, …). It is a Vue 3 single-page app that will become an offline-first PWA. See the [roadmap](https://github.com/htunnicliff/cli-flashcards/issues/1) for the plan.
 
+**Live:** <https://htunnicliff.github.io/cli-flashcards/>
+
 ## Prerequisites
 
 - **Node.js 22** (22.12 or later). The exact version is pinned in [`.nvmrc`](.nvmrc), so `nvm use` or `fnm use` picks it up.
@@ -30,8 +32,16 @@ pnpm install
 | `pnpm test:e2e`      | Build the app and run the Playwright E2E tests against it.      |
 | `pnpm test:e2e --ui` | Open Playwright's UI mode to run and debug E2E tests.           |
 | `pnpm schema:export` | Regenerate `schemas/deck.schema.json` from the Zod deck schema. |
+| `pnpm deck:generate` | Generate a deck from a tool's manpage (see below).              |
+| `pnpm decks:check`   | Validate the built decks in `public/decks/` against the schema. |
 
-CI runs lint, typecheck, tests with coverage and a build on every pull request and every push to `main`. A separate job runs the E2E tests and uploads the Playwright report and traces when they fail.
+CI runs lint, typecheck, tests with coverage and a build on every pull request and every push to `main`. Separate jobs check the decks and run the E2E tests (uploading the Playwright report and traces when they fail).
+
+## Deploy
+
+Every push to `main` deploys to [GitHub Pages](https://htunnicliff.github.io/cli-flashcards/) from the `deploy` job in [`ci.yml`](.github/workflows/ci.yml). It runs only after the unit, deck and E2E jobs pass, builds the decks, fails if any deck is invalid, then builds the app with `BASE_PATH=/cli-flashcards/` so assets, the manifest and the service worker scope sit under the subpath. `404.html` is a copy of `index.html`, so deep links like `/cli-flashcards/decks` load the app.
+
+To try the subpath build locally: `BASE_PATH=/cli-flashcards/ pnpm exec vite build && BASE_PATH=/cli-flashcards/ pnpm preview`, then open <http://localhost:4173/cli-flashcards/>.
 
 ## Layout
 
@@ -49,6 +59,18 @@ decks/      Generated and curated deck data
 ### Storage
 
 All persistent state lives in IndexedDB through [Dexie](https://dexie.org/), behind the typed repository in `src/core/storage/`. The rest of the app gets it with `useRepository()` (or `getRepository()` outside components) and never touches Dexie directly. Browser globals are injected, so the repository runs in Node tests against [fake-indexeddb](https://github.com/dumbmatter/fakeIndexedDB). The review log is append-only and is only cleared by an explicit progress reset. Schema changes follow the steps documented on `SCHEMA_VERSIONS` in `src/core/storage/database.ts`.
+
+## Generating decks
+
+`pnpm deck:generate <tool>` finds the tool's manpage with `man -w`, parses its options and writes `decks/<tool>/<variant>.generated.json`.
+
+```sh
+pnpm deck:generate rg
+pnpm deck:generate git --pages git-log,git-commit   # options get IDs like log.oneline
+pnpm deck:generate sed --variant gnu --license GPL-3.0-or-later
+```
+
+The parser in `tools/deck/` reads roff source directly, both man(7) pages (GNU, help2man, asciidoc/docbook) and mdoc(7) pages (BSD, macOS), so it needs no extra tools. It is pure (manpage text in, deck out) and covered by snapshot tests over the real pages in `tools/deck/manpage/fixtures/`. Run `pnpm test -u` to update the snapshots after a parser change and review the diff.
 
 ## Tests
 
