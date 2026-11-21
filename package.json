@@ -25,7 +25,8 @@
     "decks:check": "jiti tools/check-decks.ts",
     "deck:report": "jiti tools/deck-report.ts",
     "tldr:vendor": "jiti tools/vendor-tldr.ts",
-    "deck:build": "jiti tools/deck-build.ts"
+    "deck:build": "jiti tools/deck-build.ts",
+    "dart:golden": "jiti tools/dart-golden.ts"
   },
   "dependencies": {
     "dexie": "^4.4.7",

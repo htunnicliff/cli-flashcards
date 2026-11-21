@@ -14,6 +14,7 @@ export default defineConfigWithVueTs(
     '**/dist/**',
     '**/dist-e2e/**',
     '**/coverage/**',
+    'app/**',
     'playwright-report/**',
     'test-results/**',
   ]),

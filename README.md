@@ -4,6 +4,8 @@ A spaced repetition web app for learning the flags of well-known command-line to
 
 **Live:** <https://htunnicliff.github.io/cli-flashcards/>
 
+A cross-platform Flutter version (web, iOS, iPadOS, Android, macOS) is being built in [`app/`](app/README.md). It will replace this Vue app once it reaches feature parity.
+
 ## Prerequisites
 
 - **Node.js 22** (22.12 or later). The exact version is pinned in [`.nvmrc`](.nvmrc), so `nvm use` or `fnm use` picks it up.
