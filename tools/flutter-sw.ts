@@ -51,6 +51,16 @@ const { count, size, warnings } = await generateSW({
       handler: 'NetworkFirst',
       options: { cacheName: 'decks', networkTimeoutSeconds: 8, expiration: { maxEntries: 40 } },
     },
+    {
+      // The opt-in Wasm build (see web/flutter_bootstrap.js). Not precached,
+      // so the default build doesn't download it; cached once it has run.
+      // Network first, because these files aren't fingerprinted either.
+      urlPattern: ({ url, sameOrigin }) =>
+        sameOrigin &&
+        /\/(main\.dart\.(wasm|mjs)|canvaskit\/skwasm[^/]*\.(js|wasm))$/.test(url.pathname),
+      handler: 'NetworkFirst',
+      options: { cacheName: 'wasm-build', networkTimeoutSeconds: 8 },
+    },
   ],
 })
 

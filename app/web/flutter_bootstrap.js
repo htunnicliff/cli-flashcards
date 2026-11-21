@@ -27,4 +27,20 @@ if ('serviceWorker' in navigator) {
   })
 }
 
-_flutter.loader.load()
+// Experimental: the Wasm renderer (skwasm), switched on per browser from
+// Settings or with ?wasm=1 (?wasm=0 switches it off). Off by default, so every
+// browser runs the JavaScript build with CanvasKit, which is what sw.js
+// precaches. Where the browser can't run Wasm, Flutter falls back to that.
+const wasm = (() => {
+  try {
+    const asked = new URLSearchParams(location.search).get('wasm')
+    if (asked === '1' || asked === '0') localStorage.setItem('recall:wasm', asked)
+    return localStorage.getItem('recall:wasm') === '1'
+  } catch {
+    return false
+  }
+})()
+
+_flutter.loader.load({
+  config: { wasmAllowList: { blink: wasm, gecko: wasm, webkit: wasm } },
+})
