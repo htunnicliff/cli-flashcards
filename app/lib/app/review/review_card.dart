@@ -158,6 +158,7 @@ class ReviewCard extends StatelessWidget {
       label: prompts[card.type],
       container: true,
       child: Glass(
+        blur: false,
         padding: EdgeInsets.all(narrow ? Space.s6 : Space.s10),
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 220),

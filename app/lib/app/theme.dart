@@ -394,6 +394,7 @@ class Glass extends StatelessWidget {
     this.radius = Radii.card,
     this.chrome = false,
     this.shadow = true,
+    this.blur = true,
     this.color,
   });
 
@@ -404,6 +405,11 @@ class Glass extends StatelessWidget {
   /// The header and tab bar: clearer glass, stronger blur.
   final bool chrome;
   final bool shadow;
+
+  /// Off for panes that move, such as a card being swiped: re-blurring the
+  /// backdrop on every frame is costly, and over the plain page wash the
+  /// blur isn't visible anyway.
+  final bool blur;
   final Color? color;
 
   @override
@@ -438,7 +444,7 @@ class Glass extends StatelessWidget {
         child: Padding(padding: padding, child: child),
       ),
     );
-    final blurred = f.solid
+    final blurred = f.solid || !blur
         ? pane
         : ClipRRect(
             borderRadius: shape,
