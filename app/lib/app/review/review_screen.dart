@@ -2,6 +2,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -35,13 +36,24 @@ class ReviewScreen extends StatefulWidget {
   State<ReviewScreen> createState() => _ReviewScreenState();
 }
 
-class _ReviewScreenState extends State<ReviewScreen> {
+class _ReviewScreenState extends State<ReviewScreen>
+    with SingleTickerProviderStateMixin {
   ReviewSession? _session;
   AppController? _app;
   int _revision = 0;
   bool _helpOpen = false;
   bool _moreOpen = false;
-  double _swipeX = 0;
+
+  /// How far the revealed card is dragged sideways. Only the card's transform
+  /// and the swipe label listen to it, so a drag never rebuilds the page.
+  final _swipeX = ValueNotifier<double>(0);
+  late final AnimationController _settle = AnimationController(vsync: this)
+    ..addListener(
+      () => _swipeX.value =
+          _settleFrom * (1 - Curves.easeOutCubic.transform(_settle.value)),
+    );
+  double _settleFrom = 0;
+  final _controlsKey = GlobalKey(debugLabel: 'grade controls');
   Timer? _noticeTimer;
   int? _noticeShown;
   final _focus = FocusNode(debugLabel: 'review');
@@ -78,6 +90,41 @@ class _ReviewScreenState extends State<ReviewScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _moveFocus());
   }
 
+  /// On a phone a revealed answer can push the grade buttons below the
+  /// screen or under the tab bar, so scroll them up into view.
+  void _showGrades() {
+    final box = _controlsKey.currentContext?.findRenderObject();
+    final scrollable = _controlsKey.currentContext == null
+        ? null
+        : Scrollable.maybeOf(_controlsKey.currentContext!);
+    if (box is! RenderBox || scrollable == null) return;
+    final position = scrollable.position;
+    final viewport = scrollable.context.findRenderObject();
+    if (viewport is! RenderBox) return;
+    final bottom = box
+        .localToGlobal(Offset(0, box.size.height), ancestor: viewport)
+        .dy;
+    final narrow = MediaQuery.sizeOf(context).width < 600;
+    // What covers the bottom of the page: the tab bar on phones.
+    final covered =
+        (narrow ? 96 : Space.s6) + MediaQuery.paddingOf(context).bottom;
+    final overflow = bottom - (viewport.size.height - covered);
+    if (overflow <= 0) return;
+    final target = (position.pixels + overflow).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
+    if (reducedMotion(context)) {
+      position.jumpTo(target);
+    } else {
+      position.animateTo(
+        target,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
   /// Focus follows the flow: the suggested (or Good) grade once revealed,
   /// otherwise the answer field or Show answer.
   void _moveFocus() {
@@ -90,6 +137,16 @@ class _ReviewScreenState extends State<ReviewScreen> {
       _focus.requestFocus();
     } else if (s.revealed) {
       _gradeFocus[s.suggestedRating ?? Rating.good]!.requestFocus();
+      // After the answer has finished growing the card.
+      Future.delayed(motionDuration(context, 260), () {
+        if (!mounted || !_session!.revealed) return;
+        // Measure on the next frame, once layout has caught up.
+        WidgetsBinding.instance
+          ..addPostFrameCallback((_) {
+            if (mounted && _session!.revealed) _showGrades();
+          })
+          ..scheduleFrame();
+      });
     } else if (s.typing) {
       _typedFocus.requestFocus();
     } else {
@@ -99,6 +156,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
   @override
   void dispose() {
+    _settle.dispose();
+    _swipeX.dispose();
     _noticeTimer?.cancel();
     _session?.removeListener(_onSession);
     _session?.dispose();
@@ -159,13 +218,21 @@ class _ReviewScreenState extends State<ReviewScreen> {
     return KeyEventResult.ignored;
   }
 
+  /// Eases a card that wasn't swiped far enough back to the middle.
+  void _springBack() {
+    _settleFrom = _swipeX.value;
+    if (_settleFrom == 0) return;
+    _settle
+      ..duration = motionDuration(context, 200)
+      ..forward(from: 0);
+  }
+
   void _grade(Rating rating) {
     final s = _session!;
     if (s.current == null || !s.revealed) return;
-    setState(() {
-      _swipeX = 0;
-      _moreOpen = false;
-    });
+    _settle.stop();
+    _swipeX.value = 0;
+    setState(() => _moreOpen = false);
     s.grade(rating);
   }
 
@@ -212,7 +279,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
               else ...[
                 _stage(s, reduceMotion),
                 const SizedBox(height: Space.s6),
-                _controls(s),
+                KeyedSubtree(key: _controlsKey, child: _controls(s)),
               ],
             ],
           ),
@@ -233,40 +300,43 @@ class _ReviewScreenState extends State<ReviewScreen> {
   Widget _stage(ReviewSession s, bool reduceMotion) {
     final item = s.current!;
     final hint = s.leaveHint;
-    final swipeLabel = _swipeX <= -swipeThreshold
-        ? 'Again'
-        : _swipeX >= swipeThreshold
-        ? 'Good'
-        : null;
     final card = GestureDetector(
       key: ValueKey(item.card.id),
       behavior: HitTestBehavior.opaque,
       onTap: s.reveal,
+      onHorizontalDragStart: s.revealed ? (_) => _settle.stop() : null,
       onHorizontalDragUpdate: s.revealed
-          ? (d) => setState(() => _swipeX += d.delta.dx)
+          ? (d) => _swipeX.value += d.delta.dx
           : null,
       onHorizontalDragEnd: s.revealed
           ? (_) {
-              final dx = _swipeX;
-              setState(() => _swipeX = 0);
-              if (dx <= -swipeThreshold) _grade(Rating.again);
-              if (dx >= swipeThreshold) _grade(Rating.good);
+              final dx = _swipeX.value;
+              if (dx <= -swipeThreshold) return _grade(Rating.again);
+              if (dx >= swipeThreshold) return _grade(Rating.good);
+              _springBack();
             }
           : null,
-      onHorizontalDragCancel: () => setState(() => _swipeX = 0),
-      child: AnimatedContainer(
-        duration: _swipeX == 0 ? motionDuration(context, 200) : Duration.zero,
-        transform: Matrix4.identity()
-          ..translateByDouble(_swipeX, 0, 0, 1)
-          ..rotateZ(_swipeX / 40 * 3.14159 / 180),
-        transformAlignment: Alignment.center,
-        child: ReviewCard(
-          card: item.card,
-          option: s.option,
-          tool: s.deck?.tool ?? '',
-          revealed: s.revealed,
-          flagPairs: s.flagPairs,
-          reduceMotion: reduceMotion,
+      onHorizontalDragCancel: _springBack,
+      child: ValueListenableBuilder<double>(
+        valueListenable: _swipeX,
+        // The card is painted once into its own layer and only moved while
+        // dragging; nothing inside it rebuilds or repaints per frame.
+        child: RepaintBoundary(
+          child: ReviewCard(
+            card: item.card,
+            option: s.option,
+            tool: s.deck?.tool ?? '',
+            revealed: s.revealed,
+            flagPairs: s.flagPairs,
+            reduceMotion: reduceMotion,
+          ),
+        ),
+        builder: (context, dx, child) => Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..translateByDouble(dx, 0, 0, 1)
+            ..rotateZ(dx / 40 * math.pi / 180),
+          child: child,
         ),
       ),
     );
@@ -316,13 +386,23 @@ class _ReviewScreenState extends State<ReviewScreen> {
           },
           child: card,
         ),
-        if (swipeLabel != null)
-          Positioned(
-            top: Space.s3,
-            child: ExcludeSemantics(
-              child: FrostChip(swipeLabel, color: Frost.of(context).accent),
-            ),
+        Positioned(
+          top: Space.s3,
+          child: ValueListenableBuilder<double>(
+            valueListenable: _swipeX,
+            builder: (context, dx, _) {
+              final label = dx <= -swipeThreshold
+                  ? 'Again'
+                  : dx >= swipeThreshold
+                  ? 'Good'
+                  : null;
+              if (label == null) return const SizedBox.shrink();
+              return ExcludeSemantics(
+                child: FrostChip(label, color: Frost.of(context).accent),
+              );
+            },
           ),
+        ),
       ],
     );
   }

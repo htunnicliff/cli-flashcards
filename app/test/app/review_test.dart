@@ -26,6 +26,43 @@ void main() {
     expect(reviews, 1);
   });
 
+  testWidgets('a short swipe springs back; a long one grades', (tester) async {
+    final app = await startApp(tester);
+    await tester.tap(find.text('Show answer'));
+    await settle(tester);
+    final card = find.text('What does this flag do?');
+
+    await tester.drag(card, const Offset(40, 0));
+    await settle(tester);
+    expect(await tester.runAsync(app.repository.reviewCount), 0);
+
+    final start = tester.getTopLeft(card);
+    final gesture = await tester.startGesture(tester.getCenter(card));
+    for (var i = 0; i < 4; i++) {
+      await gesture.moveBy(const Offset(40, 0));
+      await tester.pump();
+    }
+    expect(find.text('Good'), findsNWidgets(2), reason: 'button and label');
+    expect(tester.getTopLeft(card).dx, greaterThan(start.dx + 50));
+    await gesture.up();
+    await settle(tester);
+    final log = await tester.runAsync(app.repository.allReviews);
+    expect(log!.single.rating, Rating.good);
+  });
+
+  testWidgets('on a phone, revealing scrolls the grades above the tab bar', (
+    tester,
+  ) async {
+    await startApp(tester, size: const Size(390, 640));
+    await tester.tap(find.text('Show answer'));
+    await settle(tester);
+    for (final grade in ['Again', 'Hard', 'Good', 'Easy']) {
+      final rect = tester.getRect(find.text(grade).hitTestable().first);
+      expect(rect.bottom, lessThan(640 - 96), reason: grade);
+      expect(rect.top, greaterThan(0), reason: grade);
+    }
+  });
+
   testWidgets('undo takes the grade back', (tester) async {
     final app = await startApp(tester);
     await tester.tap(find.text('Show answer'));
