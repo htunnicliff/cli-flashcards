@@ -23,7 +23,7 @@ test('the header says when the browser is offline', async ({ page, context }) =>
   await expect(page.getByText('Offline')).toBeHidden()
 
   await context.setOffline(true)
-  await expect(page.getByRole('status').getByText('Offline')).toBeVisible()
+  await expect(page.getByText('Offline')).toBeVisible()
 
   await context.setOffline(false)
   await expect(page.getByText('Offline')).toBeHidden()
@@ -53,7 +53,7 @@ test('a new version prompts instead of taking over, and reloads when asked', asy
   await deployNewBuild(context, baseURL!)
   await checkForUpdate(page)
 
-  const prompt = page.getByRole('status').filter({ hasText: 'Update available' })
+  const prompt = page.locator('.update').filter({ hasText: 'Update available' })
   await expect(prompt).toBeVisible()
   // Still the same page and the same worker: nothing was interrupted.
   expect(await page.evaluate(() => (window as unknown as { e2eMarker?: boolean }).e2eMarker)).toBe(

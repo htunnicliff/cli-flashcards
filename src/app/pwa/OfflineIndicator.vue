@@ -8,7 +8,7 @@ const online = useOnline()
 </script>
 
 <template>
-  <span class="offline-region" role="status">
+  <span class="offline-region" aria-live="polite">
     <AnimatePresence>
       <m.span
         v-if="!online"

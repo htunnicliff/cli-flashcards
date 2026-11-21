@@ -17,7 +17,7 @@ function reload() {
 
 <template>
   <!-- A banner, never a modal: it must not interrupt a review in progress. -->
-  <div class="update-region" role="status" aria-live="polite">
+  <div class="update-region" aria-live="polite">
     <AnimatePresence>
       <m.div v-if="needRefresh" class="update" v-bind="presets.slideUp">
         <p class="update-text">Update available.</p>
