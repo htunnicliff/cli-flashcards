@@ -17,9 +17,11 @@ flutter run -d chrome     # or: -d macos, an iOS simulator, an Android emulator
 ```
 lib/
   schema/   Deck, card and manifest models (ports of src/schema/)
-  core/     Framework-free logic: FSRS, queue, scheduler, answers, stats, backup, storage
+  core/     Framework-free logic: FSRS, queue, scheduler, answers, stats, backup, sync, storage
+  app/      Flutter UI: theme, routing, and one folder per page (review, decks, stats, settings)
 test/
   core/     Unit tests, including parity tests against the TypeScript app
+  app/      Widget tests that drive whole pages against the real decks
   fixtures/ Written by `pnpm dart:golden`; don't edit by hand
 assets/
   decks -> ../../public/data/decks   (symlink to the built decks)
@@ -38,3 +40,9 @@ Scheduling, card IDs and typed-answer checks must match the web app exactly, so 
 ## Storage
 
 [sembast](https://pub.dev/packages/sembast) behind `lib/core/repository.dart`: IndexedDB on the web, a file in the app's support directory elsewhere, and memory in tests.
+
+## Builds
+
+The app ID is `dev.seafarer.cliflashcards` on every platform. CI builds a release APK, an unsigned iOS build and a macOS app on every PR, and keeps the APK and the zipped macOS app as workflow artifacts for 14 days. Signed store builds (TestFlight first) aren't set up yet.
+
+To point a build at another deck host, pass `--dart-define=DECKS_URL=https://example.com/data/decks/`.
