@@ -23,6 +23,7 @@ withDefaults(
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
+  min-width: 0; /* lets it shrink in a grid row on narrow phones */
   min-height: 44px;
   padding: var(--space-2) var(--space-5);
   border: var(--border-width) solid var(--color-border);
