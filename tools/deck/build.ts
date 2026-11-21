@@ -37,6 +37,32 @@ export function contentHash(deck: Deck): string {
   return createHash('sha256').update(JSON.stringify(content)).digest('hex')
 }
 
+/** Spellings that only print help or the version: no use as flashcards. */
+const HELP_OR_VERSION = new Set(['-h', '-?', '-help', '--help', '-V', '-version', '--version'])
+
+/**
+ * True for an option whose every spelling only prints help or the version,
+ * such as `-h, --help` or `-V, --version`. Options that reuse one of those
+ * letters for something else (`grep -h, --no-filename`, `tar -V, --label`)
+ * have a spelling outside the set, so they stay.
+ */
+export function isHelpOrVersion(flags: readonly string[]): boolean {
+  return (
+    flags.some((flag) => /^--?(help|version)$/.test(flag)) &&
+    flags.every((flag) => HELP_OR_VERSION.has(flag))
+  )
+}
+
+/** Hides help and version options before overrides, so a curator can still unhide one. */
+function hideHelpAndVersion(deck: Deck): Deck {
+  return {
+    ...deck,
+    options: deck.options.map((option) =>
+      isHelpOrVersion(option.flags) ? { ...option, hidden: true } : option,
+    ),
+  }
+}
+
 export function buildDeck(input: BuildInput, label = 'deck'): BuildResult {
   const generated = DeckSchema.safeParse(input.generated)
   if (!generated.success) {
@@ -52,7 +78,7 @@ export function buildDeck(input: BuildInput, label = 'deck'): BuildResult {
       issues(overrides.error),
     )
   }
-  const { deck: merged, stale } = applyOverrides(generated.data, overrides.data)
+  const { deck: merged, stale } = applyOverrides(hideHelpAndVersion(generated.data), overrides.data)
   const candidate: Partial<typeof merged> = { ...merged, deckVersion: 1 }
   delete candidate.$schema
   const result = DeckSchema.safeParse(candidate)

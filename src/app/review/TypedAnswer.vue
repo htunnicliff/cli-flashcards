@@ -70,7 +70,7 @@ defineExpose({ focus: () => input.value?.focus() })
         :aria-describedby="result ? 'typed-result' : undefined"
         placeholder="type the flag"
       />
-      <span v-if="!result" class="hint"><UiKbd>Enter</UiKbd></span>
+      <span v-if="!result" class="hint enter-hint"><UiKbd>Enter</UiKbd></span>
     </m.div>
 
     <AnimatePresence>
@@ -180,5 +180,12 @@ input {
 .diff--added {
   color: var(--color-accent);
   text-decoration: underline;
+}
+
+/* The on-screen keyboard has its own Done key. */
+@media (hover: none) and (pointer: coarse) {
+  .enter-hint {
+    display: none;
+  }
 }
 </style>

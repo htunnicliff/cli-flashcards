@@ -13,6 +13,7 @@ import type { DeckManifest, DeckManifestEntry } from '@/schema/manifest'
 
 import { useRepository } from '../repository'
 import { fetchDeck, fetchManifest, type FetchLike } from './catalog'
+import { installPendingDecks } from './pending'
 
 export type DeckTask = { kind: 'install' | 'update' | 'remove'; progress: number }
 
@@ -61,35 +62,15 @@ export function useLibrary(options: LibraryOptions = {}) {
     }
   }
 
-  /**
-   * Installs decks a backup import queued in `pendingDeckInstalls` (it can't
-   * fetch them itself, and may run offline). Entries that fail or aren't in
-   * the manifest stay queued for the next visit.
-   */
+  /** Installs decks a backup import queued, if the import couldn't reach them. */
   async function installPending(current: DeckManifest) {
-    const pending = await repository.settings.get('pendingDeckInstalls')
-    if (pending.length === 0) return
-    const remaining: typeof pending = []
-    let installedCount = 0
-    for (const item of pending) {
-      const entry = current.decks.find((deck) => deck.id === item.id)
-      if (!entry || installedById.value.has(item.id)) {
-        if (!entry) remaining.push(item)
-        continue
-      }
-      try {
-        await repository.decks.install(await fetchDeck(entry, undefined, fetchFn))
-        await repository.decks.setIncludeObscure(item.id, item.includeObscure)
-        installedCount++
-      } catch {
-        remaining.push(item)
-      }
-    }
-    await repository.settings.set('pendingDeckInstalls', remaining)
+    const { installed: done } = await installPendingDecks(repository, {
+      fetch: fetchFn,
+      manifest: current,
+    })
+    if (done.length === 0) return
     await reloadInstalled()
-    if (installedCount > 0) {
-      status.value = `Installed ${installedCount} deck${installedCount === 1 ? '' : 's'} from your backup.`
-    }
+    status.value = `Installed ${done.length} deck${done.length === 1 ? '' : 's'} from your backup.`
   }
 
   /** Tools in the manifest, installed ones first, with the variant to show for each. */

@@ -13,9 +13,13 @@ import {
   type ImportMode,
 } from '@/core/backup'
 
+import type { FetchLike } from '../../decks/catalog'
+import { installPendingDecks } from '../../decks/pending'
 import { useRepository } from '../../repository'
 import { UiButton } from '../ui'
 import { saveBackupFile } from './backup-file'
+
+const props = defineProps<{ deckFetch?: FetchLike }>()
 
 const repository = useRepository()
 const lastBackupAt = ref<number | null>()
@@ -86,17 +90,39 @@ async function onFileChosen(event: Event) {
   }
 }
 
+/** Installs the decks the backup used right away, so Review has them without a trip to Decks. */
+async function installBackupDecks(): Promise<string> {
+  let installed: string[] = []
+  let remaining = (await repository.settings.get('pendingDeckInstalls')).map((d) => d.id)
+  try {
+    const result = await installPendingDecks(repository, { fetch: props.deckFetch })
+    installed = result.installed.map((d) => d.id)
+    remaining = result.remaining.map((d) => d.id)
+  } catch {
+    // Offline or the deck list failed to load: everything stays queued.
+  }
+  return [
+    installed.length ? `Installed ${installed.join(', ')}.` : '',
+    remaining.length
+      ? `${remaining.join(', ')} will be installed when the deck library can reach ${remaining.length === 1 ? 'it' : 'them'}.`
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+}
+
 async function onImport(mode: ImportMode) {
   if (!pending.value) return
   busy.value = true
   try {
     const result = await importBackup(repository, pending.value.backup, mode)
     const reviews = `${result.addedReviews} ${result.addedReviews === 1 ? 'review' : 'reviews'}`
-    const decks = result.pendingDecks.map((d) => d.id).join(', ')
-    importMessage.value =
-      (mode === 'replace' ? `Progress replaced with ${reviews}.` : `Merged ${reviews}.`) +
-      (decks ? ` ${decks} will be installed when the deck library can reach them.` : '')
     pending.value = undefined
+    importMessage.value =
+      mode === 'replace' ? `Progress replaced with ${reviews}.` : `Merged ${reviews}.`
+    if (result.pendingDecks.length > 0) {
+      importMessage.value += ' ' + (await installBackupDecks())
+    }
   } catch {
     importError.value = 'Import failed, so nothing was changed.'
   } finally {

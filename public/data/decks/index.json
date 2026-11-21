@@ -6,13 +6,13 @@
       "tool": "curl",
       "variant": "default",
       "toolVersion": "8.5.0",
-      "deckVersion": 2,
+      "deckVersion": 3,
       "source": "manpage",
       "license": "curl",
       "file": "curl-default.json",
-      "bytes": 253566,
-      "optionCount": 257,
-      "tiers": { "core": 19, "common": 11, "obscure": 227 }
+      "bytes": 253564,
+      "optionCount": 255,
+      "tiers": { "core": 19, "common": 11, "obscure": 225 }
     },
     {
       "id": "find-bsd",
@@ -32,13 +32,13 @@
       "tool": "find",
       "variant": "gnu",
       "toolVersion": "4.9.0",
-      "deckVersion": 2,
+      "deckVersion": 3,
       "source": "manpage",
       "license": "GPL-3.0-or-later",
       "file": "find-gnu.json",
-      "bytes": 59079,
-      "optionCount": 80,
-      "tiers": { "core": 16, "common": 14, "obscure": 50 }
+      "bytes": 59077,
+      "optionCount": 78,
+      "tiers": { "core": 16, "common": 14, "obscure": 48 }
     },
     {
       "id": "git-default",
@@ -58,52 +58,52 @@
       "tool": "grep",
       "variant": "bsd",
       "toolVersion": "freebsd-15",
-      "deckVersion": 2,
+      "deckVersion": 3,
       "source": "manpage",
       "license": "BSD-3-Clause",
       "file": "grep-bsd.json",
-      "bytes": 18668,
-      "optionCount": 47,
-      "tiers": { "core": 18, "common": 23, "obscure": 6 }
+      "bytes": 18666,
+      "optionCount": 45,
+      "tiers": { "core": 18, "common": 22, "obscure": 5 }
     },
     {
       "id": "grep-gnu",
       "tool": "grep",
       "variant": "gnu",
       "toolVersion": "3.11",
-      "deckVersion": 2,
+      "deckVersion": 3,
       "source": "manpage",
       "license": "GPL-3.0-or-later",
       "file": "grep-gnu.json",
-      "bytes": 24024,
-      "optionCount": 47,
-      "tiers": { "core": 18, "common": 9, "obscure": 20 }
+      "bytes": 24022,
+      "optionCount": 45,
+      "tiers": { "core": 18, "common": 9, "obscure": 18 }
     },
     {
       "id": "jq-default",
       "tool": "jq",
       "variant": "default",
       "toolVersion": "1.7",
-      "deckVersion": 1,
+      "deckVersion": 2,
       "source": "help",
       "license": "MIT",
       "file": "jq-default.json",
-      "bytes": 7647,
-      "optionCount": 29,
-      "tiers": { "core": 11, "common": 5, "obscure": 13 }
+      "bytes": 7645,
+      "optionCount": 27,
+      "tiers": { "core": 11, "common": 5, "obscure": 11 }
     },
     {
       "id": "rg-default",
       "tool": "rg",
       "variant": "default",
       "toolVersion": "14.1.0",
-      "deckVersion": 4,
+      "deckVersion": 5,
       "source": "manpage",
       "license": "MIT OR Unlicense",
       "file": "rg-default.json",
-      "bytes": 84210,
-      "optionCount": 101,
-      "tiers": { "core": 16, "common": 13, "obscure": 72 }
+      "bytes": 84208,
+      "optionCount": 99,
+      "tiers": { "core": 16, "common": 11, "obscure": 72 }
     },
     {
       "id": "sed-bsd",
@@ -123,26 +123,26 @@
       "tool": "sed",
       "variant": "gnu",
       "toolVersion": "4.9",
-      "deckVersion": 1,
+      "deckVersion": 2,
       "source": "manpage",
       "license": "GPL-3.0-or-later",
       "file": "sed-gnu.json",
-      "bytes": 5196,
-      "optionCount": 15,
-      "tiers": { "core": 5, "common": 6, "obscure": 4 }
+      "bytes": 5194,
+      "optionCount": 13,
+      "tiers": { "core": 5, "common": 4, "obscure": 4 }
     },
     {
       "id": "tar-gnu",
       "tool": "tar",
       "variant": "gnu",
       "toolVersion": "1.35",
-      "deckVersion": 2,
+      "deckVersion": 3,
       "source": "manpage",
       "license": "GPL-3.0-or-later",
       "file": "tar-gnu.json",
-      "bytes": 58173,
-      "optionCount": 156,
-      "tiers": { "core": 13, "common": 13, "obscure": 130 }
+      "bytes": 58171,
+      "optionCount": 154,
+      "tiers": { "core": 13, "common": 13, "obscure": 128 }
     }
   ]
 }

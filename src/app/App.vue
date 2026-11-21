@@ -1,13 +1,27 @@
 <script setup lang="ts">
+import { onMounted, watch } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 
+import { installPendingDecks } from './decks/pending'
 import MotionRoot from './motion/MotionRoot.vue'
 import OfflineIndicator from './pwa/OfflineIndicator.vue'
+import { useOnline } from './pwa/online'
 import UpdatePrompt from './pwa/UpdatePrompt.vue'
+import { useRepository } from './repository'
 import { useAppearanceStore } from './stores/appearance'
 
 // Instantiated here so the saved theme and text size stay applied on every page.
 useAppearanceStore()
+
+// Decks a backup import couldn't fetch (it was offline) install on the next
+// start or when the connection comes back, without a visit to Decks.
+const repository = useRepository()
+const online = useOnline()
+function retryPendingDecks() {
+  if (online.value) installPendingDecks(repository).catch(() => {})
+}
+onMounted(retryPendingDecks)
+watch(online, retryPendingDecks)
 
 const links = [
   { to: '/', label: 'Review' },

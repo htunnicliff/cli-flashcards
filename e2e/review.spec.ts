@@ -80,3 +80,23 @@ test('suspend a card while reviewing, then unsuspend it from the deck', async ({
   await page.goto('/')
   await expect(page.locator('[data-card]')).toHaveAttribute('data-card', first!)
 })
+
+test('keyboard hints show with a mouse and hide on a touch screen', async ({ page, isMobile }) => {
+  await page.goto('/decks')
+  const deck = page.locator('[data-deck="ripgrep-fixture"]')
+  await deck.getByRole('button', { name: 'Install' }).click()
+  await expect(deck).toHaveAttribute('data-installed', 'true')
+  await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Review' }).click()
+
+  const reveal = page.getByRole('button', { name: /Show answer/ })
+  await expect(reveal).toBeVisible()
+  const hints = [
+    page.getByRole('button', { name: 'Keyboard shortcuts' }),
+    reveal.locator('kbd'),
+    page.getByRole('button', { name: /^Bury/ }).locator('kbd'),
+  ]
+  for (const hint of hints) {
+    if (isMobile) await expect(hint).toBeHidden()
+    else await expect(hint).toBeVisible()
+  }
+})
