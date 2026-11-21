@@ -10,6 +10,7 @@ import {
   uniqueDatabaseName,
 } from '@/core/storage/test-utils'
 
+import { fakeFetch, grepDeck } from '../../decks/test-fixtures'
 import { repositoryKey } from '../../repository'
 import BackupSettings from './BackupSettings.vue'
 
@@ -27,8 +28,11 @@ afterEach(async () => {
   await repo.destroy()
 })
 
-async function mountLoaded() {
-  const wrapper = mount(BackupSettings, { global: { provide: { [repositoryKey]: repo } } })
+async function mountLoaded(props: InstanceType<typeof BackupSettings>['$props'] = {}) {
+  const wrapper = mount(BackupSettings, {
+    props,
+    global: { provide: { [repositoryKey]: repo } },
+  })
   await vi.waitFor(() => wrapper.get('[data-test="last-backup"]'))
   return wrapper
 }
@@ -85,6 +89,29 @@ describe('BackupSettings', () => {
     await vi.waitFor(() => expect(wrapper.get('[role="status"]').text()).toBe('Merged 1 review.'))
     expect(await repo.cardStates.get(cardId)).toBeDefined()
     expect(wrapper.find('[data-testid="import-summary"]').exists()).toBe(false)
+  })
+
+  it('installs the decks the backup used right away', async () => {
+    const source = createRepository({ name: uniqueDatabaseName(), dependencies: fakeIndexedDB })
+    await source.decks.install(grepDeck())
+    await source.decks.install({ ...grepDeck(), id: 'grep-gone' })
+    const json = JSON.stringify(await exportBackup(source, 2))
+    await source.destroy()
+
+    const wrapper = await mountLoaded({ deckFetch: fakeFetch([grepDeck()]) })
+    await choose(wrapper, json)
+    await vi.waitFor(() => wrapper.get('[data-testid="import-summary"]'))
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Merge')!
+      .trigger('click')
+    await vi.waitFor(() =>
+      expect(wrapper.get('[role="status"]').text()).toBe(
+        'Merged 0 reviews. Installed grep-gnu. grep-gone will be installed when the deck library can reach it.',
+      ),
+    )
+    expect(await repo.decks.get('grep-gnu')).toBeDefined()
+    expect((await repo.settings.get('pendingDeckInstalls')).map((d) => d.id)).toEqual(['grep-gone'])
   })
 
   it('explains why a file was rejected', async () => {

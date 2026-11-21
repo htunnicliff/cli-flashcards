@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { makeDeck, makeOption } from '../../src/schema/fixtures'
-import { buildDeck, contentHash, manifestEntry } from './build'
+import { buildDeck, contentHash, isHelpOrVersion, manifestEntry } from './build'
 import { DeckValidationError } from './generate'
 
 const generated = makeDeck([
@@ -54,6 +54,39 @@ describe('buildDeck', () => {
   it('reports stale overrides without failing', () => {
     const { stale } = buildDeck({ generated, overrides: { options: { gone: { hidden: true } } } })
     expect(stale).toEqual(['options.gone: no option "gone"'])
+  })
+})
+
+describe('help and version options', () => {
+  it('recognises options that only print help or the version', () => {
+    expect(isHelpOrVersion(['-h', '--help'])).toBe(true)
+    expect(isHelpOrVersion(['-?', '--help'])).toBe(true)
+    expect(isHelpOrVersion(['-help', '--help'])).toBe(true)
+    expect(isHelpOrVersion(['--version'])).toBe(true)
+    expect(isHelpOrVersion(['-V', '--version'])).toBe(true)
+  })
+
+  it('keeps options that reuse -h or -V for something else', () => {
+    expect(isHelpOrVersion(['-h', '--no-filename'])).toBe(false)
+    expect(isHelpOrVersion(['-V', '--label'])).toBe(false)
+    expect(isHelpOrVersion(['-h'])).toBe(false)
+    expect(isHelpOrVersion(['--help-all'])).toBe(false)
+  })
+
+  it('hides them in the built deck, unless an override unhides one', () => {
+    const withHelp = makeDeck([
+      makeOption(['-i', '--ignore-case']),
+      makeOption(['-h', '--help'], { tier: 'common' }),
+      makeOption(['-V', '--version']),
+    ])
+    const hidden = (deck: ReturnType<typeof buildDeck>['deck']) =>
+      deck.options.filter((o) => o.hidden).map((o) => o.id)
+    expect(hidden(buildDeck({ generated: withHelp }).deck)).toEqual(['help', 'version'])
+    const unhidden = buildDeck({
+      generated: withHelp,
+      overrides: { options: { version: { hidden: false } } },
+    }).deck
+    expect(hidden(unhidden)).toEqual(['help'])
   })
 })
 

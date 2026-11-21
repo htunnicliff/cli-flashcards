@@ -7,6 +7,7 @@ import { formatNextDue } from '@/core/review'
 import type { Rating } from '@/core/storage'
 
 import { UiButton, UiKbd } from '../components/ui'
+import { useDecksChanged } from '../decks/pending'
 import { fade, presets, spring } from '../motion/tokens'
 import ReviewCard from '../review/ReviewCard.vue'
 import TypedAnswer from '../review/TypedAnswer.vue'
@@ -40,6 +41,9 @@ const {
   answer,
   suggestedRating,
 } = session
+
+// Decks restored from a backup can finish installing while this screen is open.
+watch(useDecksChanged(), () => session.refresh())
 
 const helpOpen = ref(false)
 const revealButton = ref<{ $el: HTMLElement }>()
@@ -665,6 +669,19 @@ p {
 
   .done {
     padding: var(--space-6);
+  }
+}
+
+/*
+ * Touch screens (phones, most tablets) usually have no keyboard: hide the
+ * shortcut badges and the shortcut list toggle. The list itself keeps its
+ * badges, since only a keyboard can open it there.
+ */
+@media (hover: none) and (pointer: coarse) {
+  .help-toggle,
+  .header-actions :deep(.kbd),
+  .controls :deep(.kbd) {
+    display: none;
   }
 }
 </style>
