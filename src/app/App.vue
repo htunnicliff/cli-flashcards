@@ -2,6 +2,8 @@
 import { RouterLink, RouterView } from 'vue-router'
 
 import MotionRoot from './motion/MotionRoot.vue'
+import OfflineIndicator from './pwa/OfflineIndicator.vue'
+import UpdatePrompt from './pwa/UpdatePrompt.vue'
 import { useAppearanceStore } from './stores/appearance'
 
 // Instantiated here so the saved theme and text size stay applied on every page.
@@ -18,9 +20,12 @@ const links = [
 <template>
   <MotionRoot>
     <header class="app-header">
-      <RouterLink to="/" class="wordmark mono" aria-label="--recall, home"
-        ><span class="wordmark-dashes" aria-hidden="true">--</span>recall</RouterLink
-      >
+      <div class="app-brand">
+        <RouterLink to="/" class="wordmark mono" aria-label="--recall, home"
+          ><span class="wordmark-dashes" aria-hidden="true">--</span>recall</RouterLink
+        >
+        <OfflineIndicator />
+      </div>
       <nav aria-label="Main" class="app-nav">
         <RouterLink v-for="link in links" :key="link.to" :to="link.to" class="nav-link">{{
           link.label
@@ -30,6 +35,7 @@ const links = [
     <main class="app-main">
       <RouterView />
     </main>
+    <UpdatePrompt />
   </MotionRoot>
 </template>
 
@@ -41,6 +47,12 @@ const links = [
   gap: var(--space-3) var(--space-6);
   padding: 14px var(--space-8);
   border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .wordmark {
