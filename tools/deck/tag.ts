@@ -35,7 +35,7 @@ export function splitTag(tag: string): string[] {
   return parts
 }
 
-const FLAG_START = /^(--?)(\[no-?\])?([A-Za-z0-9?@#][\w.?#@+-]*)/
+const FLAG_START = /^(--?)(\[no-?\])?([A-Za-z0-9?@#.][\w.?#@+-]*)/
 
 interface Part {
   flags: string[]

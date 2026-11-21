@@ -72,6 +72,16 @@ pnpm deck:generate sed --variant gnu --license GPL-3.0-or-later
 
 The parser in `tools/deck/` reads roff source directly, both man(7) pages (GNU, help2man, asciidoc/docbook) and mdoc(7) pages (BSD, macOS), so it needs no extra tools. It is pure (manpage text in, deck out) and covered by snapshot tests over the real pages in `tools/deck/manpage/fixtures/`. Run `pnpm test -u` to update the snapshots after a parser change and review the diff.
 
+### Relevance tiers
+
+Every option gets a `tier` so the app can introduce cards in a sensible order. `deck:generate` assigns a default:
+
+- **core**: used in a [tldr-pages](https://github.com/tldr-pages/tldr) example for the tool. Those examples (up to three per option, long flags rewritten to the primary short flag) are attached as `examples` and feed cloze cards.
+- **common**: mentioned in the manpage's SYNOPSIS or EXAMPLES.
+- **obscure**: everything else.
+
+tldr pages are vendored in `vendor/tldr/` at a pinned commit so builds are reproducible (`pnpm tldr:vendor` refreshes them). `pnpm deck:report <tool>` prints the count per tier and the most-used options; fix anything that looks wrong with `tier:` in the overrides file.
+
 ### Curating with overrides
 
 Generated decks are never edited by hand. Fixes go in `decks/<tool>/<variant>.overrides.yaml`, which `pnpm deck:build` applies on top of the generated deck to produce `public/decks/<tool>-<variant>.json` (the file the app loads) and the `public/decks/index.json` manifest. Regenerating a deck keeps every override.

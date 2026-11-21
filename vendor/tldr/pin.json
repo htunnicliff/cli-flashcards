@@ -1,0 +1,21 @@
+{
+  "commit": "1167a813e1cf273c4b2472b9dcd93fcc65e515b4",
+  "pages": [
+    "rg",
+    "git-log",
+    "git-commit",
+    "git-rebase",
+    "git-reset",
+    "git-diff",
+    "git-stash",
+    "git-checkout",
+    "git-switch",
+    "git-branch",
+    "git-push",
+    "sed",
+    "grep",
+    "find",
+    "tar",
+    "curl"
+  ]
+}

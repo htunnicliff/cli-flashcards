@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { generateDeck } from './generate'
+import { loadTldrPages } from './tldr-files'
 
 const fixture = (name: string) => readFileSync(join(__dirname, 'manpage/fixtures', name), 'utf8')
 
@@ -24,6 +25,7 @@ describe('generateDeck snapshots', () => {
         variant,
         toolVersion: 'fixture',
         pages: [{ name, source: fixture(file), path: file, ...(subcommand ? { subcommand } : {}) }],
+        tldr: loadTldrPages([{ name, ...(subcommand ? { subcommand } : {}) }], variant),
       })
       const snapshot = { deck, warnings }
       await expect(`${JSON.stringify(snapshot, null, 2)}\n`).toMatchFileSnapshot(
@@ -113,5 +115,33 @@ describe('parsed fixtures', () => {
       '-r',
       '--regexp-extended',
     ])
+  })
+})
+
+describe('tiers', () => {
+  const generate = (tldr: string | undefined) =>
+    generateDeck({
+      tool: 'rg',
+      variant: 'default',
+      toolVersion: '14.1.0',
+      pages: [{ name: 'rg', source: fixture('rg.1') }],
+      tldr: tldr === undefined ? [] : [{ name: 'rg', markdown: tldr }],
+    }).deck
+  const tier = (deck: ReturnType<typeof generate>, id: string) =>
+    deck.options.find((option) => option.id === id)?.tier
+
+  it('ranks tldr options core, SYNOPSIS options common and the rest obscure', () => {
+    const deck = generate('- List files:\n\n`rg {{[-l|--files-with-matches]}} {{pattern}}`\n')
+    expect(tier(deck, 'files-with-matches')).toBe('core')
+    expect(tier(deck, 'regexp')).toBe('common') // rg -e PATTERN in SYNOPSIS
+    expect(tier(deck, 'pre-glob')).toBe('obscure')
+    expect(deck.options.find((o) => o.id === 'files-with-matches')?.examples).toEqual([
+      { command: 'rg -l pattern', description: 'List files' },
+    ])
+    expect(deck.attribution).toMatch(/tldr-pages.*CC BY 4\.0/)
+  })
+
+  it('does not credit tldr when no examples were used', () => {
+    expect(generate(undefined).attribution).not.toMatch(/tldr/)
   })
 })

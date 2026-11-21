@@ -15,4 +15,6 @@ export interface RawPage {
   title: string
   section: string | undefined
   entries: RawEntry[]
+  /** Plain text of each section, keyed by upper-cased heading (for SYNOPSIS/EXAMPLES mentions). */
+  sectionText: Record<string, string>
 }
