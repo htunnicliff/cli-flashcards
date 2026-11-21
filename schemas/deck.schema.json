@@ -69,6 +69,14 @@
         ]
       }
     },
+    "parsingStyle": {
+      "type": "string",
+      "enum": [
+        "gnu",
+        "posix",
+        "strict"
+      ]
+    },
     "options": {
       "type": "array",
       "items": {

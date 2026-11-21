@@ -1,5 +1,6 @@
 import { computed, onScopeDispose, ref, shallowRef } from 'vue'
 
+import { checkAnswer, type AnswerResult } from '@/core/answers'
 import { formatInterval } from '@/core/review'
 import { createScheduler, nextState, type QueueItem, type Queue } from '@/core/scheduler'
 import {
@@ -46,6 +47,8 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
   const nextLearningDue = ref<number>()
   const nextDue = ref<number>()
   const decks = shallowRef(new Map<string, Deck>())
+  /** Decks with typed answers turned on. */
+  const typedDecks = shallowRef(new Set<string>())
   const loading = ref(true)
   const revealed = ref(false)
   const desiredRetention = ref(0.9)
@@ -53,6 +56,8 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
   /** The rating of the last grade, so the leaving card can drift the right way. */
   const lastRating = ref<Rating>()
   const error = ref<string>()
+  /** The checked typed answer for the card on screen, once submitted. */
+  const answer = shallowRef<AnswerResult & { typed: string }>()
 
   const history: Graded[] = []
   /** Cards graded on screen whose write hasn't run yet; a refresh must not bring them back. */
@@ -78,6 +83,17 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
   })
   const deck = computed(() =>
     current.value ? decks.value.get(current.value.card.deckId) : undefined,
+  )
+
+  /** Whether the card on screen asks for its flag to be typed. */
+  const typing = computed(() => {
+    const card = current.value?.card
+    return Boolean(card && card.type !== 'flag-to-meaning' && typedDecks.value.has(card.deckId))
+  })
+
+  /** The grade a typed answer suggests: Good when right, Again when wrong. */
+  const suggestedRating = computed<Rating | undefined>(() =>
+    answer.value ? (answer.value.correct ? 3 : 1) : undefined,
   )
 
   /** Next interval for each rating, from the card's current state. */
@@ -110,6 +126,7 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
       scheduler.nextDue(now()),
     ])
     decks.value = new Map(stored.map((s) => [s.id, s.deck]))
+    typedDecks.value = new Set(stored.filter((s) => s.typeAnswers).map((s) => s.id))
     desiredRetention.value = retention
     today.value = queue.today
     nextLearningDue.value = queue.nextLearningDue
@@ -139,6 +156,19 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     if (current.value) revealed.value = true
   }
 
+  /** Checks a typed answer against the card on screen and reveals the back. */
+  function submitAnswer(typed: string) {
+    const item = current.value
+    const target = option.value
+    if (!item || !target || revealed.value) return
+    const options = deck.value?.options ?? [target]
+    answer.value = {
+      typed,
+      ...checkAnswer(typed, { option: target, options, style: deck.value?.parsingStyle }),
+    }
+    revealed.value = true
+  }
+
   /** Grades the card on screen and moves on at once; the write follows. */
   function grade(rating: Rating) {
     const item = current.value
@@ -148,6 +178,7 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     lastRating.value = rating
     items.value = items.value.slice(1)
     revealed.value = false
+    answer.value = undefined
     shownAt = at
     gradedThisSession.value++
     pending.add(item.card.id)
@@ -179,6 +210,7 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
       lastRating.value = undefined
       items.value = [last.item, ...items.value.filter((i) => i.card.id !== last.item.card.id)]
       revealed.value = false
+      answer.value = undefined
       shownAt = now()
       await refresh()
     })
@@ -210,7 +242,11 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     lastRating,
     gradedThisSession,
     error,
+    typing,
+    answer,
+    suggestedRating,
     reveal,
+    submitAnswer,
     grade,
     undo,
     canUndo,

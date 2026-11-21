@@ -38,11 +38,11 @@ async function confirmRemove(id: string) {
   await library.remove(id, { resetProgress: reset })
 }
 
-function onToggle(id: string, kind: 'obscure' | 'paused', event: Event) {
+function onToggle(id: string, kind: 'obscure' | 'paused' | 'typed', event: Event) {
   const checked = (event.target as HTMLInputElement).checked
-  return kind === 'obscure'
-    ? library.setIncludeObscure(id, checked)
-    : library.setPaused(id, checked)
+  if (kind === 'obscure') return library.setIncludeObscure(id, checked)
+  if (kind === 'typed') return library.setTypeAnswers(id, checked)
+  return library.setPaused(id, checked)
 }
 </script>
 
@@ -135,6 +135,14 @@ function onToggle(id: string, kind: 'obscure' | 'paused', event: Event) {
                 @change="onToggle(tool.entry.id, 'obscure', $event)"
               />
               Include obscure options
+            </label>
+            <label class="check">
+              <input
+                type="checkbox"
+                :checked="tool.stored.typeAnswers ?? false"
+                @change="onToggle(tool.entry.id, 'typed', $event)"
+              />
+              Type answers
             </label>
             <label class="check">
               <input

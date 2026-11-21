@@ -39,6 +39,8 @@ export interface StoredDeck {
   includeObscure: boolean
   /** Paused decks show no cards until resumed. Absent on decks stored before #12. */
   paused?: boolean
+  /** Meaning → flag and cloze cards ask for the flag to be typed. Absent means off. */
+  typeAnswers?: boolean
   deck: Deck
 }
 
