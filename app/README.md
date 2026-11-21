@@ -43,9 +43,11 @@ Scheduling, card IDs and typed-answer checks must match the web app exactly, so 
 
 ## Builds
 
-The app ID is `dev.seafarer.cliflashcards` on every platform. CI builds a release APK, an unsigned iOS build and a macOS app on every PR, and keeps the APK and the zipped macOS app as workflow artifacts for 14 days.
+The app ID is `dev.seafarer.cliflashcards` on every platform. The icons are drawn from `public/icons/icon.svg` by `tools/flutter-icons.py`. Android uses an adaptive icon defined in XML. CI builds a release APK, an unsigned iOS build and a macOS app on every PR, and keeps the APK and the zipped macOS app as workflow artifacts for 14 days.
 
 To publish a release, run **Release app** from the Actions tab with a version like `0.2.0`, or push a tag like `app-v0.2.0`. It attaches the APK and the zipped macOS app to a GitHub release.
+
+For the web, build with `flutter build web --no-web-resources-cdn` and then run `pnpm flutter:sw` from the repo root. The flag serves CanvasKit from our own origin instead of Google's CDN, so the service worker can cache it. The service worker precaches the app (about 18 MB) so it works offline and can be added to a phone's home screen. A new version installs in the background and takes over the next time the page is hidden.
 
 To point a build at another deck host, pass `--dart-define=DECKS_URL=https://example.com/data/decks/`.
 
