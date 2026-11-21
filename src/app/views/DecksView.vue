@@ -255,7 +255,8 @@ p {
   min-height: 44px;
   padding: var(--space-2) var(--space-5);
   border-radius: var(--radius-button);
-  background: var(--color-accent);
+  background: var(--fill-primary);
+  box-shadow: var(--shadow-primary);
   color: var(--color-on-primary);
   font-weight: 600;
   text-decoration: none;
@@ -292,10 +293,12 @@ p {
   flex-direction: column;
   gap: var(--space-3);
   padding: var(--space-6);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--glass-rim);
   border-radius: var(--radius-card);
-  background: var(--color-surface);
+  background: var(--surface-glass);
   box-shadow: var(--shadow-card);
+  -webkit-backdrop-filter: var(--glass-filter-card);
+  backdrop-filter: var(--glass-filter-card);
 }
 
 .deck-head {
@@ -341,7 +344,7 @@ p {
 .segmented {
   display: inline-flex;
   padding: 2px;
-  border-radius: var(--radius-small);
+  border-radius: var(--radius-pill);
   background: var(--color-sunken);
 }
 
@@ -357,13 +360,14 @@ p {
 .segment span {
   display: block;
   padding: var(--space-1) var(--space-3);
-  border-radius: calc(var(--radius-small) - 2px);
+  border-radius: var(--radius-pill);
   cursor: pointer;
   font-size: var(--text-sm);
 }
 
 .segment input:checked + span {
   background: var(--color-surface);
+  box-shadow: var(--shadow-control);
   font-weight: 600;
 }
 

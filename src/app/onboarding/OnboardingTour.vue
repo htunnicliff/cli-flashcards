@@ -183,11 +183,13 @@ function onCancel(event: Event) {
   width: min(520px, calc(100vw - 2 * var(--space-4)));
   max-height: calc(100dvh - 2 * var(--space-4));
   padding: var(--space-6) var(--space-8) var(--space-8);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--glass-rim);
   border-radius: var(--radius-card);
-  background: var(--color-surface);
+  background: var(--surface-glass);
   color: var(--color-text);
   box-shadow: var(--shadow-card);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
   overflow-y: auto;
 }
 

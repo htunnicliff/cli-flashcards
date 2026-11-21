@@ -542,9 +542,12 @@ p {
 
 .help {
   padding: var(--space-4) var(--space-5);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--glass-rim);
   border-radius: var(--radius-button);
-  background: var(--color-surface);
+  background: var(--surface-glass);
+  box-shadow: var(--shadow-control);
+  -webkit-backdrop-filter: var(--glass-filter-card);
+  backdrop-filter: var(--glass-filter-card);
 }
 
 .help dl {
@@ -588,7 +591,8 @@ p {
   margin-top: var(--space-2);
   padding: var(--space-2) var(--space-5);
   border-radius: var(--radius-button);
-  background: var(--color-accent);
+  background: var(--fill-primary);
+  box-shadow: var(--shadow-primary);
   color: var(--color-on-primary);
   text-decoration: none;
 }
@@ -617,10 +621,13 @@ p {
   right: var(--space-4);
   margin: 0;
   padding: var(--space-1) var(--space-3);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--glass-rim);
   border-radius: var(--radius-pill);
-  background: var(--color-surface);
+  background: var(--surface-glass);
+  box-shadow: var(--shadow-control);
   color: var(--color-muted);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
   font-weight: 700;
   pointer-events: none;
 }
@@ -632,7 +639,9 @@ p {
 }
 
 .grade[data-suggested] {
-  box-shadow: 0 0 0 2px var(--color-accent);
+  box-shadow:
+    var(--shadow-control),
+    0 0 0 2px var(--color-accent);
 }
 
 .set-aside {
@@ -712,10 +721,12 @@ p {
   max-width: var(--content-width);
   margin: 0 auto;
   padding: var(--space-3) var(--space-4);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--glass-rim);
   border-radius: var(--radius-button);
-  background: var(--color-surface);
+  background: var(--surface-glass);
   box-shadow: var(--shadow-card);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
 }
 
 .snackbar p {
@@ -757,9 +768,9 @@ p {
 }
 
 @media (max-width: 600px) {
-  /* Clear the bottom tab bar. */
+  /* Clear the floating tab bar (App.vue). */
   .snackbar {
-    bottom: calc(64px + env(safe-area-inset-bottom));
+    bottom: calc(84px + env(safe-area-inset-bottom));
   }
 
   .grades {

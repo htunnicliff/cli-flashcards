@@ -121,10 +121,12 @@ const prompt: Record<Card['type'], string> = {
   gap: var(--space-5);
   min-height: 260px;
   padding: var(--space-10);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--glass-rim);
   border-radius: var(--radius-card);
-  background: var(--color-surface);
+  background: var(--surface-glass);
   box-shadow: var(--shadow-card);
+  -webkit-backdrop-filter: var(--glass-filter-card);
+  backdrop-filter: var(--glass-filter-card);
 }
 
 p {

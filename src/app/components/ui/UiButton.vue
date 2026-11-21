@@ -26,9 +26,10 @@ withDefaults(
   min-width: 0; /* lets it shrink in a grid row on narrow phones */
   min-height: 44px;
   padding: var(--space-2) var(--space-5);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--glass-rim);
   border-radius: var(--radius-button);
-  background: var(--color-surface);
+  background: var(--surface-glass);
+  box-shadow: var(--shadow-control);
   color: var(--color-text);
   font-size: var(--text-md);
   font-weight: 600;
@@ -50,7 +51,8 @@ withDefaults(
 
 .button--primary {
   border-color: var(--color-accent);
-  background: var(--color-accent);
+  background: var(--fill-primary);
+  box-shadow: var(--shadow-primary);
   color: var(--color-on-primary);
 }
 
@@ -66,7 +68,7 @@ withDefaults(
 
 .button--again {
   border-color: var(--color-again-border);
-  background: var(--color-again-tint);
+  background: var(--glass-sheen), var(--color-again-tint);
   color: var(--color-again);
 }
 
