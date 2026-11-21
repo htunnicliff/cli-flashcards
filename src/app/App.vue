@@ -63,13 +63,20 @@ const links = [
 </template>
 
 <style scoped>
+/* A frosted bar that content scrolls under. */
 .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3) var(--space-6);
   padding: 14px var(--space-8);
-  border-bottom: var(--border-width) solid var(--color-border);
+  border-bottom: var(--border-width) solid var(--glass-edge);
+  background: var(--glass-chrome);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
 }
 
 .app-brand {
@@ -90,14 +97,18 @@ const links = [
   color: var(--color-accent);
 }
 
+/* A capsule of tabs; the current one is a raised pane. */
 .app-nav {
   display: flex;
   gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--color-sunken);
 }
 
 .nav-link {
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-small);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
   color: var(--color-muted);
   font-size: var(--text-sm);
   text-decoration: none;
@@ -108,7 +119,8 @@ const links = [
 }
 
 .nav-link.router-link-exact-active {
-  background: var(--color-sunken);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-control);
   color: var(--color-text);
   font-weight: 600;
 }
@@ -120,33 +132,42 @@ const links = [
   padding: var(--space-10) var(--space-6) var(--space-12);
 }
 
-/* Phone: the same four destinations as a bottom tab bar, in the thumb zone. */
+/* Phone: the same four destinations as a floating glass tab bar, in the thumb zone. */
 @media (max-width: 600px) {
   .app-header {
+    position: static;
     padding: var(--space-3) var(--space-4);
+    border-bottom: 0;
+    background: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 
   .app-nav {
     position: fixed;
-    inset: auto 0 0;
+    inset: auto var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
     z-index: 10;
     justify-content: space-around;
-    padding: var(--space-1) var(--space-2) calc(var(--space-1) + env(safe-area-inset-bottom));
-    border-top: var(--border-width) solid var(--color-border);
-    background: var(--color-surface);
+    padding: 5px;
+    border: var(--border-width) solid var(--glass-rim);
+    background: var(--glass-sheen), var(--glass-chrome);
+    box-shadow: var(--shadow-card);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
   }
 
   .nav-link {
     flex: 1;
-    min-height: 48px;
+    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: var(--space-2);
     font-size: var(--text-xs);
   }
 
   .app-main {
-    padding: var(--space-6) var(--space-4) calc(72px + env(safe-area-inset-bottom));
+    padding: var(--space-6) var(--space-4) calc(96px + env(safe-area-inset-bottom));
   }
 }
 </style>
