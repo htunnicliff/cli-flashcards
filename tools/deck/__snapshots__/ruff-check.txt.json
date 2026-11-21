@@ -1,0 +1,724 @@
+{
+  "deck": {
+    "schemaVersion": 1,
+    "id": "ruff-default",
+    "tool": "ruff",
+    "variant": "default",
+    "toolVersion": "fixture",
+    "deckVersion": 1,
+    "source": "help",
+    "license": "NOASSERTION",
+    "attribution": "Generated from the ruff --help output.",
+    "sourcePages": [
+      {
+        "name": "ruff-check"
+      }
+    ],
+    "options": [
+      {
+        "id": "check.fix",
+        "flags": [
+          "--fix"
+        ],
+        "summary": "Apply fixes to resolve lint violations.",
+        "description": "Apply fixes to resolve lint violations. Use `--no-fix` to disable or `--unsafe-fixes` to include unsafe fixes",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.unsafe-fixes",
+        "flags": [
+          "--unsafe-fixes"
+        ],
+        "summary": "Include fixes that may not retain the original intent of the code.",
+        "description": "Include fixes that may not retain the original intent of the code. Use `--no-unsafe-fixes` to disable",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.show-fixes",
+        "flags": [
+          "--show-fixes"
+        ],
+        "summary": "Show an enumeration of all fixed lint violations.",
+        "description": "Show an enumeration of all fixed lint violations. Use `--no-show-fixes` to disable",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.diff",
+        "flags": [
+          "--diff"
+        ],
+        "summary": "Avoid writing any fixed files back; instead, output a diff for each changed file to stdout, and exit 0 if there are no diffs.",
+        "description": "Avoid writing any fixed files back; instead, output a diff for each changed file to stdout, and exit 0 if there are no diffs. Implies `--fix-only`",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.watch",
+        "flags": [
+          "-w",
+          "--watch"
+        ],
+        "summary": "Run in watch mode by re-running whenever files change",
+        "description": "Run in watch mode by re-running whenever files change",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.fix-only",
+        "flags": [
+          "--fix-only"
+        ],
+        "summary": "Apply fixes to resolve lint violations, but don't report on, or exit non-zero for, leftover violations.",
+        "description": "Apply fixes to resolve lint violations, but don't report on, or exit non-zero for, leftover violations. Implies `--fix`. Use `--no-fix-only` to disable or `--unsafe-fixes` to include unsafe fixes",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.ignore-noqa",
+        "flags": [
+          "--ignore-noqa"
+        ],
+        "summary": "Ignore any `# noqa` comments",
+        "description": "Ignore any `# noqa` comments",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.output-format",
+        "flags": [
+          "--output-format"
+        ],
+        "argument": {
+          "name": "OUTPUT_FORMAT",
+          "optional": false
+        },
+        "summary": "Output serialization format for violations.",
+        "description": "Output serialization format for violations. The default serialization format is \"full\"\n\n[env: RUFF_OUTPUT_FORMAT=] [possible values: concise, full, json, json-lines, junit, grouped, github, gitlab, pylint, rdjson, azure, sarif]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.output-file",
+        "flags": [
+          "-o",
+          "--output-file"
+        ],
+        "argument": {
+          "name": "OUTPUT_FILE",
+          "optional": false
+        },
+        "summary": "Specify file to write the linter output to (default: stdout)",
+        "description": "Specify file to write the linter output to (default: stdout)\n\n[env: RUFF_OUTPUT_FILE=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.target-version",
+        "flags": [
+          "--target-version"
+        ],
+        "argument": {
+          "name": "TARGET_VERSION",
+          "optional": false
+        },
+        "summary": "The minimum Python version that should be supported",
+        "description": "The minimum Python version that should be supported\n\n[possible values: py37, py38, py39, py310, py311, py312, py313, py314, py315]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.preview",
+        "flags": [
+          "--preview"
+        ],
+        "summary": "Enable preview mode; checks will include unstable rules and fixes.",
+        "description": "Enable preview mode; checks will include unstable rules and fixes. Use `--no-preview` to disable",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.extension",
+        "flags": [
+          "--extension"
+        ],
+        "argument": {
+          "name": "EXTENSION",
+          "optional": false
+        },
+        "summary": "List of mappings from file extension to language (one of `python`, `ipynb`, `pyi`).",
+        "description": "List of mappings from file extension to language (one of `python`, `ipynb`, `pyi`). For example, to treat `.ipy` files as IPython notebooks, use `--extension ipy:ipynb`",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.statistics",
+        "flags": [
+          "--statistics"
+        ],
+        "summary": "Show counts for every rule with at least one violation",
+        "description": "Show counts for every rule with at least one violation",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.add-noqa",
+        "flags": [
+          "--add-noqa"
+        ],
+        "argument": {
+          "name": "REASON",
+          "optional": true
+        },
+        "summary": "Enable automatic additions of `noqa` directives to failing lines.",
+        "description": "Enable automatic additions of `noqa` directives to failing lines. Optionally provide a reason to append after the codes",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.add-ignore",
+        "flags": [
+          "--add-ignore"
+        ],
+        "argument": {
+          "name": "REASON",
+          "optional": true
+        },
+        "summary": "Enable automatic additions of `ruff: ignore` comments to failing lines.",
+        "description": "Enable automatic additions of `ruff: ignore` comments to failing lines. Optionally provide a reason to append after the codes. In preview, add suppression comments with rule names instead",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.show-files",
+        "flags": [
+          "--show-files"
+        ],
+        "summary": "See the files Ruff will be run against with the current settings",
+        "description": "See the files Ruff will be run against with the current settings",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.show-settings",
+        "flags": [
+          "--show-settings"
+        ],
+        "summary": "See the settings Ruff will use to lint a given Python file",
+        "description": "See the settings Ruff will use to lint a given Python file",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.help",
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "summary": "Print help (see a summary with '-h')",
+        "description": "Print help (see a summary with '-h')",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.select",
+        "flags": [
+          "--select"
+        ],
+        "argument": {
+          "name": "RULE_CODE",
+          "optional": false
+        },
+        "summary": "Comma-separated list of rule codes to enable (or ALL, to enable all rules)",
+        "description": "Comma-separated list of rule codes to enable (or ALL, to enable all rules)",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.ignore",
+        "flags": [
+          "--ignore"
+        ],
+        "argument": {
+          "name": "RULE_CODE",
+          "optional": false
+        },
+        "summary": "Comma-separated list of rule codes to disable",
+        "description": "Comma-separated list of rule codes to disable",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.extend-select",
+        "flags": [
+          "--extend-select"
+        ],
+        "argument": {
+          "name": "RULE_CODE",
+          "optional": false
+        },
+        "summary": "Like --select, but adds additional rule codes on top of those already specified",
+        "description": "Like --select, but adds additional rule codes on top of those already specified",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.per-file-ignores",
+        "flags": [
+          "--per-file-ignores"
+        ],
+        "argument": {
+          "name": "PER_FILE_IGNORES",
+          "optional": false
+        },
+        "summary": "List of mappings from file pattern to code to exclude",
+        "description": "List of mappings from file pattern to code to exclude",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.extend-per-file-ignores",
+        "flags": [
+          "--extend-per-file-ignores"
+        ],
+        "argument": {
+          "name": "EXTEND_PER_FILE_IGNORES",
+          "optional": false
+        },
+        "summary": "Like `--per-file-ignores`, but adds additional ignores on top of those already specified",
+        "description": "Like `--per-file-ignores`, but adds additional ignores on top of those already specified",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.fixable",
+        "flags": [
+          "--fixable"
+        ],
+        "argument": {
+          "name": "RULE_CODE",
+          "optional": false
+        },
+        "summary": "List of rule codes to treat as eligible for fix.",
+        "description": "List of rule codes to treat as eligible for fix. Only applicable when fix itself is enabled (e.g., via `--fix`)",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.unfixable",
+        "flags": [
+          "--unfixable"
+        ],
+        "argument": {
+          "name": "RULE_CODE",
+          "optional": false
+        },
+        "summary": "List of rule codes to treat as ineligible for fix.",
+        "description": "List of rule codes to treat as ineligible for fix. Only applicable when fix itself is enabled (e.g., via `--fix`)",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.extend-fixable",
+        "flags": [
+          "--extend-fixable"
+        ],
+        "argument": {
+          "name": "RULE_CODE",
+          "optional": false
+        },
+        "summary": "Like --fixable, but adds additional rule codes on top of those already specified",
+        "description": "Like --fixable, but adds additional rule codes on top of those already specified",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.exclude",
+        "flags": [
+          "--exclude"
+        ],
+        "argument": {
+          "name": "FILE_PATTERN",
+          "optional": false
+        },
+        "summary": "List of paths, used to omit files and/or directories from analysis",
+        "description": "List of paths, used to omit files and/or directories from analysis",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.extend-exclude",
+        "flags": [
+          "--extend-exclude"
+        ],
+        "argument": {
+          "name": "FILE_PATTERN",
+          "optional": false
+        },
+        "summary": "Like --exclude, but adds additional files and directories on top of those already excluded",
+        "description": "Like --exclude, but adds additional files and directories on top of those already excluded",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.respect-gitignore",
+        "flags": [
+          "--respect-gitignore"
+        ],
+        "summary": "Respect file exclusions via `.gitignore` and other standard ignore files.",
+        "description": "Respect file exclusions via `.gitignore` and other standard ignore files. Use `--no-respect-gitignore` to disable",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.force-exclude",
+        "flags": [
+          "--force-exclude"
+        ],
+        "summary": "Enforce exclusions, even for paths passed to Ruff directly on the command-line.",
+        "description": "Enforce exclusions, even for paths passed to Ruff directly on the command-line. Use `--no-force-exclude` to disable",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.no-cache",
+        "flags": [
+          "-n",
+          "--no-cache"
+        ],
+        "summary": "Disable cache reads",
+        "description": "Disable cache reads\n\n[env: RUFF_NO_CACHE=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.cache-dir",
+        "flags": [
+          "--cache-dir"
+        ],
+        "argument": {
+          "name": "CACHE_DIR",
+          "optional": false
+        },
+        "summary": "Path to the cache directory",
+        "description": "Path to the cache directory\n\n[env: RUFF_CACHE_DIR=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.stdin-filename",
+        "flags": [
+          "--stdin-filename"
+        ],
+        "argument": {
+          "name": "STDIN_FILENAME",
+          "optional": false
+        },
+        "summary": "The name of the file when passing it through stdin",
+        "description": "The name of the file when passing it through stdin",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.exit-zero",
+        "flags": [
+          "-e",
+          "--exit-zero"
+        ],
+        "summary": "Exit with status code \"0\", even upon detecting lint violations",
+        "description": "Exit with status code \"0\", even upon detecting lint violations",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.exit-non-zero-on-fix",
+        "flags": [
+          "--exit-non-zero-on-fix"
+        ],
+        "summary": "Exit with a non-zero status code if any files were modified via fix, even if no lint violations remain",
+        "description": "Exit with a non-zero status code if any files were modified via fix, even if no lint violations remain",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.verbose",
+        "flags": [
+          "-v",
+          "--verbose"
+        ],
+        "summary": "Enable verbose logging",
+        "description": "Enable verbose logging",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.quiet",
+        "flags": [
+          "-q",
+          "--quiet"
+        ],
+        "summary": "Print diagnostics, but nothing else",
+        "description": "Print diagnostics, but nothing else",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.silent",
+        "flags": [
+          "-s",
+          "--silent"
+        ],
+        "summary": "Disable all logging (but still exit with status code \"1\" upon detecting diagnostics)",
+        "description": "Disable all logging (but still exit with status code \"1\" upon detecting diagnostics)",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.config",
+        "flags": [
+          "--config"
+        ],
+        "argument": {
+          "name": "CONFIG_OPTION",
+          "optional": false
+        },
+        "summary": "Either a path to a TOML configuration file (`pyproject.toml` or `ruff.toml`), or a TOML `<KEY> = <VALUE>` pair (such as you might find in a `ruff.toml` configuration file) overriding a specific configuration option (e.g., `--config \"line-length = 100\"` or `--config \"format.quote-style = 'single'\"`).",
+        "description": "Either a path to a TOML configuration file (`pyproject.toml` or `ruff.toml`), or a TOML `<KEY> = <VALUE>` pair (such as you might find in a `ruff.toml` configuration file) overriding a specific configuration option (e.g., `--config \"line-length = 100\"` or `--config \"format.quote-style = 'single'\"`). Overrides of individual settings using this option always take precedence over all configuration files, including configuration files that were also specified using `--config`",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.isolated",
+        "flags": [
+          "--isolated"
+        ],
+        "summary": "Ignore all configuration files",
+        "description": "Ignore all configuration files",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      },
+      {
+        "id": "check.color",
+        "flags": [
+          "--color"
+        ],
+        "argument": {
+          "name": "WHEN",
+          "optional": false
+        },
+        "summary": "Control when colored output is used",
+        "description": "Control when colored output is used\n\nPossible values: - auto: Display colors if the output goes to an interactive terminal - always: Always display colors - never: Never display colors",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [
+          "check"
+        ],
+        "hidden": false,
+        "subcommand": "check"
+      }
+    ]
+  },
+  "warnings": []
+}
