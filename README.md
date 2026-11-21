@@ -41,7 +41,7 @@ CI runs lint, typecheck, tests with coverage and a build on every pull request a
 
 Production builds register a service worker ([vite-plugin-pwa](https://vite-pwa-org.netlify.app/), `generateSW`). It precaches the app shell, so the app loads and reviews work with no network once it has been opened. `data/decks/index.json` is network-first with a cache fallback, and deck files are cached as they are fetched; installed decks themselves live in IndexedDB.
 
-A new deploy never takes over mid-session: the app shows an "Update available" banner and switches only when the user picks Reload. Long-open tabs check for a new version hourly. The header shows "Offline" while the browser has no connection. The manifest is the hand-written `public/manifest.webmanifest`. There is no service worker in `pnpm dev`; use the production build (`pnpm build && pnpm preview`) or the E2E tests in `e2e/offline.spec.ts`.
+New deploys apply themselves with no prompt. A new version downloads in the background and waits for a quiet moment to take over: before the user has touched a freshly opened page, right after they move to another screen, or while the app is in the background. It never takes over during a review with cards left, a deck install, or a backup import (see `src/app/pwa/update-holds.ts`). The app checks for a new version when it comes back to the foreground and hourly while open. The header shows "Offline" while the browser has no connection. The manifest is the hand-written `public/manifest.webmanifest`. There is no service worker in `pnpm dev`; use the production build (`pnpm build && pnpm preview`) or the E2E tests in `e2e/offline.spec.ts`.
 
 ## Deploy
 

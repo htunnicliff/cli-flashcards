@@ -2,7 +2,7 @@
  * Static server for E2E tests: serves `dist-e2e/` like GitHub Pages would, with an SPA
  * fallback to index.html.
  *
- * To test the "Update available" prompt, a browser context can pretend a new version
+ * To test automatic updates, a browser context can pretend a new version
  * was deployed: with the cookie `e2e-build=<n>` set, `sw.js` gets a trailing comment,
  * which makes it byte-different, so the browser installs it as an update. Cookies are
  * per context, so other tests keep seeing the original build.
