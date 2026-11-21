@@ -62,6 +62,7 @@ const BackupSettingsSchema = z
     newCardsPerDay: z.number(),
     maxReviewsPerDay: z.number(),
     dayRolloverHour: z.number(),
+    leechThreshold: z.number(),
   })
   .partial()
 export type BackupSettings = z.infer<typeof BackupSettingsSchema>

@@ -18,6 +18,7 @@ const values = reactive<Record<SchedulingSettingKey, number>>({
   newCardsPerDay: SETTING_DEFAULTS.newCardsPerDay,
   maxReviewsPerDay: SETTING_DEFAULTS.maxReviewsPerDay,
   dayRolloverHour: SETTING_DEFAULTS.dayRolloverHour,
+  leechThreshold: SETTING_DEFAULTS.leechThreshold,
 })
 
 const fields: { key: SchedulingSettingKey; label: string; hint: string }[] = [
@@ -36,6 +37,11 @@ const fields: { key: SchedulingSettingKey; label: string; hint: string }[] = [
     key: 'dayRolloverHour',
     label: 'New day starts at',
     hint: 'Hour of the day (0–23), so late-night study counts toward the day before.',
+  },
+  {
+    key: 'leechThreshold',
+    label: 'Leech after',
+    hint: 'Times a card can be forgotten before it is suspended as a leech.',
   },
 ]
 

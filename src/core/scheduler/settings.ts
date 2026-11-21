@@ -1,7 +1,7 @@
 import type { Settings } from '../storage'
 
 export type SchedulingSettingKey =
-  'desiredRetention' | 'newCardsPerDay' | 'maxReviewsPerDay' | 'dayRolloverHour'
+  'desiredRetention' | 'newCardsPerDay' | 'maxReviewsPerDay' | 'dayRolloverHour' | 'leechThreshold'
 
 export interface SettingLimits {
   min: number
@@ -17,6 +17,7 @@ export const SCHEDULING_LIMITS: Record<SchedulingSettingKey, SettingLimits> = {
   newCardsPerDay: { min: 0, max: 999, step: 1 },
   maxReviewsPerDay: { min: 0, max: 9999, step: 1 },
   dayRolloverHour: { min: 0, max: 23, step: 1 },
+  leechThreshold: { min: 2, max: 99, step: 1 },
 }
 
 /**

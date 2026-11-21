@@ -2,14 +2,20 @@ import { computed, onScopeDispose, ref, shallowRef } from 'vue'
 
 import { checkAnswer, type AnswerResult } from '@/core/answers'
 import { formatInterval } from '@/core/review'
-import { createScheduler, nextState, type QueueItem, type Queue } from '@/core/scheduler'
+import {
+  createScheduler,
+  nextState,
+  type PreviousState,
+  type QueueItem,
+  type Queue,
+} from '@/core/scheduler'
 import {
   requestPersistenceOnce,
   type CardState,
   type Rating,
   type StorageManagerLike,
 } from '@/core/storage'
-import type { Deck, Option } from '@/schema'
+import { deriveCards, type Deck, type Option } from '@/schema'
 
 import { useRepository } from '../repository'
 
@@ -21,10 +27,29 @@ export const RATINGS: { rating: Rating; label: string; key: string }[] = [
 ]
 
 interface Graded {
+  kind: 'grade'
   item: QueueItem
   /** The card's state before the grade, to restore on undo. */
   previous: CardState | undefined
   entryId: number
+}
+
+interface SetAside {
+  kind: 'aside'
+  item: QueueItem
+  previous: PreviousState[]
+}
+
+/** How the last card left the screen, so it can animate the right way. */
+export type LeaveHint = { kind: 'grade'; rating: Rating } | { kind: 'aside' } | undefined
+
+/** A message for the snackbar, with an undo button unless `undoable` is false. */
+export interface ReviewNotice {
+  id: number
+  message: string
+  undoable: boolean
+  /** Where to read more, such as a leech's full description. */
+  link?: { to: string; label: string }
 }
 
 export interface ReviewSessionOptions {
@@ -55,11 +80,16 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
   const gradedThisSession = ref(0)
   /** The rating of the last grade, so the leaving card can drift the right way. */
   const lastRating = ref<Rating>()
+  const leaveHint = shallowRef<LeaveHint>()
+  const notice = shallowRef<ReviewNotice>()
+  /** Actions in this session that undo can take back. */
+  const undoable = ref(0)
+  let noticeId = 0
   const error = ref<string>()
   /** The checked typed answer for the card on screen, once submitted. */
   const answer = shallowRef<AnswerResult & { typed: string }>()
 
-  const history: Graded[] = []
+  const history: (Graded | SetAside)[] = []
   /** Cards graded on screen whose write hasn't run yet; a refresh must not bring them back. */
   const pending = new Set<string>()
   let shownAt = now()
@@ -176,6 +206,8 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     const at = now()
     const durationMs = at - shownAt
     lastRating.value = rating
+    leaveHint.value = { kind: 'grade', rating }
+    undoable.value++
     items.value = items.value.slice(1)
     revealed.value = false
     answer.value = undefined
@@ -185,8 +217,23 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     void enqueue(async () => {
       const previous = await repository.cardStates.get(item.card.id)
       try {
-        const { entry } = await scheduler.grade(item.card.id, rating, at, durationMs)
-        history.push({ item, previous, entryId: entry.id! })
+        const { entry, state, becameLeech } = await scheduler.grade(
+          item.card.id,
+          rating,
+          at,
+          durationMs,
+        )
+        history.push({ kind: 'grade', item, previous, entryId: entry.id! })
+        if (becameLeech) {
+          showNotice({
+            message: `Forgotten ${state.fsrs.lapses} times, so this card is now suspended as a leech.`,
+            undoable: false,
+            link: {
+              to: `/decks/${item.card.deckId}#option-${item.card.optionId}`,
+              label: 'Read the full description',
+            },
+          })
+        }
       } finally {
         pending.delete(item.card.id)
       }
@@ -205,9 +252,16 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     return enqueue(async () => {
       const last = history.pop()
       if (!last) return
-      await repository.undoReview(last.entryId, last.item.card.id, last.previous)
-      gradedThisSession.value = Math.max(0, gradedThisSession.value - 1)
+      if (last.kind === 'grade') {
+        await repository.undoReview(last.entryId, last.item.card.id, last.previous)
+        gradedThisSession.value = Math.max(0, gradedThisSession.value - 1)
+      } else {
+        await scheduler.restore(last.previous)
+      }
+      undoable.value = Math.max(0, undoable.value - 1)
+      notice.value = undefined
       lastRating.value = undefined
+      leaveHint.value = undefined
       items.value = [last.item, ...items.value.filter((i) => i.card.id !== last.item.card.id)]
       revealed.value = false
       answer.value = undefined
@@ -216,8 +270,55 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     })
   }
 
-  /** Whether there is a grade from this session to take back. */
-  const canUndo = computed(() => gradedThisSession.value > 0)
+  /**
+   * Sets the card on screen aside without grading it: suspends it (or, with
+   * `scope: 'option'`, every card for its option) or buries it until tomorrow.
+   */
+  function setAside(how: 'suspend' | 'bury', scope: 'card' | 'option' = 'card') {
+    const item = current.value
+    if (!item) return
+    const at = now()
+    const cardIds =
+      scope === 'option'
+        ? deriveCards(decks.value.get(item.card.deckId)!)
+            .filter((card) => card.optionId === item.card.optionId)
+            .map((card) => card.id)
+        : [item.card.id]
+    leaveHint.value = { kind: 'aside' }
+    undoable.value++
+    items.value = items.value.filter((i) => !cardIds.includes(i.card.id))
+    revealed.value = false
+    answer.value = undefined
+    shownAt = at
+    for (const id of cardIds) pending.add(id)
+    const message =
+      how === 'bury'
+        ? 'Buried until tomorrow.'
+        : scope === 'option'
+          ? `Suspended every card for ${item.card.flag}.`
+          : 'Card suspended.'
+    showNotice({ message, undoable: true })
+    void enqueue(async () => {
+      try {
+        const previous = await scheduler.setAside(cardIds, how, at)
+        history.push({ kind: 'aside', item, previous })
+      } finally {
+        for (const id of cardIds) pending.delete(id)
+      }
+      await refresh()
+    })
+  }
+
+  function showNotice(next: Omit<ReviewNotice, 'id'>) {
+    notice.value = { ...next, id: ++noticeId }
+  }
+
+  function dismissNotice() {
+    notice.value = undefined
+  }
+
+  /** Whether there is an action from this session to take back. */
+  const canUndo = computed(() => undoable.value > 0)
   /** Whether any deck is installed, so the empty state can point to the Decks page. */
   const hasDecks = computed(() => decks.value.size > 0)
 
@@ -240,6 +341,8 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     nextDue,
     nextLearningDue,
     lastRating,
+    leaveHint,
+    notice,
     gradedThisSession,
     error,
     typing,
@@ -248,6 +351,8 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     reveal,
     submitAnswer,
     grade,
+    setAside,
+    dismissNotice,
     undo,
     canUndo,
     hasDecks,

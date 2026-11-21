@@ -7,10 +7,15 @@ import { formatNextDue } from '@/core/review'
 import type { Rating } from '@/core/storage'
 
 import { UiButton, UiKbd } from '../components/ui'
-import { fade, spring } from '../motion/tokens'
+import { fade, presets, spring } from '../motion/tokens'
 import ReviewCard from '../review/ReviewCard.vue'
 import TypedAnswer from '../review/TypedAnswer.vue'
-import { RATINGS, useReviewSession, type ReviewSessionOptions } from '../review/useReviewSession'
+import {
+  RATINGS,
+  useReviewSession,
+  type LeaveHint,
+  type ReviewSessionOptions,
+} from '../review/useReviewSession'
 
 const props = defineProps<{ sessionOptions?: ReviewSessionOptions }>()
 
@@ -26,7 +31,8 @@ const {
   intervals,
   nextDue,
   nextLearningDue,
-  lastRating,
+  leaveHint,
+  notice,
   error,
   canUndo,
   hasDecks,
@@ -47,17 +53,36 @@ const COUNT_LABELS = [
   { kind: 'review', label: 'Review' },
 ] as const
 
-/** Where a graded card drifts as it leaves: Again left, Hard down, Good right, Easy up. */
+/**
+ * Where a card goes as it leaves. Graded cards drift by grade: Again left, Hard
+ * down, Good right, Easy up. A suspended or buried card drops and shrinks instead,
+ * so it reads as set aside rather than graded.
+ */
 const cardVariants = {
-  initial: { opacity: 0, y: 8 },
-  enter: { opacity: 1, x: 0, y: 0, transition: spring.gentle },
-  exit: (rating: Rating | undefined) => ({
-    opacity: 0,
-    x: rating === 1 ? -48 : rating === 3 ? 48 : 0,
-    y: rating === 2 ? 24 : rating === 4 ? -24 : 0,
-    transition: fade.base,
-  }),
+  initial: { opacity: 0, y: 8, scale: 1 },
+  enter: { opacity: 1, x: 0, y: 0, scale: 1, transition: spring.gentle },
+  exit: (hint: LeaveHint) => {
+    if (hint?.kind === 'aside') {
+      return { opacity: 0, y: 56, scale: 0.94, transition: fade.base }
+    }
+    const rating = hint?.rating
+    return {
+      opacity: 0,
+      x: rating === 1 ? -48 : rating === 3 ? 48 : 0,
+      y: rating === 2 ? 24 : rating === 4 ? -24 : 0,
+      transition: fade.base,
+    }
+  },
 }
+
+// The snackbar leaves on its own after a while; a new notice restarts the clock.
+const NOTICE_MS = 8000
+let noticeTimer: ReturnType<typeof setTimeout> | undefined
+watch(notice, (next) => {
+  if (noticeTimer) clearTimeout(noticeTimer)
+  if (next) noticeTimer = setTimeout(() => session.dismissNotice(), NOTICE_MS)
+})
+onBeforeUnmount(() => noticeTimer && clearTimeout(noticeTimer))
 
 const nextDueText = computed(() => {
   const due = nextLearningDue.value ?? nextDue.value
@@ -117,6 +142,14 @@ function onKeydown(event: KeyboardEvent) {
   }
   if (event.key === 'u' || event.key === 'U') {
     if (canUndo.value) void session.undo()
+    return
+  }
+  if (event.key === 's' || event.key === 'S') {
+    session.setAside('suspend', event.shiftKey || event.key === 'S' ? 'option' : 'card')
+    return
+  }
+  if (event.key === 'b') {
+    session.setAside('bury')
     return
   }
   const rating = RATINGS.find((r) => r.key === event.key)
@@ -226,7 +259,19 @@ const swipeHint = computed(() => {
           </div>
           <div>
             <dt><UiKbd>u</UiKbd></dt>
-            <dd>Undo the last grade</dd>
+            <dd>Undo the last grade, suspend or bury</dd>
+          </div>
+          <div>
+            <dt><UiKbd>s</UiKbd></dt>
+            <dd>Suspend this card</dd>
+          </div>
+          <div>
+            <dt><UiKbd>S</UiKbd></dt>
+            <dd>Suspend every card for this flag</dd>
+          </div>
+          <div>
+            <dt><UiKbd>b</UiKbd></dt>
+            <dd>Bury this card until tomorrow</dd>
           </div>
           <div>
             <dt><UiKbd>?</UiKbd></dt>
@@ -265,12 +310,12 @@ const swipeHint = computed(() => {
         @pointerup="onPointerUp"
         @pointercancel="onPointerUp"
       >
-        <AnimatePresence mode="wait" :custom="lastRating">
+        <AnimatePresence mode="wait" :custom="leaveHint">
           <m.div
             :key="current.card.id"
             class="card-motion"
             :variants="cardVariants"
-            :custom="lastRating"
+            :custom="leaveHint"
             initial="initial"
             animate="enter"
             exit="exit"
@@ -335,8 +380,48 @@ const swipeHint = computed(() => {
             >
           </UiButton>
         </div>
+        <div class="set-aside" role="group" aria-label="Set this card aside">
+          <button type="button" aria-keyshortcuts="b" @click="session.setAside('bury')">
+            Bury <UiKbd>b</UiKbd>
+          </button>
+          <button type="button" aria-keyshortcuts="s" @click="session.setAside('suspend')">
+            Suspend <UiKbd>s</UiKbd>
+          </button>
+          <button
+            type="button"
+            aria-keyshortcuts="Shift+S"
+            @click="session.setAside('suspend', 'option')"
+          >
+            Suspend all {{ current.card.flag }} cards <UiKbd>S</UiKbd>
+          </button>
+        </div>
       </div>
     </template>
+
+    <AnimatePresence>
+      <m.div
+        v-if="notice"
+        :key="notice.id"
+        class="snackbar"
+        role="status"
+        data-testid="notice"
+        v-bind="presets.slideUp"
+      >
+        <p>{{ notice.message }}</p>
+        <RouterLink v-if="notice.link" :to="notice.link.to" class="snackbar-link">{{
+          notice.link.label
+        }}</RouterLink>
+        <button
+          v-if="notice.undoable && canUndo"
+          type="button"
+          class="snackbar-undo"
+          @click="session.undo()"
+        >
+          Undo
+        </button>
+        <button type="button" aria-label="Dismiss" @click="session.dismissNotice()">×</button>
+      </m.div>
+    </AnimatePresence>
   </section>
 </template>
 
@@ -491,6 +576,64 @@ p {
 
 .grade[data-suggested] {
   box-shadow: 0 0 0 2px var(--color-accent);
+}
+
+.set-aside {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-1) var(--space-4);
+}
+
+.set-aside button,
+.snackbar button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-muted);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.snackbar {
+  position: fixed;
+  z-index: 10;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  left: var(--space-4);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-button);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.snackbar p {
+  flex: 1;
+  font-size: var(--text-sm);
+}
+
+.snackbar .snackbar-undo {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.snackbar-link {
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-weight: 600;
 }
 
 .grades {

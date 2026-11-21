@@ -238,3 +238,80 @@ describe('grade', () => {
     )
   })
 })
+
+describe('leeches', () => {
+  /** Graduates a card, then forgets it `times` times, letting it relearn in between. */
+  async function lapse(cardId: string, times: number, start: number) {
+    let due = await graduate(cardId, start)
+    let result
+    for (let i = 0; i < times; i++) {
+      result = await scheduler.grade(cardId, 1, due)
+      let state = result.state
+      while (state.fsrs.phase !== 'review' && !state.suspended) {
+        ;({ state } = await scheduler.grade(cardId, 3, state.fsrs.due))
+      }
+      due = state.fsrs.due
+    }
+    return result!
+  }
+
+  it('tags and suspends a card on the lapse that reaches the threshold', async () => {
+    await repo.settings.set('leechThreshold', 3)
+    const id = 'grep:gnu:ignore-case:flag-to-meaning'
+    expect((await lapse(id, 2, at(10))).becameLeech).toBe(false)
+    const third = await lapse(id, 1, (await repo.cardStates.get(id))!.fsrs.due)
+    expect(third.becameLeech).toBe(true)
+    expect(third.state).toMatchObject({ leech: true, suspended: true })
+    expect(await ids(at(400))).not.toContain(id)
+  })
+
+  it('keeps the leech tag but does not suspend again after unsuspending', async () => {
+    await repo.settings.set('leechThreshold', 2)
+    const id = 'grep:gnu:ignore-case:flag-to-meaning'
+    expect((await lapse(id, 2, at(10))).becameLeech).toBe(true)
+    await scheduler.unsuspend([id])
+    const state = (await repo.cardStates.get(id))!
+    expect(state).toMatchObject({ leech: true, suspended: false })
+    const again = await scheduler.grade(id, 1, state.fsrs.due)
+    expect(again.becameLeech).toBe(false)
+    expect(again.state.suspended).toBe(false)
+  })
+})
+
+describe('setAside', () => {
+  const card = 'grep:gnu:ignore-case:flag-to-meaning'
+  const sibling = 'grep:gnu:ignore-case:meaning-to-flag'
+
+  it('suspends new and studied cards, and restore puts them back exactly', async () => {
+    await scheduler.grade(card, 3, at(10))
+    const before = await repo.cardStates.get(card)
+    const previous = await scheduler.setAside([card, sibling], 'suspend', at(10))
+    expect(previous).toEqual([
+      { cardId: card, state: before },
+      { cardId: sibling, state: undefined },
+    ])
+    expect(await repo.cardStates.get(sibling)).toMatchObject({
+      suspended: true,
+      fsrs: expect.objectContaining({ phase: 'new' }),
+    })
+    expect(await ids(at(11))).not.toContain(sibling)
+
+    await scheduler.restore(previous)
+    expect(await repo.cardStates.get(card)).toEqual(before)
+    expect(await repo.cardStates.get(sibling)).toBeUndefined()
+  })
+
+  it('buries a card until the next study day', async () => {
+    expect(await ids(at(10))).toContain(card)
+    await scheduler.setAside([card], 'bury', at(10))
+    expect(await ids(at(10, 20))).not.toContain(card)
+    expect(await ids(at(11, 5))).toContain(card)
+  })
+
+  it('unsuspends cards', async () => {
+    await scheduler.setAside([card], 'suspend', at(10))
+    await scheduler.unsuspend([card, sibling])
+    expect(await repo.cardStates.get(card)).toMatchObject({ suspended: false })
+    expect(await repo.cardStates.get(sibling)).toBeUndefined()
+  })
+})

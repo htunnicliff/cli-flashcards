@@ -57,6 +57,11 @@ export interface CardState {
   suspended: boolean
   /** Buried cards are skipped until this time (epoch ms). */
   buriedUntil?: number
+  /**
+   * Forgotten `leechThreshold` times. Set (and the card suspended) by the
+   * scheduler on the lapse that crosses the threshold; kept after unsuspending.
+   */
+  leech?: boolean
 }
 
 /**
@@ -98,6 +103,8 @@ export interface Settings {
   maxReviewsPerDay: number
   /** Local hour at which a new study day starts; 4 means 4 AM. */
   dayRolloverHour: number
+  /** Lapses after which a card is tagged as a leech and suspended. */
+  leechThreshold: number
   /** When a backup was last exported (epoch ms). */
   lastBackupAt: number | null
   /**
@@ -121,6 +128,7 @@ export const SETTING_DEFAULTS: Settings = {
   newCardsPerDay: 20,
   maxReviewsPerDay: 200,
   dayRolloverHour: 4,
+  leechThreshold: 6,
   lastBackupAt: null,
   pendingDeckInstalls: [],
 }
