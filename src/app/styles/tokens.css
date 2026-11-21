@@ -5,6 +5,11 @@
  * Text size: <html data-font-size="s|m|l"> scales the root size, and with it every rem below.
  *
  * Colour values are mirrored in palette.ts for the contrast tests; keep the two in sync.
+ *
+ * Glass ("Frost"): raised surfaces are frosted panes over a soft colour wash (--backdrop).
+ * The header and the phone tab bar are the clearest glass; cards stay nearly opaque so text
+ * contrast matches the solid palette. Reduce transparency, Increase contrast and browsers
+ * without backdrop-filter all get solid surfaces (bottom of this file).
  */
 
 :root {
@@ -40,8 +45,8 @@
   --space-12: 48px;
 
   /* Shape */
-  --radius-card: 20px;
-  --radius-button: 14px;
+  --radius-card: 24px;
+  --radius-button: 16px;
   --radius-code: 10px;
   --radius-small: 8px;
   --radius-kbd: 5px;
@@ -52,6 +57,10 @@
   /* Focus */
   --focus-ring-width: 2px;
   --focus-ring-offset: 2px;
+
+  /* Glass blur: strong on the chrome, light on cards so text stays crisp */
+  --glass-filter: blur(20px) saturate(140%);
+  --glass-filter-card: blur(8px);
 
   /* Motion (springs live in #20; these cover plain CSS transitions) */
   --duration-fast: 120ms;
@@ -80,7 +89,28 @@
   --color-kbd: #efede8;
   --color-kbd-on-primary: rgb(255 255 255 / 0.18);
   --color-focus: var(--color-accent);
-  --shadow-card: 0 1px 2px rgb(29 28 26 / 0.06), 0 12px 32px rgb(29 28 26 / 0.07);
+
+  /* Glass */
+  --backdrop:
+    radial-gradient(70% 45% at 0% 0%, rgb(255 215 170 / 0.4), transparent 70%),
+    radial-gradient(60% 45% at 100% 100%, rgb(170 195 255 / 0.35), transparent 70%);
+  --glass-card: rgb(255 255 255 / 0.82);
+  --glass-chrome: rgb(250 249 246 / 0.66);
+  --glass-rim: rgb(255 255 255 / 0.9);
+  --glass-edge: rgb(29 28 26 / 0.08);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 1);
+  --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0) 30%);
+  --surface-glass: var(--glass-sheen), var(--glass-card);
+  --fill-primary: linear-gradient(180deg, #3560d4, #2b54c9);
+  --shadow-card:
+    var(--glass-highlight), 0 0 0 var(--border-width) var(--glass-edge),
+    0 1px 2px rgb(29 28 26 / 0.05), 0 10px 30px rgb(29 28 26 / 0.08);
+  --shadow-control:
+    var(--glass-highlight), 0 0 0 var(--border-width) var(--glass-edge),
+    0 2px 8px rgb(29 28 26 / 0.06);
+  --shadow-primary:
+    inset 0 1px 0 rgb(255 255 255 / 0.35), inset 0 -1px 0 rgb(0 0 0 / 0.12),
+    0 6px 18px rgb(43 84 201 / 0.3);
 }
 
 /* Dark, chosen explicitly */
@@ -103,7 +133,26 @@
   --color-kbd: #26272b;
   --color-kbd-on-primary: rgb(15 23 48 / 0.16);
   --color-focus: var(--color-accent);
-  --shadow-card: none;
+
+  /* Glass */
+  --backdrop:
+    radial-gradient(70% 45% at 0% 0%, rgb(120 80 40 / 0.28), transparent 70%),
+    radial-gradient(60% 45% at 100% 100%, rgb(50 70 140 / 0.3), transparent 70%);
+  --glass-card: rgb(30 31 35 / 0.82);
+  --glass-chrome: rgb(22 23 26 / 0.66);
+  --glass-rim: rgb(255 255 255 / 0.09);
+  --glass-edge: rgb(0 0 0 / 0.4);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.1);
+  --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0) 30%);
+  --fill-primary: linear-gradient(180deg, #a2bcff, #94b2ff);
+  --shadow-card:
+    var(--glass-highlight), 0 0 0 var(--border-width) var(--glass-edge), 0 1px 2px rgb(0 0 0 / 0.3),
+    0 12px 32px rgb(0 0 0 / 0.35);
+  --shadow-control:
+    var(--glass-highlight), 0 0 0 var(--border-width) var(--glass-edge), 0 2px 8px rgb(0 0 0 / 0.25);
+  --shadow-primary:
+    inset 0 1px 0 rgb(255 255 255 / 0.35), inset 0 -1px 0 rgb(0 0 0 / 0.12),
+    0 6px 18px rgb(148 178 255 / 0.18);
 }
 
 /* Dark, following the system (no override, or "system") */
@@ -127,7 +176,27 @@
     --color-kbd: #26272b;
     --color-kbd-on-primary: rgb(15 23 48 / 0.16);
     --color-focus: var(--color-accent);
-    --shadow-card: none;
+
+    /* Glass */
+    --backdrop:
+      radial-gradient(70% 45% at 0% 0%, rgb(120 80 40 / 0.28), transparent 70%),
+      radial-gradient(60% 45% at 100% 100%, rgb(50 70 140 / 0.3), transparent 70%);
+    --glass-card: rgb(30 31 35 / 0.82);
+    --glass-chrome: rgb(22 23 26 / 0.66);
+    --glass-rim: rgb(255 255 255 / 0.09);
+    --glass-edge: rgb(0 0 0 / 0.4);
+    --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.1);
+    --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0) 30%);
+    --fill-primary: linear-gradient(180deg, #a2bcff, #94b2ff);
+    --shadow-card:
+      var(--glass-highlight), 0 0 0 var(--border-width) var(--glass-edge),
+      0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px rgb(0 0 0 / 0.35);
+    --shadow-control:
+      var(--glass-highlight), 0 0 0 var(--border-width) var(--glass-edge),
+      0 2px 8px rgb(0 0 0 / 0.25);
+    --shadow-primary:
+      inset 0 1px 0 rgb(255 255 255 / 0.35), inset 0 -1px 0 rgb(0 0 0 / 0.12),
+      0 6px 18px rgb(148 178 255 / 0.18);
   }
 }
 
@@ -143,5 +212,31 @@
 @media (max-width: 600px) {
   :root {
     --text-flag: 1.875rem; /* 30px on phones */
+  }
+}
+
+/*
+ * Reduce transparency or Increase contrast: the same shapes with solid fills, no blur and
+ * no colour wash. Matches every theme block (same specificity, later in the file).
+ */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  :root[data-theme],
+  :root:not([data-theme]) {
+    --backdrop: none;
+    --glass-card: var(--color-surface);
+    --glass-chrome: var(--color-surface);
+    --glass-rim: var(--color-border);
+    --glass-sheen: linear-gradient(transparent, transparent);
+    --glass-filter: none;
+    --glass-filter-card: none;
+  }
+}
+
+/* No backdrop-filter: translucent fills would show the content behind them unblurred. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root[data-theme],
+  :root:not([data-theme]) {
+    --glass-card: var(--color-surface);
+    --glass-chrome: var(--color-surface);
   }
 }

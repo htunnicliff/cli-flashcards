@@ -24,6 +24,16 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* The soft colour wash the glass surfaces frost. Fixed, so it shifts under content. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--backdrop);
+  pointer-events: none;
+}
+
 button,
 input,
 select,

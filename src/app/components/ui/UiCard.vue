@@ -18,10 +18,12 @@ withDefaults(
   flex-direction: column;
   gap: var(--space-6);
   padding: var(--space-10);
-  border: var(--border-width) solid var(--color-border);
+  border: var(--border-width) solid var(--glass-rim);
   border-radius: var(--radius-card);
-  background: var(--color-surface);
+  background: var(--surface-glass);
   box-shadow: var(--shadow-card);
+  -webkit-backdrop-filter: var(--glass-filter-card);
+  backdrop-filter: var(--glass-filter-card);
 }
 
 @media (max-width: 600px) {
