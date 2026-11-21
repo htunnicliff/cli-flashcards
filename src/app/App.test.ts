@@ -1,10 +1,16 @@
 import { mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
 import App from './App.vue'
 import { routes } from './router'
+
+// Views that load decks fetch the manifest; there is no server in unit tests.
+beforeEach(() => {
+  vi.stubGlobal('fetch', async () => new Response('', { status: 404 }))
+  return () => vi.unstubAllGlobals()
+})
 
 async function mountAt(path: string) {
   const router = createRouter({ history: createMemoryHistory(), routes })

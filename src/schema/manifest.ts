@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { SourceSchema, TierSchema } from './deck'
+import { SourceSchema, TIERS, TierSchema, type Deck } from './deck'
 
 /** Bump when the manifest format changes incompatibly. */
 export const MANIFEST_VERSION = 1
@@ -28,3 +28,24 @@ export const DeckManifestSchema = z.object({
   decks: z.array(DeckManifestEntrySchema),
 })
 export type DeckManifest = z.infer<typeof DeckManifestSchema>
+
+/** The manifest entry for a built deck file. */
+export function manifestEntry(deck: Deck, file: string, bytes: number): DeckManifestEntry {
+  const visible = deck.options.filter((option) => !option.hidden)
+  const tiers = Object.fromEntries(
+    TIERS.map((tier) => [tier, visible.filter((option) => option.tier === tier).length]),
+  ) as DeckManifestEntry['tiers']
+  return {
+    id: deck.id,
+    tool: deck.tool,
+    variant: deck.variant,
+    toolVersion: deck.toolVersion,
+    deckVersion: deck.deckVersion,
+    source: deck.source,
+    license: deck.license,
+    file,
+    bytes,
+    optionCount: visible.length,
+    tiers,
+  }
+}

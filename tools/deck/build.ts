@@ -3,8 +3,7 @@
  * validated, with `deckVersion` bumped whenever the content changes.
  */
 import { createHash } from 'node:crypto'
-import { DeckSchema, TIERS, type Deck } from '../../src/schema/deck'
-import type { DeckManifestEntry } from '../../src/schema/manifest'
+import { DeckSchema, type Deck } from '../../src/schema/deck'
 import { OverridesSchema } from '../../src/schema/overrides'
 import { DeckValidationError } from './generate'
 import { applyOverrides } from './overrides'
@@ -72,22 +71,4 @@ export function buildDeck(input: BuildInput, label = 'deck'): BuildResult {
   return { deck, stale }
 }
 
-export function manifestEntry(deck: Deck, file: string, bytes: number): DeckManifestEntry {
-  const visible = deck.options.filter((option) => !option.hidden)
-  const tiers = Object.fromEntries(
-    TIERS.map((tier) => [tier, visible.filter((option) => option.tier === tier).length]),
-  ) as DeckManifestEntry['tiers']
-  return {
-    id: deck.id,
-    tool: deck.tool,
-    variant: deck.variant,
-    toolVersion: deck.toolVersion,
-    deckVersion: deck.deckVersion,
-    source: deck.source,
-    license: deck.license,
-    file,
-    bytes,
-    optionCount: visible.length,
-    tiers,
-  }
-}
+export { manifestEntry } from '../../src/schema/manifest'
