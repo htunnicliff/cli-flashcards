@@ -9,23 +9,35 @@ options:
     summary: Highlight matches; WHEN is never, always or auto
   short-H:
     summary: Prefix each match with its file name
+    examples:
+      - command: grep -H 'search_pattern' path/to/file
   recursive:
     primary: -r
     summary: Search directories recursively
+    examples:
+      - command: grep -r 'search_pattern' path/to/directory
   extended-regexp:
     summary: Use extended regular expressions, so | + ? ( ) need no backslash
+    examples:
+      - command: grep -E 'error|warning' path/to/log
   fixed-strings:
     summary: Treat the pattern as a literal string, not a regex
   ignore-case:
     summary: Match regardless of upper or lower case
+    examples:
+      - command: grep -i 'search_pattern' path/to/file
   invert-match:
     summary: Show the lines that do NOT match
   only-matching:
     summary: Print just the matched text, one match per line
   line-number:
     summary: Show where each match is, as a line number before it
+    examples:
+      - command: grep -n 'search_pattern' path/to/file
   short-I:
     summary: Skip binary files
+    examples:
+      - command: grep -r -I 'search_pattern' path/to/directory
   word-regexp:
     tier: core
     summary: Only match whole words
@@ -41,6 +53,7 @@ options:
     tier: core
     summary: List only the names of files that contain a match
     examples:
+      - command: grep -l 'search_pattern' path/to/*.txt
       - command: grep -rl 'search_pattern' path/to/directory
   after-context:
     tier: core

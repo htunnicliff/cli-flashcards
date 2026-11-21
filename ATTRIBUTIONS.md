@@ -46,6 +46,13 @@ Deck content is derived from the manual pages and examples listed below. Option 
 - License: GPL-3.0-or-later
 - Attribution: GNU grep manual page © Free Software Foundation, Inc. (https://www.gnu.org/software/grep/). Examples adapted from tldr-pages (https://github.com/tldr-pages/tldr), CC BY 4.0.
 
+## jq (default)
+
+- Deck: `jq-default`, generated from help 1.7
+- Source pages: jq
+- License: MIT
+- Attribution: jq --help output © Stephen Dolan and jq contributors (https://jqlang.org). Examples adapted from tldr-pages (https://github.com/tldr-pages/tldr), CC BY 4.0.
+
 ## rg (default)
 
 - Deck: `rg-default`, generated from manpage 14.1.0

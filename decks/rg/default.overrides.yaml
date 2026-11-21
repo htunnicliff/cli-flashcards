@@ -79,6 +79,7 @@ options:
     tier: core
     summary: Search ignored files too; repeat (-uu, -uuu) to add hidden and binary files
     examples:
+      - command: rg -u pattern
       - command: rg -uu pattern
   count:
     tier: common

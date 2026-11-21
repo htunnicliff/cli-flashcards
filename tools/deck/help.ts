@@ -32,6 +32,8 @@ export function parseHelp(text: string): RawPage {
     | { tag: string; indent: number; bodyIndent?: number; body: TextBuilder; section: string }
     | undefined
   let blankPending = false
+  /** Where same-line descriptions start, from the last entry that had one. */
+  let descriptionColumn: number | undefined
 
   const close = () => {
     if (entry) {
@@ -82,15 +84,32 @@ export function parseHelp(text: string): RawPage {
       !(option && indent < (entry.bodyIndent ?? entry.indent + 5))
     if (option && !continues) {
       close()
+      let tag = option[2]!.trim()
+      let description = option[3]
+      // A long tag can reach the description column with a single space
+      // before the text (jq's `--slurpfile name file set $name to …`). Split
+      // it at the column the other entries use.
+      const column = descriptionColumn
+      if (
+        !description &&
+        column !== undefined &&
+        column > indent &&
+        line[column - 1] === ' ' &&
+        /\S/.test(line[column] ?? '')
+      ) {
+        tag = line.slice(indent, column).trim()
+        description = line.slice(column).trim()
+      }
       entry = {
-        tag: option[2]!.trim(),
+        tag,
         indent: option[1]!.length,
         body: new TextBuilder(),
         section,
       }
-      if (option[3]) {
-        entry.body.add(option[3])
-        entry.bodyIndent = line.indexOf(option[3], option[1]!.length + option[2]!.length)
+      if (description) {
+        entry.body.add(description)
+        entry.bodyIndent = line.indexOf(description, indent + tag.length)
+        descriptionColumn = entry.bodyIndent
       }
       continue
     }

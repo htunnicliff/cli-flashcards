@@ -32,11 +32,13 @@ options:
     tier: core
     summary: With -s, still print an error message when the transfer fails
     examples:
+      - command: curl -s -S https://example.com/api
       - command: curl -sS https://example.com/api
   fail:
     tier: core
     summary: Exit with an error and print nothing on HTTP 4xx or 5xx responses
     examples:
+      - command: curl -f https://example.com/missing
       - command: curl -fsSL https://example.com/install.sh | sh
   include:
     tier: core

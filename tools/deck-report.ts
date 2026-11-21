@@ -57,7 +57,7 @@ if (copied.length > 0) {
 
 const bare = coreWithoutExamples(deck)
 if (bare.length > 0) {
-  console.log(`\nCore options with no example (${bare.length}):`)
+  console.log(`\nCore options with no cloze-able example (${bare.length}):`)
   console.log(`  ${bare.join(', ')}`)
 }
 

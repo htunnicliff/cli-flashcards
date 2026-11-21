@@ -1,0 +1,56 @@
+name: New deck
+description: Propose a deck for a command-line tool
+title: 'Deck: <tool>'
+labels: ['area: data']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for adding a tool! The steps are in [CONTRIBUTING.md](https://github.com/htunnicliff/cli-flashcards/blob/main/CONTRIBUTING.md#adding-a-deck). Open this issue first so nobody else picks the same tool.
+  - type: input
+    id: tool
+    attributes:
+      label: Tool
+      description: The command name, and a link to its project.
+      placeholder: jq (https://jqlang.org)
+    validations:
+      required: true
+  - type: input
+    id: variants
+    attributes:
+      label: Variants
+      description: Implementations whose flags differ, each getting its own deck. Leave as `default` if there is only one.
+      placeholder: default
+    validations:
+      required: true
+  - type: dropdown
+    id: source
+    attributes:
+      label: Source
+      description: Where the options come from.
+      options:
+        - Manpage
+        - --help output
+    validations:
+      required: true
+  - type: input
+    id: license
+    attributes:
+      label: License of the source text
+      description: SPDX identifier of the manpage or help text (check its copyright notice).
+      placeholder: MIT
+    validations:
+      required: true
+  - type: textarea
+    id: core
+    attributes:
+      label: Core options
+      description: The flags you'd teach first. A rough list is fine; it gets refined in the pull request.
+      placeholder: |
+        -r  print raw strings
+        -c  compact output
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Anything unusual, such as parser warnings or options that need merging.
