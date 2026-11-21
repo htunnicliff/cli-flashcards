@@ -6,13 +6,13 @@
       "tool": "rg",
       "variant": "default",
       "toolVersion": "14.1.0",
-      "deckVersion": 1,
+      "deckVersion": 2,
       "source": "manpage",
       "license": "MIT OR Unlicense",
       "file": "rg-default.json",
-      "bytes": 82897,
+      "bytes": 84046,
       "optionCount": 101,
-      "tiers": { "core": 0, "common": 101, "obscure": 0 }
+      "tiers": { "core": 8, "common": 5, "obscure": 88 }
     }
   ]
 }

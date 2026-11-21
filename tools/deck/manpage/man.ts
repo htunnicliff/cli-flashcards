@@ -31,7 +31,13 @@ const FONT = new Set(['B', 'I', 'SM', 'SB', 'R'])
 export function parseMan(source: string): RawPage {
   const ctx = new RoffContext()
   const lines = readRoff(source, ctx)
-  const page: RawPage = { format: 'man', title: '', section: undefined, entries: [] }
+  const page: RawPage = {
+    format: 'man',
+    title: '',
+    section: undefined,
+    entries: [],
+    sectionText: {},
+  }
 
   let section = ''
   let subsection: string | undefined
@@ -66,6 +72,7 @@ export function parseMan(source: string): RawPage {
 
   const text = (raw: string) => {
     const plain = ctx.unescape(raw)
+    page.sectionText[section] = `${page.sectionText[section] ?? ''}${plain}\n`
     if (expectTag === 'entry' || expectTag === 'extra') {
       entry?.tags.push(plain)
       expectTag = undefined

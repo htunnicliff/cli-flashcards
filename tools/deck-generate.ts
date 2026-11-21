@@ -1,20 +1,30 @@
 /**
- * Generates a deck from a tool's manpage(s).
+ * Generates a deck from a tool's manpage(s) or `--help` output.
  *
  *   pnpm deck:generate rg
  *   pnpm deck:generate git --pages git-log,git-commit
+ *   pnpm deck:generate sed --variant bsd --file path/to/bsd/sed.1
+ *   pnpm deck:generate ruff --source help --pages check,format
  *
  * Options:
- *   --pages a,b,c      manpages to read (default: the tool's own page). Pages
- *                      named `<tool>-<sub>` tag their options with subcommand `<sub>`.
- *   --variant NAME     deck variant (default: `default`)
- *   --sections A,B     only read these manpage sections
+ *   --source manpage|help  where options come from (default: manpage)
+ *   --pages a,b,c      manpage source: manpages to read (default: the tool's own
+ *                      page); pages named `<tool>-<sub>` tag their options with
+ *                      subcommand `<sub>`. help source: subcommands to run
+ *                      `<tool> <sub> --help` for.
+ *   --file a,b         read these files instead of locating pages or running the
+ *                      tool, e.g. a BSD manpage on Linux or saved --help output
+ *   --variant NAME     deck variant, e.g. gnu or bsd (default: `default`)
+ *   --tool-version V   tool version to record (default: `<tool> --version`,
+ *                      or `unknown` with --file)
+ *   --sections A,B     only read these sections
  *   --license SPDX     license of the source text
  *   --attribution TXT  attribution line for the deck
  *   --out PATH         output file (default: decks/<tool>/<variant>.generated.json)
+ *   --no-tldr          don't use vendored tldr-pages for tiers and examples
  *
- * Needs `man` on PATH to locate pages. The parser itself is pure; see
- * tools/deck/generate.ts.
+ * The variant is always an explicit input; nothing is auto-detected. The
+ * parsers themselves are pure; see tools/deck/generate.ts.
  */
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
@@ -24,16 +34,21 @@ import { parseArgs } from 'node:util'
 import { gunzipSync } from 'node:zlib'
 import { format } from 'prettier'
 import { DeckValidationError, generateDeck, type PageInput } from './deck/generate'
+import { loadTldrPages } from './deck/tldr-files'
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
   options: {
+    source: { type: 'string', default: 'manpage' },
     pages: { type: 'string' },
+    file: { type: 'string' },
+    'tool-version': { type: 'string' },
     variant: { type: 'string', default: 'default' },
     sections: { type: 'string' },
     license: { type: 'string' },
     attribution: { type: 'string' },
     out: { type: 'string' },
+    'no-tldr': { type: 'boolean', default: false },
   },
 })
 
@@ -96,27 +111,82 @@ function toolVersion(command: string): string {
   }
 }
 
-const pageNames = values.pages ? values.pages.split(',').map((name) => name.trim()) : [tool]
-const sections = values.sections?.split(',').map((section) => section.trim().toUpperCase())
-const pages: PageInput[] = pageNames.map((name) => {
-  const path = locate(name)
-  const subcommand =
-    values.pages && name.startsWith(`${tool}-`) ? name.slice(tool.length + 1) : undefined
-  return {
-    name,
-    path,
-    source: readManpage(path),
-    ...(subcommand ? { subcommand } : {}),
-    ...(sections ? { sections } : {}),
+const source = values.source
+if (source !== 'manpage' && source !== 'help') {
+  console.error('--source must be "manpage" or "help"')
+  process.exit(2)
+}
+const list = (value: string | undefined) =>
+  value
+    ?.split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+const sections = list(values.sections)?.map((section) => section.toUpperCase())
+const files = list(values.file)
+const pageArgs = list(values.pages)
+
+function helpText(args: string[]): string {
+  const run = (flag: string) =>
+    execFileSync(tool!, [...args, flag], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 10000,
+    })
+  try {
+    return run('--help')
+  } catch {
+    return run('-h')
   }
-})
+}
+
+function subcommandOf(name: string): string | undefined {
+  return name.startsWith(`${tool}-`) ? name.slice(tool!.length + 1) : undefined
+}
+
+let pages: PageInput[]
+if (files) {
+  // Page names come from --pages when given, else from the file name (`git-log.1` → git-log).
+  pages = files.map((path, index) => {
+    const name = pageArgs?.[index] ?? path.split('/').pop()!.split('.')[0]!
+    const subcommand = files.length > 1 || pageArgs ? subcommandOf(name) : undefined
+    return {
+      name,
+      path,
+      format: source,
+      source: source === 'help' ? readFileSync(path, 'utf8') : readManpage(path),
+      ...(subcommand ? { subcommand } : {}),
+      ...(sections ? { sections } : {}),
+    }
+  })
+} else if (source === 'help') {
+  pages = (pageArgs ?? ['']).map((sub) => ({
+    name: sub ? `${tool}-${sub}` : tool,
+    format: 'help' as const,
+    source: helpText(sub ? [sub] : []),
+    ...(sub ? { subcommand: sub } : {}),
+    ...(sections ? { sections } : {}),
+  }))
+} else {
+  pages = (pageArgs ?? [tool]).map((name) => {
+    const path = locate(name)
+    const subcommand = pageArgs ? subcommandOf(name) : undefined
+    return {
+      name,
+      path,
+      source: readManpage(path),
+      ...(subcommand ? { subcommand } : {}),
+      ...(sections ? { sections } : {}),
+    }
+  })
+}
 
 try {
   const { deck, warnings } = generateDeck({
     tool,
     variant: values.variant!,
-    toolVersion: toolVersion(tool),
+    toolVersion: values['tool-version'] ?? (files ? 'unknown' : toolVersion(tool)),
     pages,
+    tldr: values['no-tldr'] ? [] : loadTldrPages(pages, values.variant!),
     ...(values.license ? { license: values.license } : {}),
     ...(values.attribution ? { attribution: values.attribution } : {}),
   })

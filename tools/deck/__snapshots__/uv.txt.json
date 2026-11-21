@@ -1,0 +1,266 @@
+{
+  "deck": {
+    "schemaVersion": 1,
+    "id": "uv-default",
+    "tool": "uv",
+    "variant": "default",
+    "toolVersion": "fixture",
+    "deckVersion": 1,
+    "source": "help",
+    "license": "NOASSERTION",
+    "attribution": "Generated from the uv --help output.",
+    "sourcePages": [
+      {
+        "name": "uv"
+      }
+    ],
+    "options": [
+      {
+        "id": "no-cache",
+        "flags": [
+          "-n",
+          "--no-cache"
+        ],
+        "summary": "Avoid reading from or writing to the cache, instead using a temporary directory for the duration of the operation",
+        "description": "Avoid reading from or writing to the cache, instead using a temporary directory for the duration of the operation [env: UV_NO_CACHE=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "cache-dir",
+        "flags": [
+          "--cache-dir"
+        ],
+        "argument": {
+          "name": "CACHE_DIR",
+          "optional": false
+        },
+        "summary": "Path to the cache directory",
+        "description": "Path to the cache directory [env: UV_CACHE_DIR=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "managed-python",
+        "flags": [
+          "--managed-python"
+        ],
+        "summary": "Require use of uv-managed Python versions",
+        "description": "Require use of uv-managed Python versions [env: UV_MANAGED_PYTHON=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "no-managed-python",
+        "flags": [
+          "--no-managed-python"
+        ],
+        "summary": "Disable use of uv-managed Python versions",
+        "description": "Disable use of uv-managed Python versions [env: UV_NO_MANAGED_PYTHON=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "no-python-downloads",
+        "flags": [
+          "--no-python-downloads"
+        ],
+        "summary": "Disable automatic downloads of Python.",
+        "description": "Disable automatic downloads of Python. [env: \"UV_PYTHON_DOWNLOADS=never\"]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "quiet",
+        "flags": [
+          "-q",
+          "--quiet"
+        ],
+        "summary": "Use quiet output",
+        "description": "Use quiet output",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "verbose",
+        "flags": [
+          "-v",
+          "--verbose"
+        ],
+        "summary": "Use verbose output",
+        "description": "Use verbose output",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "color",
+        "flags": [
+          "--color"
+        ],
+        "argument": {
+          "name": "COLOR_CHOICE",
+          "optional": false
+        },
+        "summary": "Control the use of color in output",
+        "description": "Control the use of color in output [possible values: auto, always, never]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "system-certs",
+        "flags": [
+          "--system-certs"
+        ],
+        "summary": "Whether to load TLS certificates from the platform's native certificate store",
+        "description": "Whether to load TLS certificates from the platform's native certificate store [env: UV_SYSTEM_CERTS=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "offline",
+        "flags": [
+          "--offline"
+        ],
+        "summary": "Disable network access",
+        "description": "Disable network access [env: UV_OFFLINE=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "allow-insecure-host",
+        "flags": [
+          "--allow-insecure-host"
+        ],
+        "argument": {
+          "name": "ALLOW_INSECURE_HOST",
+          "optional": false
+        },
+        "summary": "Allow insecure connections to a host",
+        "description": "Allow insecure connections to a host [env: UV_INSECURE_HOST=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "no-progress",
+        "flags": [
+          "--no-progress"
+        ],
+        "summary": "Hide all progress outputs",
+        "description": "Hide all progress outputs [env: UV_NO_PROGRESS=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "directory",
+        "flags": [
+          "--directory"
+        ],
+        "argument": {
+          "name": "DIRECTORY",
+          "optional": false
+        },
+        "summary": "Change to the given directory prior to running the command",
+        "description": "Change to the given directory prior to running the command [env: UV_WORKING_DIR=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "project",
+        "flags": [
+          "--project"
+        ],
+        "argument": {
+          "name": "PROJECT",
+          "optional": false
+        },
+        "summary": "Discover a project in the given directory",
+        "description": "Discover a project in the given directory [env: UV_PROJECT=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "config-file",
+        "flags": [
+          "--config-file"
+        ],
+        "argument": {
+          "name": "CONFIG_FILE",
+          "optional": false
+        },
+        "summary": "The path to a `uv.toml` file to use for configuration",
+        "description": "The path to a `uv.toml` file to use for configuration [env: UV_CONFIG_FILE=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "no-config",
+        "flags": [
+          "--no-config"
+        ],
+        "summary": "Avoid discovering configuration files (`pyproject.toml`, `uv.toml`)",
+        "description": "Avoid discovering configuration files (`pyproject.toml`, `uv.toml`) [env: UV_NO_CONFIG=]",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "help",
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "summary": "Display the concise help for this command",
+        "description": "Display the concise help for this command",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "version",
+        "flags": [
+          "-V",
+          "--version"
+        ],
+        "summary": "Display the uv version",
+        "description": "Display the uv version",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      }
+    ]
+  },
+  "warnings": []
+}

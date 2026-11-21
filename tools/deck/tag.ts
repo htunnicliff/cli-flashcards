@@ -35,7 +35,7 @@ export function splitTag(tag: string): string[] {
   return parts
 }
 
-const FLAG_START = /^(--?)(\[no-?\])?([A-Za-z0-9?@#][\w.?#@+-]*)/
+const FLAG_START = /^(--?)(\[no-?\])?([A-Za-z0-9?@#.][\w.?#@+-]*)/
 
 interface Part {
   flags: string[]
@@ -76,7 +76,9 @@ function parseArgument(rest: string): Argument | undefined | null {
   return null
 }
 
-function parsePart(part: string): Part | null {
+function parsePart(text: string): Part | null {
+  // `--verbose...` marks a repeatable flag in clap help output.
+  const part = text.replace(/\.\.\.$/, '')
   const match = FLAG_START.exec(part)
   if (!match) return null
   const [whole, dashes, negation, name] = match

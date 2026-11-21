@@ -8,7 +8,7 @@
     "deckVersion": 1,
     "source": "manpage",
     "license": "NOASSERTION",
-    "attribution": "Generated from the sed(1) manual page.",
+    "attribution": "Generated from the sed(1) manual page. Examples adapted from tldr-pages (https://github.com/tldr-pages/tldr), CC BY 4.0.",
     "sourcePages": [
       {
         "name": "sed",
@@ -26,8 +26,13 @@
         ],
         "summary": "Suppress automatic printing of pattern space",
         "description": "suppress automatic printing of pattern space",
-        "tier": "common",
-        "examples": [],
+        "tier": "core",
+        "examples": [
+          {
+            "command": "command | sed -n '1p'",
+            "description": "[p]rint only the first line to `stdout`"
+          }
+        ],
         "tags": [],
         "hidden": false
       },
@@ -38,7 +43,7 @@
         ],
         "summary": "Annotate program execution",
         "description": "annotate program execution",
-        "tier": "common",
+        "tier": "obscure",
         "examples": [],
         "tags": [],
         "hidden": false
@@ -55,8 +60,13 @@
         },
         "summary": "Add the script to the commands to be executed",
         "description": "add the script to the commands to be executed",
-        "tier": "common",
-        "examples": [],
+        "tier": "core",
+        "examples": [
+          {
+            "command": "command | sed -e 's/apple/mango/g' -e 's/orange/lime/g'",
+            "description": "Run multiple substitutions in one command"
+          }
+        ],
         "tags": [],
         "hidden": false
       },
@@ -72,8 +82,13 @@
         },
         "summary": "Add the contents of script-file to the commands to be executed",
         "description": "add the contents of script-file to the commands to be executed",
-        "tier": "common",
-        "examples": [],
+        "tier": "core",
+        "examples": [
+          {
+            "command": "command | sed -f path/to/script.sed",
+            "description": "Execute a specific script [f]ile and print the result to `stdout`"
+          }
+        ],
         "tags": [],
         "hidden": false
       },
@@ -84,7 +99,7 @@
         ],
         "summary": "Follow symlinks when processing in place",
         "description": "follow symlinks when processing in place",
-        "tier": "common",
+        "tier": "obscure",
         "examples": [],
         "tags": [],
         "hidden": false
@@ -101,8 +116,21 @@
         },
         "summary": "Edit files in place (makes backup if SUFFIX supplied)",
         "description": "edit files in place (makes backup if SUFFIX supplied)",
-        "tier": "common",
-        "examples": [],
+        "tier": "core",
+        "examples": [
+          {
+            "command": "sed -i 's/apple/mango/g' path/to/file",
+            "description": "Replace \"apple\" with \"mango\" in-place in a file (overwriting original file)"
+          },
+          {
+            "command": "sed -i '1i\\your new line text\\' path/to/file",
+            "description": "[i]nsert a new line at the beginning of a file, overwriting the original file"
+          },
+          {
+            "command": "sed -i '/^[[:space:]]*$/d' path/to/file",
+            "description": "Delete blank lines (with or without spaces/tabs) from a file, overwriting the original file"
+          }
+        ],
         "tags": [],
         "hidden": false
       },
@@ -130,7 +158,7 @@
         ],
         "summary": "Disable all GNU extensions.",
         "description": "disable all GNU extensions.",
-        "tier": "common",
+        "tier": "obscure",
         "examples": [],
         "tags": [],
         "hidden": false
@@ -157,7 +185,7 @@
         ],
         "summary": "Consider files as separate rather than as a single, continuous long stream.",
         "description": "consider files as separate rather than as a single, continuous long stream.",
-        "tier": "common",
+        "tier": "obscure",
         "examples": [],
         "tags": [],
         "hidden": false
@@ -169,7 +197,7 @@
         ],
         "summary": "Operate in sandbox mode (disable e/r/w commands).",
         "description": "operate in sandbox mode (disable e/r/w commands).",
-        "tier": "common",
+        "tier": "obscure",
         "examples": [],
         "tags": [],
         "hidden": false
@@ -195,7 +223,7 @@
         ],
         "summary": "Separate lines by NUL characters",
         "description": "separate lines by NUL characters",
-        "tier": "common",
+        "tier": "obscure",
         "examples": [],
         "tags": [],
         "hidden": false

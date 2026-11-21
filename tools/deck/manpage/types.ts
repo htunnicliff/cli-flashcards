@@ -10,9 +10,11 @@ export interface RawEntry {
 }
 
 export interface RawPage {
-  format: 'man' | 'mdoc'
+  format: 'man' | 'mdoc' | 'help'
   /** Page name from `.TH` / `.Dt`, e.g. `RG` or `SED`. */
   title: string
   section: string | undefined
   entries: RawEntry[]
+  /** Plain text of each section, keyed by upper-cased heading (for SYNOPSIS/EXAMPLES mentions). */
+  sectionText: Record<string, string>
 }

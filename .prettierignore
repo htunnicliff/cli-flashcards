@@ -15,3 +15,6 @@ schemas/*.schema.json
 
 # Built by `pnpm deck:build`
 public/decks/
+
+# Vendored third-party content
+vendor/

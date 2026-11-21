@@ -8,7 +8,7 @@
     "deckVersion": 1,
     "source": "manpage",
     "license": "NOASSERTION",
-    "attribution": "Generated from the sed(1) manual page.",
+    "attribution": "Generated from the sed(1) manual page. Examples adapted from tldr-pages (https://github.com/tldr-pages/tldr), CC BY 4.0.",
     "sourcePages": [
       {
         "name": "sed",
@@ -24,8 +24,13 @@
         ],
         "summary": "Interpret regular expressions as extended (modern) regular expressions rather than basic regular expressions (BRE's).",
         "description": "Interpret regular expressions as extended (modern) regular expressions rather than basic regular expressions (BRE's). The re_format(7) manual page fully describes both formats.",
-        "tier": "common",
-        "examples": [],
+        "tier": "core",
+        "examples": [
+          {
+            "command": "command | sed -E 's/(apple)/\\U\\1/g'",
+            "description": "Replace all `apple` (extended `regex`) occurrences with `APPLE` (extended `regex`) in all input lines and print the result to `stdout`"
+          }
+        ],
         "tags": [],
         "hidden": false
       },
@@ -68,8 +73,17 @@
         },
         "summary": "Append the editing commands found in the file command_file to the list of commands.",
         "description": "Append the editing commands found in the file command_file to the list of commands. The editing commands should each be listed on a separate line. The commands are read from the standard input if command_file is \"-\".",
-        "tier": "common",
-        "examples": [],
+        "tier": "core",
+        "examples": [
+          {
+            "command": "command | sed -f path/to/script_file.sed",
+            "description": "Execute a specific script [f]ile and print the result to `stdout`"
+          },
+          {
+            "command": "command | sed -f path/to/script.sed",
+            "description": "Execute a specific script [f]ile and print the result to `stdout`"
+          }
+        ],
         "tags": [],
         "hidden": false
       },
@@ -100,8 +114,13 @@
         },
         "summary": "Edit files in-place similarly to -I, but treat each file independently from other files.",
         "description": "Edit files in-place similarly to -I, but treat each file independently from other files. In particular, line numbers in each file start at 1, the \"$\" address matches the last line of the current file, and address ranges are limited to the current file. (See Sed Addresses.) The net result is as though each file were edited by a separate sed instance.",
-        "tier": "common",
-        "examples": [],
+        "tier": "core",
+        "examples": [
+          {
+            "command": "sed -i bak 's/apple/mango/g' path/to/file",
+            "description": "Replace all `apple` (basic `regex`) occurrences with `mango` (basic `regex`) in a `file` and save a backup of the original to `file.bak`"
+          }
+        ],
         "tags": [],
         "hidden": false
       },
@@ -124,8 +143,13 @@
         ],
         "summary": "By default, each line of input is echoed to the standard output after all of the commands have been applied to it.",
         "description": "By default, each line of input is echoed to the standard output after all of the commands have been applied to it. The -n option suppresses this behavior.",
-        "tier": "common",
-        "examples": [],
+        "tier": "core",
+        "examples": [
+          {
+            "command": "command | sed -n '1p'",
+            "description": "Print just a first line to `stdout`"
+          }
+        ],
         "tags": [],
         "hidden": false
       },
