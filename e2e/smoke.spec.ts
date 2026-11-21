@@ -33,7 +33,7 @@ test('client-side navigation reaches every route', async ({ page }) => {
 })
 
 test('fixture decks are served instead of the real ones', async ({ page }) => {
-  const response = await page.request.get('/decks/index.json')
+  const response = await page.request.get('/data/decks/index.json')
   expect(response.ok()).toBe(true)
   const index = (await response.json()) as { decks: { id: string }[] }
   expect(index.decks.map((deck) => deck.id)).toEqual(['ripgrep-fixture'])

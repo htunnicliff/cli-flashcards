@@ -26,7 +26,7 @@ if (!tool) {
   process.exit(2)
 }
 const variant = values.variant!
-const built = join('public', 'decks', `${tool}-${variant}.json`)
+const built = join('public', 'data', 'decks', `${tool}-${variant}.json`)
 const generated = join('decks', tool, `${variant}.generated.json`)
 const path = existsSync(built) ? built : generated
 if (!existsSync(path)) {

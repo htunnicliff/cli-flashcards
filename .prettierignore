@@ -14,7 +14,7 @@ schemas/*.schema.json
 **/__snapshots__/**
 
 # Built by `pnpm deck:build`
-public/decks/
+public/data/decks/
 
 # Vendored third-party content
 vendor/

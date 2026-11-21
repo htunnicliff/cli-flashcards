@@ -5,14 +5,14 @@ export type FetchLike = (input: string, init?: RequestInit) => Promise<Response>
 
 /** Where built decks are served from, under the app's base path. */
 export function decksUrl(file = ''): string {
-  return `${import.meta.env.BASE_URL}decks/${file}`
+  return `${import.meta.env.BASE_URL}data/decks/${file}`
 }
 
 export class CatalogError extends Error {
   override name = 'CatalogError'
 }
 
-/** Fetches and validates `decks/index.json`. Always asks the network first. */
+/** Fetches and validates `data/decks/index.json`. Always asks the network first. */
 export async function fetchManifest(fetchFn: FetchLike = fetch): Promise<DeckManifest> {
   const response = await fetchFn(decksUrl('index.json'), { cache: 'no-cache' })
   if (!response.ok) throw new CatalogError(`Couldn't load the deck list (HTTP ${response.status}).`)
