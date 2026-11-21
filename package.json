@@ -1,0 +1,50 @@
+{
+  "name": "cli-flashcards",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Spaced repetition flashcards for learning command-line flags.",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.12.0 <23"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "pnpm typecheck && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --build",
+    "lint": "eslint . && prettier --check .",
+    "lint:fix": "eslint . --fix && prettier --write .",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "pinia": "^4.1.0",
+    "vue": "^3.5.46",
+    "vue-router": "^5.5.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.7",
+    "@types/node": "^22.20.5",
+    "@vitejs/plugin-vue": "^6.0.11",
+    "@vitest/coverage-v8": "^5.1.1",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "@vue/eslint-config-typescript": "^14.9.0",
+    "@vue/test-utils": "^2.6.0",
+    "@vue/tsconfig": "^0.9.1",
+    "eslint": "^10.15.0",
+    "eslint-plugin-vue": "^10.12.1",
+    "fast-check": "^4.10.3",
+    "globals": "^17.14.0",
+    "happy-dom": "^21.0.4",
+    "jiti": "^2.7.0",
+    "prettier": "^3.10.1",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1",
+    "vue-tsc": "^3.3.14"
+  }
+}
