@@ -140,12 +140,14 @@ describe('DecksView', () => {
   it('saves per-deck settings', async () => {
     await repo.decks.install(grepDeck())
     const wrapper = await mountView([grepDeck()])
-    const [obscure, pause] = card(wrapper, 'grep').findAll('.deck-settings input')
+    const [obscure, typed, pause] = card(wrapper, 'grep').findAll('.deck-settings input')
     await obscure!.setValue(true)
+    await typed!.setValue(true)
     await pause!.setValue(true)
     await vi.waitFor(async () =>
       expect(await repo.decks.get('grep-gnu')).toMatchObject({
         includeObscure: true,
+        typeAnswers: true,
         paused: true,
       }),
     )

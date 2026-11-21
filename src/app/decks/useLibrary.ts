@@ -190,6 +190,11 @@ export function useLibrary(options: LibraryOptions = {}) {
     await reloadInstalled()
   }
 
+  async function setTypeAnswers(id: string, typeAnswers: boolean) {
+    await repository.decks.setTypeAnswers(id, typeAnswers)
+    await reloadInstalled()
+  }
+
   return {
     manifest,
     installed,
@@ -206,6 +211,7 @@ export function useLibrary(options: LibraryOptions = {}) {
     remove,
     setIncludeObscure,
     setPaused,
+    setTypeAnswers,
   }
 }
 

@@ -101,6 +101,18 @@ export const SourcePageSchema = z.object({
 })
 export type SourcePage = z.infer<typeof SourcePageSchema>
 
+/**
+ * How the tool reads its command line, which decides what typed answers count as
+ * the same flag.
+ * - `gnu` (getopt_long, the default): short flags combine (`-iw`), and a long
+ *   option may be shortened to any unambiguous prefix (`--ignore` for `--ignore-case`).
+ * - `posix` (getopt): short flags combine; long options must be spelled in full.
+ * - `strict`: every flag is its own word, spelled in full (Go's flag package, `find`).
+ */
+export const PARSING_STYLES = ['gnu', 'posix', 'strict'] as const
+export const ParsingStyleSchema = z.enum(PARSING_STYLES)
+export type ParsingStyle = z.infer<typeof ParsingStyleSchema>
+
 export const DeckSchema = z
   .object({
     /** Lets deck files point at `schemas/deck.schema.json` for editor support. */
@@ -120,6 +132,8 @@ export const DeckSchema = z
     attribution: z.string().min(1),
     /** The manpages (or `--help` output) the deck was generated from. */
     sourcePages: z.array(SourcePageSchema).optional(),
+    /** Absent means `gnu`. */
+    parsingStyle: ParsingStyleSchema.optional(),
     options: z.array(OptionSchema),
   })
   .superRefine((deck, ctx) => {

@@ -49,6 +49,7 @@ describe('decks', () => {
     await repo.decks.install(grepV1, 100)
     await repo.decks.setIncludeObscure('grep-gnu', true)
     await repo.decks.setPaused('grep-gnu', true)
+    await repo.decks.setTypeAnswers('grep-gnu', true)
     const updated = await repo.decks.install(grepV2, 200)
     expect(updated).toMatchObject({
       deckVersion: 2,
@@ -56,6 +57,7 @@ describe('decks', () => {
       updatedAt: 200,
       includeObscure: true,
       paused: true,
+      typeAnswers: true,
     })
     expect(updated.deck.options).toHaveLength(1)
   })
@@ -63,6 +65,7 @@ describe('decks', () => {
   it('refuses preferences for a deck that is not installed', async () => {
     await expect(repo.decks.setIncludeObscure('nope', true)).rejects.toThrow(/not installed/)
     await expect(repo.decks.setPaused('nope', true)).rejects.toThrow(/not installed/)
+    await expect(repo.decks.setTypeAnswers('nope', true)).rejects.toThrow(/not installed/)
   })
 
   it('keeps progress when a deck is updated or removed', async () => {

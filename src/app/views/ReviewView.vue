@@ -9,6 +9,7 @@ import type { Rating } from '@/core/storage'
 import { UiButton, UiKbd } from '../components/ui'
 import { fade, spring } from '../motion/tokens'
 import ReviewCard from '../review/ReviewCard.vue'
+import TypedAnswer from '../review/TypedAnswer.vue'
 import { RATINGS, useReviewSession, type ReviewSessionOptions } from '../review/useReviewSession'
 
 const props = defineProps<{ sessionOptions?: ReviewSessionOptions }>()
@@ -29,10 +30,14 @@ const {
   error,
   canUndo,
   hasDecks,
+  typing,
+  answer,
+  suggestedRating,
 } = session
 
 const helpOpen = ref(false)
 const revealButton = ref<{ $el: HTMLElement }>()
+const typedAnswer = ref<InstanceType<typeof TypedAnswer>>()
 const gradeButtons = ref<{ $el: HTMLElement }[]>([])
 const now = props.sessionOptions?.now ?? (() => Date.now())
 
@@ -70,12 +75,23 @@ function grade(rating: Rating) {
   session.grade(rating)
 }
 
-// Focus follows the flow, so keyboard and screen reader users stay on the controls.
-watch(revealed, async (isRevealed) => {
-  await nextTick()
-  if (isRevealed) gradeButtons.value[2]?.$el.focus()
-  else revealButton.value?.$el.focus()
+const command = computed(() => {
+  const tool = deck.value?.tool ?? ''
+  return option.value?.subcommand ? `${tool} ${option.value.subcommand}` : tool
 })
+
+// Focus follows the flow, so keyboard and screen reader users stay on the controls:
+// the suggested (or Good) grade once revealed, otherwise the answer field or Show answer.
+watch(
+  [revealed, () => current.value?.card.id],
+  async ([isRevealed]) => {
+    await nextTick()
+    if (isRevealed) gradeButtons.value[(suggestedRating.value ?? 3) - 1]?.$el.focus()
+    else if (typing.value) typedAnswer.value?.focus()
+    else revealButton.value?.$el.focus()
+  },
+  { flush: 'post' },
+)
 
 function isTyping(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false
@@ -283,8 +299,15 @@ const swipeHint = computed(() => {
       </div>
 
       <div class="controls">
+        <TypedAnswer
+          v-if="typing"
+          ref="typedAnswer"
+          :result="answer"
+          :command="command"
+          @submit="session.submitAnswer"
+        />
         <UiButton
-          v-if="!revealed"
+          v-if="!revealed && !typing"
           ref="revealButton"
           variant="primary"
           block
@@ -293,7 +316,7 @@ const swipeHint = computed(() => {
           @click="reveal"
           >Show answer <UiKbd>Space</UiKbd></UiButton
         >
-        <div v-else class="grades" role="group" aria-label="Grade this card">
+        <div v-if="revealed" class="grades" role="group" aria-label="Grade this card">
           <UiButton
             v-for="{ rating, label, key } in RATINGS"
             :key="rating"
@@ -301,6 +324,7 @@ const swipeHint = computed(() => {
             :variant="rating === 1 ? 'again' : rating === 3 ? 'primary' : 'neutral'"
             class="grade"
             :data-rating="rating"
+            :data-suggested="suggestedRating === rating ? 'true' : undefined"
             :aria-keyshortcuts="key"
             :aria-label="`${label}, next in ${intervals[rating]}`"
             @click="grade(rating)"
@@ -457,6 +481,16 @@ p {
   right: var(--space-4);
   color: var(--color-muted);
   font-weight: 700;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.grade[data-suggested] {
+  box-shadow: 0 0 0 2px var(--color-accent);
 }
 
 .grades {

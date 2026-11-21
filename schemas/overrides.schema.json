@@ -19,6 +19,14 @@
         "toolVersion": {
           "type": "string",
           "minLength": 1
+        },
+        "parsingStyle": {
+          "type": "string",
+          "enum": [
+            "gnu",
+            "posix",
+            "strict"
+          ]
         }
       },
       "additionalProperties": false

@@ -5,6 +5,7 @@ import {
   FlagSchema,
   OptionIdSchema,
   OptionBaseSchema,
+  ParsingStyleSchema,
   TierSchema,
 } from './deck'
 
@@ -58,6 +59,7 @@ export const DeckPatchSchema = z
     license: z.string().min(1).optional(),
     attribution: z.string().min(1).optional(),
     toolVersion: z.string().min(1).optional(),
+    parsingStyle: ParsingStyleSchema.optional(),
   })
   .strict()
 

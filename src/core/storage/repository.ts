@@ -57,6 +57,7 @@ export interface DeckRepository {
   setIncludeObscure(id: string, include: boolean): Promise<void>
   /** Paused decks are skipped by the scheduler; their progress is kept. */
   setPaused(id: string, paused: boolean): Promise<void>
+  setTypeAnswers(id: string, typeAnswers: boolean): Promise<void>
   /** Uninstalls the deck. Its progress stays, so reinstalling picks up where it left off. */
   remove(id: string): Promise<void>
 }
@@ -120,6 +121,7 @@ export function createRepository(
           updatedAt: now,
           includeObscure: existing?.includeObscure ?? false,
           ...(existing?.paused ? { paused: true } : {}),
+          ...(existing?.typeAnswers ? { typeAnswers: true } : {}),
           deck,
         }
         await db.decks.put(stored)
@@ -135,6 +137,10 @@ export function createRepository(
     async setPaused(id, paused) {
       const updated = await db.decks.update(id, { paused })
       if (updated === 0) throw new Error(`setPaused: deck "${id}" is not installed`)
+    },
+    async setTypeAnswers(id, typeAnswers) {
+      const updated = await db.decks.update(id, { typeAnswers })
+      if (updated === 0) throw new Error(`setTypeAnswers: deck "${id}" is not installed`)
     },
     async remove(id) {
       await db.decks.delete(id)

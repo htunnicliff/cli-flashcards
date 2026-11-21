@@ -4,7 +4,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
 import { createRepository, type Repository } from '@/core/storage'
-import { fakeIndexedDB, uniqueDatabaseName } from '@/core/storage/test-utils'
+import {
+  fakeIndexedDB,
+  makeCardState,
+  makeFsrsState,
+  uniqueDatabaseName,
+} from '@/core/storage/test-utils'
 import { DeckSchema } from '@/schema'
 import { makeDeck, makeOption } from '@/schema/fixtures'
 
@@ -207,5 +212,74 @@ describe('ReviewView', () => {
     await flushPromises()
     expect(w.find('[data-testid="back"]').exists()).toBe(false)
     input.remove()
+  })
+
+  describe('typed answers', () => {
+    /** Leaves the -i meaning → flag card first in the queue, with typing on. */
+    async function setUpTyping() {
+      await repo.decks.install(
+        DeckSchema.parse(
+          makeDeck([
+            makeOption(['-i', '--ignore-case'], { summary: 'Match case-insensitively' }),
+            makeOption(['-l', '--files-with-matches']),
+          ]),
+        ),
+      )
+      await repo.decks.setTypeAnswers('grep-gnu', true)
+      // The flag → meaning card was learned on an earlier day, so its sibling is up next.
+      const later = Date.now() + 30 * 86_400_000
+      await repo.cardStates.put(
+        makeCardState('grep:gnu:ignore-case:flag-to-meaning', {
+          fsrs: makeFsrsState({ due: later }),
+        }),
+      )
+      await repo.cardStates.put(
+        makeCardState('grep:gnu:files-with-matches:flag-to-meaning', {
+          fsrs: makeFsrsState({ due: later }),
+        }),
+      )
+      const w = await mountView()
+      expect(cardId(w)).toBe('grep:gnu:ignore-case:meaning-to-flag')
+      return w
+    }
+
+    it('accepts the long form, says the short form, and suggests Good', async () => {
+      const w = await setUpTyping()
+      const input = w.get<HTMLInputElement>('#typed-answer')
+      expect(document.activeElement).toBe(input.element)
+      await input.setValue('--ignore')
+      await w.get('form.typed').trigger('submit')
+      await flushPromises()
+      expect(w.get('#typed-result').text()).toMatch(/Correct\s*· short form: -i/)
+      expect(w.find('[data-testid="back"]').exists()).toBe(true)
+      expect(w.get('[data-suggested]').attributes('data-rating')).toBe('3')
+      expect(document.activeElement?.getAttribute('data-rating')).toBe('3')
+    })
+
+    it('marks a wrong answer, shows a diff and suggests Again, which can be changed', async () => {
+      const w = await setUpTyping()
+      await w.get('#typed-answer').setValue('-l')
+      await w.get('form.typed').trigger('submit')
+      await flushPromises()
+      expect(w.get('#typed-result').text()).toContain('Not quite')
+      expect(w.get('#typed-result').text()).toContain('expected -i')
+      expect(w.get('.diff--removed').text()).toBe('l')
+      expect(w.get('.diff--added').text()).toBe('i')
+      expect(w.get('#typed-answer').attributes('aria-invalid')).toBe('true')
+      expect(w.get('[data-suggested]').attributes('data-rating')).toBe('1')
+      // The suggestion is only a suggestion.
+      press('3')
+      await vi.waitFor(async () => expect(await repo.reviewLog.count()).toBe(1))
+      expect((await repo.reviewLog.all())[0]).toMatchObject({ rating: 3 })
+    })
+
+    it('keeps shortcuts out of the answer field', async () => {
+      const w = await setUpTyping()
+      const input = w.get('#typed-answer')
+      input.element.dispatchEvent(new KeyboardEvent('keydown', { key: '1', bubbles: true }))
+      input.element.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }))
+      await flushPromises()
+      expect(w.find('[data-testid="back"]').exists()).toBe(false)
+    })
   })
 })
