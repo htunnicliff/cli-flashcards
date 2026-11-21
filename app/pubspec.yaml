@@ -10,6 +10,8 @@ dependencies:
   file_selector: ^1.1.0
   flutter:
     sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
   go_router: ^18.1.4
   http: ^1.6.0
   material_ui: ^1.1.0
@@ -31,3 +33,19 @@ flutter:
     # A symlink to public/data/decks, built by `pnpm deck:build`. The app ships
     # these for the first launch offline, then downloads updates.
     - assets/decks/
+  fonts:
+    # Recursive (SIL Open Font License, assets/fonts/OFL.txt), Latin subset, cut
+    # into one variable-weight font per style with fontTools' instancer. Separate
+    # families, because the web renderer can mix up variations of one family.
+    - family: RecursiveSans
+      fonts:
+        - asset: assets/fonts/RecursiveSans.ttf
+    - family: RecursiveMono
+      fonts:
+        - asset: assets/fonts/RecursiveMono.ttf
+    - family: RecursiveCasual
+      fonts:
+        - asset: assets/fonts/RecursiveCasual.ttf
+    - family: RecursiveMonoCasual
+      fonts:
+        - asset: assets/fonts/RecursiveMonoCasual.ttf

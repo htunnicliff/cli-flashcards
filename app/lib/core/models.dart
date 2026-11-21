@@ -336,6 +336,19 @@ class PendingDeckInstall {
   };
 }
 
+enum AppTheme { system, light, dark }
+
+enum TextSize {
+  s(0.875),
+  m(1),
+  l(1.125);
+
+  const TextSize(this.scale);
+  final double scale;
+}
+
+enum MotionPreference { system, reduce, full }
+
 /// Every stored setting. Defaults match `SETTING_DEFAULTS`.
 class Settings {
   const Settings({
@@ -350,6 +363,9 @@ class Settings {
     this.deckFlavor,
     this.onboardingDone = false,
     this.reduceTransparency = false,
+    this.theme = AppTheme.system,
+    this.textSize = TextSize.m,
+    this.motion = MotionPreference.system,
   });
 
   factory Settings.fromJson(Map<String, dynamic> json) {
@@ -375,8 +391,14 @@ class Settings {
       deckFlavor: flavor == null ? null : DeckFlavor.values.byName(flavor),
       onboardingDone: json['onboardingDone'] as bool? ?? false,
       reduceTransparency: json['reduceTransparency'] as bool? ?? false,
+      theme: _enum(AppTheme.values, json['theme'], d.theme),
+      textSize: _enum(TextSize.values, json['textSize'], d.textSize),
+      motion: _enum(MotionPreference.values, json['motion'], d.motion),
     );
   }
+
+  static T _enum<T extends Enum>(List<T> values, Object? name, T fallback) =>
+      values.where((v) => v.name == name).firstOrNull ?? fallback;
 
   /// Probability of recall FSRS aims for.
   final double desiredRetention;
@@ -411,6 +433,12 @@ class Settings {
   /// Solid surfaces instead of frosted glass.
   final bool reduceTransparency;
 
+  final AppTheme theme;
+  final TextSize textSize;
+
+  /// `reduce` keeps fades but drops movement; `system` follows the device.
+  final MotionPreference motion;
+
   Settings copyWith({
     double? desiredRetention,
     int? newCardsPerDay,
@@ -423,6 +451,9 @@ class Settings {
     DeckFlavor? Function()? deckFlavor,
     bool? onboardingDone,
     bool? reduceTransparency,
+    AppTheme? theme,
+    TextSize? textSize,
+    MotionPreference? motion,
   }) => Settings(
     desiredRetention: desiredRetention ?? this.desiredRetention,
     newCardsPerDay: newCardsPerDay ?? this.newCardsPerDay,
@@ -435,6 +466,9 @@ class Settings {
     deckFlavor: deckFlavor == null ? this.deckFlavor : deckFlavor(),
     onboardingDone: onboardingDone ?? this.onboardingDone,
     reduceTransparency: reduceTransparency ?? this.reduceTransparency,
+    theme: theme ?? this.theme,
+    textSize: textSize ?? this.textSize,
+    motion: motion ?? this.motion,
   );
 
   Map<String, dynamic> toJson() => {
@@ -449,5 +483,8 @@ class Settings {
     'deckFlavor': deckFlavor?.name,
     'onboardingDone': onboardingDone,
     'reduceTransparency': reduceTransparency,
+    'theme': theme.name,
+    'textSize': textSize.name,
+    'motion': motion.name,
   };
 }
