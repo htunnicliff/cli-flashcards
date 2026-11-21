@@ -1,6 +1,126 @@
+<script setup lang="ts">
+import { storeToRefs } from 'pinia'
+
+import { useAppearanceStore, type FontSize, type ThemePreference } from '../stores/appearance'
+
+const { theme, fontSize } = storeToRefs(useAppearanceStore())
+
+const themeOptions: { value: ThemePreference; label: string }[] = [
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'system', label: 'System' },
+]
+
+const fontSizeOptions: { value: FontSize; label: string }[] = [
+  { value: 's', label: 'S' },
+  { value: 'm', label: 'M' },
+  { value: 'l', label: 'L' },
+]
+</script>
+
 <template>
-  <section>
+  <section class="settings">
     <h1>Settings</h1>
-    <p>Preferences will show up here.</p>
+
+    <fieldset class="setting">
+      <legend>Theme</legend>
+      <div class="segmented">
+        <label v-for="option in themeOptions" :key="option.value" class="segment">
+          <input v-model="theme" type="radio" name="theme" :value="option.value" />
+          <span>{{ option.label }}</span>
+        </label>
+      </div>
+      <p class="hint casual">System follows your device's light or dark setting.</p>
+    </fieldset>
+
+    <fieldset class="setting">
+      <legend>Text size</legend>
+      <div class="segmented">
+        <label v-for="option in fontSizeOptions" :key="option.value" class="segment">
+          <input v-model="fontSize" type="radio" name="font-size" :value="option.value" />
+          <span>{{ option.label }}</span>
+        </label>
+      </div>
+    </fieldset>
   </section>
 </template>
+
+<style scoped>
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+h1 {
+  margin: 0;
+  font-size: var(--text-2xl);
+}
+
+.setting {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  margin-bottom: var(--space-3);
+  padding: 0;
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.segmented {
+  display: inline-flex;
+  align-self: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-button);
+  background: var(--color-surface);
+}
+
+.segment {
+  position: relative;
+}
+
+.segment input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.segment span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border-radius: 10px;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.segment input:checked + span {
+  background: var(--color-sunken);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.segment input:focus-visible + span {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+</style>
