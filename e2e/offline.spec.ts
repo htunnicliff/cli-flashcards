@@ -1,3 +1,4 @@
+import { readStore } from './support/storage'
 import { checkForUpdate, deployNewBuild, simulateOutage, waitForServiceWorker } from './support/pwa'
 import { expect, test } from './support/test'
 
@@ -106,4 +107,29 @@ test('installed decks stay available offline, and installing waits for a connect
 
   await context.setOffline(false)
   await expect(deck.getByRole('button', { name: 'Install' })).toBeEnabled()
+})
+
+test('a whole review session works offline after a reload', async ({ page, context, baseURL }) => {
+  await page.goto('/decks')
+  await waitForServiceWorker(page)
+  const deck = page.locator('[data-deck="ripgrep-fixture"]')
+  await deck.getByRole('button', { name: 'Install' }).click()
+  await expect(deck).toHaveAttribute('data-installed', 'true')
+
+  await simulateOutage(context, baseURL!)
+  await page.goto('/')
+  const newCount = page.getByTestId('count-new')
+  await expect(newCount).toHaveText('3')
+  for (const left of ['2', '1', '0']) {
+    await page.keyboard.press('Space')
+    await expect(page.getByTestId('back')).toBeVisible()
+    await page.keyboard.press('4')
+    if (left !== '0') await expect(newCount).toHaveText(left)
+  }
+  await expect(page.getByTestId('done')).toContainText('All done for today')
+
+  // Progress made offline is still there after another offline reload.
+  await expect.poll(async () => (await readStore(page, 'recall', 'reviewLog')).length).toBe(3)
+  await page.reload()
+  await expect(page.getByTestId('done')).toContainText('All done for today')
 })
