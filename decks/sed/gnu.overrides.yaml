@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=../../schemas/overrides.schema.json
+#
+# Curation for the GNU sed deck. Applied on top of gnu.generated.json by
+# `pnpm deck:build`; regenerating the deck keeps these edits.
+
+options:
+  silent:
+    summary: Only print lines the script prints explicitly (with p)
+  expression:
+    summary: Add a script command; repeat to run several in order
+    examples:
+      - command: sed -e 's/foo/bar/' -e '/^#/d' path/to/file
+        description: Replace foo and delete comment lines in one pass
+  file:
+    summary: Read sed commands from a script file
+  in-place:
+    summary: Edit files in place, keeping a backup if a suffix is attached
+    examples:
+      - command: sed -i.bak 's/http:/https:/g' config.txt
+        description: Edit config.txt in place and keep config.txt.bak
+  regexp-extended:
+    tier: core
+    summary: Use extended regular expressions (no backslashes before ( ) + ?)
+    examples:
+      - command: sed -E 's/([0-9]+)-([0-9]+)/\2-\1/' path/to/file
+        description: Swap two hyphen-separated numbers
+  null-data:
+    tier: common
+  separate:
+    tier: common

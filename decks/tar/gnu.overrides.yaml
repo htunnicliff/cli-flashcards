@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=../../schemas/overrides.schema.json
+#
+# Curation for the GNU tar deck. Applied on top of gnu.generated.json by
+# `pnpm deck:build`; regenerating the deck keeps these edits.
+#
+# tldr-pages writes tar options bundled without a dash (`tar czf`), which the
+# generator can't match to options, so the core set and its examples are
+# chosen here. Examples use the dashed form (`tar -czf`) so cloze cards work.
+
+options:
+  create:
+    tier: core
+    summary: Make an archive from files and directories
+    examples:
+      - command: tar -cf archive.tar path/to/directory
+  extract:
+    tier: core
+    summary: Unpack an archive's files to disk
+    examples:
+      - command: tar -xf archive.tar
+  list:
+    tier: core
+    summary: List an archive's contents without extracting
+    examples:
+      - command: tar -tvf archive.tar.gz
+  file:
+    tier: core
+    summary: Name the archive file to read or write (- for stdin or stdout)
+    examples:
+      - command: tar -xf path/to/archive.tar
+  verbose:
+    tier: core
+    summary: Print each file name as it is processed
+    examples:
+      - command: tar -xvf archive.tar
+  gunzip:
+    tier: core
+    primary: -z
+    summary: Compress or decompress with gzip (.tar.gz, .tgz)
+    examples:
+      - command: tar -czf archive.tar.gz path/to/directory
+  bzip2:
+    tier: core
+    summary: Compress or decompress with bzip2 (.tar.bz2)
+    examples:
+      - command: tar -cjf archive.tar.bz2 path/to/directory
+  xz:
+    tier: core
+    summary: Compress or decompress with xz (.tar.xz)
+    examples:
+      - command: tar -cJf archive.tar.xz path/to/directory
+  auto-compress:
+    tier: core
+    summary: Pick the compression program from the archive's file extension
+    examples:
+      - command: tar -caf archive.tar.zst path/to/directory
+  directory:
+    summary: Change to a directory first, e.g. to extract somewhere else
+    replaceExamples: true
+    examples:
+      - command: tar -xf archive.tar -C path/to/target
+        description: Extract into path/to/target
+      - command: tar -czf archive.tar.gz -C path/to/directory .
+        description: Archive a directory's contents without its leading path
+  exclude:
+    tier: core
+    summary: Leave out files matching a glob
+    examples:
+      - command: tar -czf archive.tar.gz --exclude='*.log' path/to/directory
+  strip-components:
+    tier: core
+    summary: Drop the first N leading path components when extracting
+    examples:
+      - command: tar -xf project-1.0.tar.gz --strip-components=1
+        description: Extract without the top-level project-1.0/ directory
+  wildcards:
+    summary: Treat member names on the command line as globs when extracting
+    replaceExamples: true
+    examples:
+      - command: tar -xf archive.tar --wildcards '*.html'
+  zstd:
+    tier: common
+  keep-old-files:
+    tier: common
+  to-stdout:
+    tier: common
+  files-from:
+    tier: common
+  exclude-vcs:
+    tier: common
+  preserve-permissions:
+    tier: common
+  transform:
+    tier: common

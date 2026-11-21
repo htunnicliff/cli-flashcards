@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=../../schemas/overrides.schema.json
+#
+# Curation for the curl deck. Applied on top of default.generated.json by
+# `pnpm deck:build`; regenerating the deck keeps these edits.
+
+options:
+  data:
+    summary: Send data in the request body (makes it a POST)
+  header:
+    summary: "Add a request header, e.g. 'Accept: application/json'"
+  insecure:
+    summary: Skip TLS certificate verification
+  location:
+    summary: Follow redirects
+  remote-name:
+    summary: Save to a local file named after the last part of the URL
+  request:
+    summary: Use a different HTTP method, e.g. PUT or DELETE
+  verbose:
+    summary: Show the request and response headers and connection details
+  output:
+    tier: core
+    summary: Write the response body to a file instead of stdout
+    examples:
+      - command: curl -o page.html https://example.com
+  silent:
+    tier: core
+    summary: Hide the progress meter and error messages
+    examples:
+      - command: curl -s https://example.com/api | jq .
+  show-error:
+    tier: core
+    summary: With -s, still print an error message when the transfer fails
+    examples:
+      - command: curl -sS https://example.com/api
+  fail:
+    tier: core
+    summary: Exit with an error and print nothing on HTTP 4xx or 5xx responses
+    examples:
+      - command: curl -fsSL https://example.com/install.sh | sh
+  include:
+    tier: core
+    summary: Print the response headers before the body
+    examples:
+      - command: curl -i https://example.com
+  head:
+    tier: core
+    summary: Fetch only the headers, with a HEAD request
+    examples:
+      - command: curl -I https://example.com
+  user:
+    tier: core
+    summary: Log in to the server with user:password
+    examples:
+      - command: curl -u myname:mypassword https://example.com
+  form:
+    tier: core
+    summary: Send a multipart form field; name=@path uploads a file
+    examples:
+      - command: curl -F 'file=@path/to/file' https://example.com/upload
+  write-out:
+    tier: core
+    summary: Print chosen transfer details after it finishes, e.g. '%{http_code}'
+    examples:
+      - command: curl -s -o /dev/null -w '%{http_code}\n' https://example.com
+        description: Print just the HTTP status code
+  max-time:
+    tier: core
+    summary: Give up if the whole transfer takes longer than N seconds
+    examples:
+      - command: curl -m 10 https://example.com
+  user-agent:
+    tier: core
+    summary: Set the User-Agent header
+    examples:
+      - command: curl -A 'Mozilla/5.0' https://example.com
+  upload-file:
+    tier: core
+    summary: Upload a local file to the URL (a PUT for HTTP)
+    examples:
+      - command: curl -T path/to/file https://example.com/upload/
+  cookie:
+    tier: common
+  cookie-jar:
+    tier: common
+  continue-at:
+    tier: common
+  get:
+    tier: common
+  compressed:
+    tier: common
+  json:
+    tier: common
+  cert:
+    tier: common
+  key:
+    tier: common
+  proxy:
+    tier: common
+  dump-header:
+    tier: common
+  resolve:
+    tier: common

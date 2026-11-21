@@ -23,8 +23,13 @@ export const OptionPatchSchema = z
     /** Which spelling leads on cards and in examples. */
     primary: FlagSchema.optional(),
     argument: ArgumentSchema.nullable().optional(),
-    /** Appended to the generated examples. */
+    /** Appended to the generated examples, or replaces them with `replaceExamples`. */
     examples: z.array(ExampleSchema).optional(),
+    /**
+     * Drop the generated examples and keep only `examples`, e.g. when a shared
+     * tldr example uses flags this variant doesn't have.
+     */
+    replaceExamples: z.boolean().optional(),
     /** Added to the generated tags. */
     tags: z.array(z.string().min(1)).optional(),
     hidden: z.boolean().optional(),
