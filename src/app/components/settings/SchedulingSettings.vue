@@ -21,13 +21,22 @@ const values = reactive<Record<SchedulingSettingKey, number>>({
   leechThreshold: SETTING_DEFAULTS.leechThreshold,
 })
 
-const fields: { key: SchedulingSettingKey; label: string; hint: string }[] = [
+type Field = { key: SchedulingSettingKey; label: string; hint: string }
+
+/** The one setting most people change: how fast new flags arrive. */
+const mainField: Field = {
+  key: 'newCardsPerDay',
+  label: 'New cards per day',
+  hint: 'Across all decks. Lower it for shorter daily sessions.',
+}
+
+/** Tuning for people who know spaced repetition; the defaults suit everyone else. */
+const advancedFields: Field[] = [
   {
     key: 'desiredRetention',
     label: 'Desired retention',
     hint: 'How likely you should be to remember a card when it comes up. Higher means more reviews.',
   },
-  { key: 'newCardsPerDay', label: 'New cards per day', hint: 'Across all decks.' },
   {
     key: 'maxReviewsPerDay',
     label: 'Maximum reviews per day',
@@ -40,10 +49,12 @@ const fields: { key: SchedulingSettingKey; label: string; hint: string }[] = [
   },
   {
     key: 'leechThreshold',
-    label: 'Leech after',
-    hint: 'Times a card can be forgotten before it is suspended as a leech.',
+    label: 'Suspend hard cards after',
+    hint: "Times you can forget a card before it's suspended so it stops slowing you down. Find these cards in the deck's options.",
   },
 ]
+
+const fields = [mainField, ...advancedFields]
 
 onMounted(async () => {
   const stored = await repository.settings.getAll()
@@ -67,7 +78,7 @@ async function save(key: SchedulingSettingKey, event: Event) {
 <template>
   <section class="setting" aria-labelledby="scheduling-heading" :aria-busy="!loaded">
     <h2 id="scheduling-heading">Scheduling</h2>
-    <div v-for="field in fields" :key="field.key" class="field">
+    <div v-for="field in [mainField]" :key="field.key" class="field">
       <label :for="`setting-${field.key}`">{{ field.label }}</label>
       <input
         :id="`setting-${field.key}`"
@@ -84,6 +95,28 @@ async function save(key: SchedulingSettingKey, event: Event) {
       />
       <p :id="`setting-${field.key}-hint`" class="hint">{{ field.hint }}</p>
     </div>
+    <details class="advanced">
+      <summary>Advanced</summary>
+      <div class="advanced-fields">
+        <div v-for="field in advancedFields" :key="field.key" class="field">
+          <label :for="`setting-${field.key}`">{{ field.label }}</label>
+          <input
+            :id="`setting-${field.key}`"
+            :value="values[field.key]"
+            :min="SCHEDULING_LIMITS[field.key].min"
+            :max="SCHEDULING_LIMITS[field.key].max"
+            :step="SCHEDULING_LIMITS[field.key].step"
+            :disabled="!loaded"
+            :aria-describedby="`setting-${field.key}-hint`"
+            type="number"
+            inputmode="decimal"
+            class="mono"
+            @change="save(field.key, $event)"
+          />
+          <p :id="`setting-${field.key}-hint`" class="hint">{{ field.hint }}</p>
+        </div>
+      </div>
+    </details>
   </section>
 </template>
 
@@ -112,7 +145,8 @@ label {
 }
 
 input {
-  width: 7ch;
+  /* Room for "0.95" or "9999" plus the browser's spin buttons. */
+  width: 11ch;
   min-height: 40px;
   padding: 0 var(--space-3);
   border: var(--border-width) solid var(--color-border);
@@ -126,6 +160,37 @@ input {
 input:focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus);
   outline-offset: var(--focus-ring-offset);
+}
+
+.advanced summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.advanced summary::before {
+  content: '▸';
+  margin-right: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--text-xs);
+}
+
+.advanced[open] summary::before {
+  content: '▾';
+}
+
+.advanced summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding-top: var(--space-2);
 }
 
 .hint {

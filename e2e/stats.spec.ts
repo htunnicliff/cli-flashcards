@@ -79,6 +79,6 @@ test('stats are computed from the stored review log', async ({ page }) => {
   await expect(page.getByTestId('retention')).toContainText('2 of 3 mature reviews passed')
   await expect(page.getByText('1 card due in the next 30 days')).toBeVisible()
   await expect(page.getByText('3 reviews on 3 of the last 365 days')).toBeVisible()
-  await expect(page.getByRole('row', { name: new RegExp(deck.id) })).toBeVisible()
+  await expect(page.getByRole('row', { name: `${deck.tool} (${deck.variant})` })).toBeVisible()
   await expectNoA11yViolations(page)
 })

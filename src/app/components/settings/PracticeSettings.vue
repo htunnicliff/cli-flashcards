@@ -35,10 +35,9 @@ async function save(event: Event) {
       Flag pair practice
     </label>
     <p id="setting-flagPairs-hint" class="hint">
-      Adds cards that show a short flag and ask for its long form, and the other way round. Card
-      fronts show one form only, so <code class="mono">-r</code> never appears next to
-      <code class="mono">--recursive</code> until you reveal the answer. Turning it off pauses those
-      cards and keeps their progress.
+      Adds cards that show one form of a flag, like <code class="mono">-r</code>, and ask for the
+      other, like <code class="mono">--recursive</code>. Turning it off pauses those cards and keeps
+      their progress.
     </p>
   </section>
 </template>
