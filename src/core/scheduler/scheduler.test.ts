@@ -54,6 +54,19 @@ async function graduate(cardId: string, now: number): Promise<number> {
   return state.fsrs.due
 }
 
+describe('nextDue', () => {
+  it('is undefined before anything is studied', async () => {
+    expect(await scheduler.nextDue(at(10))).toBeUndefined()
+  })
+
+  it('finds the earliest future due card, ignoring paused decks', async () => {
+    const due = await graduate('grep:gnu:ignore-case:flag-to-meaning', at(10))
+    expect(await scheduler.nextDue(at(10, 13))).toBe(due)
+    await repo.decks.setPaused('grep-gnu', true)
+    expect(await scheduler.nextDue(at(10, 13))).toBeUndefined()
+  })
+})
+
 describe('getQueue', () => {
   it('introduces new cards core first, one card per option, skipping obscure', async () => {
     expect(await ids(at(10))).toEqual([

@@ -166,6 +166,26 @@ describe('recordReview', () => {
   })
 })
 
+describe('undoReview', () => {
+  it('removes the entry and restores the previous state', async () => {
+    const before = makeCardState('grep:gnu:i:flag-to-meaning')
+    const first = await repo.recordReview(before, makeLogEntry(before.cardId, { reviewedAt: 1 }))
+    const after = { ...before, fsrs: { ...before.fsrs, reps: before.fsrs.reps + 1 } }
+    const second = await repo.recordReview(after, makeLogEntry(before.cardId, { reviewedAt: 2 }))
+    await repo.undoReview(second, before.cardId, before)
+    expect(await repo.cardStates.get(before.cardId)).toEqual(before)
+    expect((await repo.reviewLog.all()).map((e) => e.id)).toEqual([first])
+  })
+
+  it('removes the state of a card that had none', async () => {
+    const state = makeCardState('grep:gnu:i:flag-to-meaning')
+    const id = await repo.recordReview(state, makeLogEntry(state.cardId))
+    await repo.undoReview(id, state.cardId, undefined)
+    expect(await repo.cardStates.get(state.cardId)).toBeUndefined()
+    expect(await repo.reviewLog.count()).toBe(0)
+  })
+})
+
 describe('resetProgress', () => {
   beforeEach(async () => {
     for (const cardId of ['grep:gnu:i:cloze', 'rg:rust:i:cloze']) {

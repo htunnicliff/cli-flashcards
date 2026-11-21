@@ -27,7 +27,7 @@ describe('App', () => {
   })
 
   it.each([
-    ['/', "Today's review"],
+    ['/', 'Review'],
     ['/decks', 'Decks'],
     ['/stats', 'Stats'],
     ['/settings', 'Settings'],

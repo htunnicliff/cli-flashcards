@@ -16,6 +16,12 @@ export interface Scheduler {
    * review log entry together. `durationMs` is how long the user took.
    */
   grade(cardId: string, rating: Rating, now: number, durationMs?: number): Promise<GradeResult>
+  /**
+   * When the next card that has been studied before comes due after `now`,
+   * across active decks, or `undefined` if none will. New cards don't count:
+   * they are limited per day, not due.
+   */
+  nextDue(now: number): Promise<number | undefined>
 }
 
 type SchedulerRepository = Pick<
@@ -51,6 +57,20 @@ export function createScheduler(repository: SchedulerRepository): Scheduler {
         repository.reviewLog.between(day.start, day.end),
       ])
       return buildQueue({ decks, states, todaysLog, settings, now })
+    },
+
+    async nextDue(now) {
+      const decks = (await repository.decks.list()).filter((stored) => !stored.paused)
+      let next: number | undefined
+      for (const stored of decks) {
+        const current = new Set(deriveCards(stored.deck).map((card) => card.id))
+        for (const state of await repository.cardStates.listByDeck(stored.id)) {
+          if (!current.has(state.cardId) || state.suspended || state.fsrs.phase === 'new') continue
+          const due = Math.max(state.fsrs.due, state.buriedUntil ?? 0)
+          if (due > now && (next === undefined || due < next)) next = due
+        }
+      }
+      return next
     },
 
     async grade(cardId, rating, now, durationMs = 0) {
