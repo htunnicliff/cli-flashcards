@@ -12,6 +12,7 @@
  *   --license SPDX     license of the source text
  *   --attribution TXT  attribution line for the deck
  *   --out PATH         output file (default: decks/<tool>/<variant>.generated.json)
+ *   --no-tldr          don't use vendored tldr-pages for tiers and examples
  *
  * Needs `man` on PATH to locate pages. The parser itself is pure; see
  * tools/deck/generate.ts.
@@ -24,6 +25,7 @@ import { parseArgs } from 'node:util'
 import { gunzipSync } from 'node:zlib'
 import { format } from 'prettier'
 import { DeckValidationError, generateDeck, type PageInput } from './deck/generate'
+import { loadTldrPages } from './deck/tldr-files'
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
@@ -34,6 +36,7 @@ const { values, positionals } = parseArgs({
     license: { type: 'string' },
     attribution: { type: 'string' },
     out: { type: 'string' },
+    'no-tldr': { type: 'boolean', default: false },
   },
 })
 
@@ -117,6 +120,7 @@ try {
     variant: values.variant!,
     toolVersion: toolVersion(tool),
     pages,
+    tldr: values['no-tldr'] ? [] : loadTldrPages(pages, values.variant!),
     ...(values.license ? { license: values.license } : {}),
     ...(values.attribution ? { attribution: values.attribution } : {}),
   })

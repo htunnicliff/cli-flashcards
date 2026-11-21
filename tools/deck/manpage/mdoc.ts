@@ -278,7 +278,13 @@ export function parseMdoc(source: string): RawPage {
   const roff = new RoffContext()
   const lines = readRoff(source, roff)
   const ctx: MdocRenderContext = { roff, name: '' }
-  const page: RawPage = { format: 'mdoc', title: '', section: undefined, entries: [] }
+  const page: RawPage = {
+    format: 'mdoc',
+    title: '',
+    section: undefined,
+    entries: [],
+    sectionText: {},
+  }
 
   let section = ''
   let subsection: string | undefined
@@ -308,12 +314,20 @@ export function parseMdoc(source: string): RawPage {
     }
   }
 
+  const record = (text: string) => {
+    page.sectionText[section] = `${page.sectionText[section] ?? ''}${text}\n`
+  }
+
   for (const line of lines) {
     if (line.kind === 'text') {
-      currentBody()?.add(roff.unescape(line.text))
+      const text = roff.unescape(line.text)
+      record(text)
+      currentBody()?.add(text)
       continue
     }
     const { name, rest, args } = line
+    if (MACRO.test(name) && name !== 'Sh' && name !== 'Ss')
+      record(renderMacroLine(`${name} ${rest}`, ctx))
     switch (name) {
       case 'Dt':
         page.title = roff.unescape(args[0] ?? '')
