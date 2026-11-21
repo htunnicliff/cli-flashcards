@@ -25,6 +25,12 @@ export interface Repository {
    */
   recordReview(state: CardState, entry: ReviewLogEntry): Promise<number>
   /**
+   * Takes back a grade the user just made: removes its review log entry and
+   * restores the card's previous state (or removes the state if the card had
+   * none). The one exception to the append-only log, for the review screen's undo.
+   */
+  undoReview(entryId: number, cardId: string, previous: CardState | undefined): Promise<void>
+  /**
    * Deletes card states and review log entries, for one deck or for all of
    * them. The only operation that removes review history.
    */
@@ -185,6 +191,12 @@ export function createRepository(
       db.transaction('rw', db.cardStates, db.reviewLog, async () => {
         await db.cardStates.put(state)
         return addLogEntry(db, entry)
+      }),
+    undoReview: (entryId, cardId, previous) =>
+      db.transaction('rw', db.cardStates, db.reviewLog, async () => {
+        await db.reviewLog.delete(entryId)
+        if (previous) await db.cardStates.put(previous)
+        else await db.cardStates.delete(cardId)
       }),
     resetProgress: (deckId) =>
       db.transaction('rw', db.cardStates, db.reviewLog, async () => {
