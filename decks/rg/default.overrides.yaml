@@ -14,3 +14,79 @@ options:
   sort-files:
     hidden: true
     summary: Deprecated; use --sort=path instead.
+
+  fixed-strings:
+    summary: Treat the pattern as a literal string, not a regex
+  invert-match:
+    summary: Show the lines that do NOT match
+  glob:
+    summary: Only search paths matching a glob; prefix it with ! to exclude
+    examples:
+      - command: rg -g '!*.min.js' pattern
+        description: Search everything except minified JavaScript
+  hidden:
+    summary: Also search hidden files and directories (names starting with .)
+  no-ignore:
+    summary: Don't skip files listed in .gitignore, .ignore and similar files
+  passthru:
+    summary: Print every line, highlighting matches, instead of only matching lines
+  files-with-matches:
+    summary: List only the names of files that contain a match
+  files:
+    summary: List the files rg would search, without searching them
+  ignore-case:
+    tier: core
+    summary: Match regardless of upper or lower case
+    examples:
+      - command: rg -i todo
+  smart-case:
+    tier: core
+    summary: Ignore case unless the pattern contains an uppercase letter
+    examples:
+      - command: rg -S config
+  word-regexp:
+    tier: core
+    summary: Only match whole words
+    examples:
+      - command: rg -w is
+  type:
+    tier: core
+    summary: Only search files of a type, e.g. py or js (see --type-list)
+    examples:
+      - command: rg -t py 'import requests'
+  type-not:
+    tier: common
+  context:
+    tier: core
+    summary: Show N lines of context around each match
+    examples:
+      - command: rg -C 3 'fn main'
+  after-context:
+    tier: common
+  before-context:
+    tier: common
+  only-matching:
+    tier: core
+    summary: Print just the matched text, not the whole line
+    examples:
+      - command: rg -o '[0-9]+\.[0-9]+\.[0-9]+' CHANGELOG.md
+  replace:
+    tier: core
+    summary: Show each match replaced with the given text (files are not changed)
+    examples:
+      - command: rg 'colour' -r 'color'
+  unrestricted:
+    tier: core
+    summary: Search ignored files too; repeat (-uu, -uuu) to add hidden and binary files
+    examples:
+      - command: rg -uu pattern
+  count:
+    tier: common
+  multiline:
+    tier: common
+  max-depth:
+    tier: common
+  pcre2:
+    tier: common
+  follow:
+    tier: common

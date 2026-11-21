@@ -11,6 +11,7 @@ import { parseArgs } from 'node:util'
 import { DeckSchema, TIERS } from '../src/schema/deck'
 import { tldrUsage } from './deck/tldr'
 import { loadTldrPages } from './deck/tldr-files'
+import { copiedSummaries, coreWithoutExamples } from './deck/review'
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
@@ -46,6 +47,18 @@ for (const tier of TIERS) {
   console.log(
     `  ${tier.padEnd(8)} ${String(options.length).padStart(4)}${hidden ? `  (${hidden} hidden)` : ''}`,
   )
+}
+
+const copied = copiedSummaries(deck)
+if (copied.length > 0) {
+  console.log(`\nCore summaries still copied from the manpage (${copied.length}):`)
+  console.log(`  ${copied.join(', ')}`)
+}
+
+const bare = coreWithoutExamples(deck)
+if (bare.length > 0) {
+  console.log(`\nCore options with no example (${bare.length}):`)
+  console.log(`  ${bare.join(', ')}`)
 }
 
 const top = Number(values.top)

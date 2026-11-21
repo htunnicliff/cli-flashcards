@@ -1,0 +1,923 @@
+{
+  "$schema": "../../schemas/deck.schema.json",
+  "schemaVersion": 1,
+  "id": "find-bsd",
+  "tool": "find",
+  "variant": "bsd",
+  "toolVersion": "freebsd-15",
+  "deckVersion": 1,
+  "source": "manpage",
+  "license": "BSD-3-Clause",
+  "attribution": "FreeBSD find(1) manual page © The Regents of the University of California and FreeBSD contributors (https://github.com/freebsd/freebsd-src). Examples adapted from tldr-pages (https://github.com/tldr-pages/tldr), CC BY 4.0.",
+  "sourcePages": [{ "name": "find", "section": "1", "path": "vendor/freebsd/find.1" }],
+  "options": [
+    {
+      "id": "short-E",
+      "flags": ["-E"],
+      "summary": "Interpret regular expressions following the -regex and -iregex primaries as extended (modern) regular expressions rather than basic regular expressions (BRE's).",
+      "description": "Interpret regular expressions following the -regex and -iregex primaries as extended (modern) regular expressions rather than basic regular expressions (BRE's). The re_format(7) manual page fully describes both formats.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "short-H",
+      "flags": ["-H"],
+      "summary": "Cause the file information and file type (see stat(2)) returned for each symbolic link specified on the command line to be those of the file referenced by the link, not the link itself.",
+      "description": "Cause the file information and file type (see stat(2)) returned for each symbolic link specified on the command line to be those of the file referenced by the link, not the link itself. If the referenced file does not exist, the file information and type will be for the link itself. File information of all symbolic links not on the command line is that of the link itself.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "short-L",
+      "flags": ["-L"],
+      "summary": "Cause the file information and file type (see stat(2)) returned for each symbolic link to be those of the file referenced by the link, not the link itself.",
+      "description": "Cause the file information and file type (see stat(2)) returned for each symbolic link to be those of the file referenced by the link, not the link itself. If the referenced file does not exist, the file information and type will be for the link itself.\n\nThis option is equivalent to the deprecated -follow primary.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "short-P",
+      "flags": ["-P"],
+      "summary": "Cause the file information and file type (see stat(2)) returned for each symbolic link to be those of the link itself.",
+      "description": "Cause the file information and file type (see stat(2)) returned for each symbolic link to be those of the link itself. This is the default.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "short-X",
+      "flags": ["-X"],
+      "summary": "Permit find to be safely used in conjunction with xargs(1).",
+      "description": "Permit find to be safely used in conjunction with xargs(1). If a file name contains any of the delimiting characters used by xargs(1), a diagnostic message is displayed on standard error, and the file is skipped. The delimiting characters include single (\" ' \") and double (\" \" \") quotes, backslash (\"\\\"), space, tab and newline characters.\n\nHowever, you may wish to consider the -print0 primary in conjunction with \"xargs -0\" as an effective alternative.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "short-d",
+      "flags": ["-d"],
+      "summary": "Cause find to perform a depth-first traversal.",
+      "description": "Cause find to perform a depth-first traversal.\n\nThis option is a BSD-specific equivalent of the -depth primary specified by IEEE Std 1003.1-2001 (POSIX.1). Refer to its description under PRIMARIES for more information.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "short-f",
+      "flags": ["-f"],
+      "argument": { "name": "path", "optional": false },
+      "summary": "Add path to the list of paths that will be recursed into.",
+      "description": "Add path to the list of paths that will be recursed into. This is useful when path begins with a character that would otherwise be interpreted as an expression, namely \"\"!, \"(\" and \"-\".",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "short-s",
+      "flags": ["-s"],
+      "summary": "Cause find to traverse the file hierarchies in lexicographical order, sorting entries within each directory.",
+      "description": "Cause find to traverse the file hierarchies in lexicographical order, sorting entries within each directory.\n\nThe output order is deterministic for a given locale and does not depend on the type of file system or on the order in which directory entries were created. This is useful for comparing results between runs, reproducible builds, and automated tests.\n\nSince entries are sorted per directory, 'find -s' typically uses less memory and temporary disk space than 'find | sort'. Unlike 'find | sort', 'find -s' can produce output while the traversal is still in progress, allowing a long-running pipeline such as 'find -s . -print0 | xargs -0 -n1 /slow/script' to begin processing files immediately. The predictable order also makes the progress easy to follow, e.g., with ps(1).\n\nNote that 'find -s' and 'find | sort' may give different results. For example, 'find -s' puts a directory 'foo' with all its contents before a directory 'foo.', but 'find | sort' puts the directory name 'foo.' before any string like 'foo/bar' because ''. goes before '/' in ASCII. In locales other than C, the two may differ further because of locale-dependent collation.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "short-x",
+      "flags": ["-x"],
+      "summary": "Prevent find from descending into directories that have a device number different than that of the file from which the descent began.",
+      "description": "Prevent find from descending into directories that have a device number different than that of the file from which the descent began.\n\nThis option is equivalent to the deprecated -xdev primary.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "Bmin",
+      "flags": ["-Bmin"],
+      "argument": { "name": "n", "optional": false },
+      "summary": "True if the difference between the time of a file's inode creation and the time find was started, rounded up to the next full minute, is n minutes.",
+      "description": "True if the difference between the time of a file's inode creation and the time find was started, rounded up to the next full minute, is n minutes.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "Bnewer",
+      "flags": ["-Bnewer"],
+      "argument": { "name": "file", "optional": false },
+      "summary": "Same as -newerBm.",
+      "description": "Same as -newerBm.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "Btime",
+      "flags": ["-Btime"],
+      "argument": { "name": "n[smhdw]", "optional": false },
+      "summary": "If no units are specified, this primary evaluates to true if the difference between the time of a file's inode creation and the time find was started, rounded up to the next full 24-hour period, is n 24-hour periods.",
+      "description": "If no units are specified, this primary evaluates to true if the difference between the time of a file's inode creation and the time find was started, rounded up to the next full 24-hour period, is n 24-hour periods.\n\nIf units are specified, this primary evaluates to true if the difference between the time of a file's inode creation and the time find was started is exactly n units. Please refer to the -atime primary description for information on supported time units.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "acl",
+      "flags": ["-acl"],
+      "summary": "May be used in conjunction with other primaries to locate files with extended ACLs.",
+      "description": "May be used in conjunction with other primaries to locate files with extended ACLs. See acl(3) for more information.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "amin",
+      "flags": ["-amin"],
+      "argument": { "name": "[-|+]n", "optional": false },
+      "summary": "True if the difference between the file last access time and the time find was started, rounded up to the next full minute, is more than n (+n), less than n (-n), or exactly n minutes ago.",
+      "description": "True if the difference between the file last access time and the time find was started, rounded up to the next full minute, is more than n (+n), less than n (-n), or exactly n minutes ago.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "anewer",
+      "flags": ["-anewer"],
+      "argument": { "name": "file", "optional": false },
+      "summary": "Same as -neweram.",
+      "description": "Same as -neweram.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "atime",
+      "flags": ["-atime"],
+      "argument": { "name": "n[smhdw]", "optional": false },
+      "summary": "If no units are specified, this primary evaluates to true if the difference between the file last access time and the time find was started, rounded up to the next full 24-hour period, is n 24-hour periods.",
+      "description": "If no units are specified, this primary evaluates to true if the difference between the file last access time and the time find was started, rounded up to the next full 24-hour period, is n 24-hour periods.\n\nIf units are specified, this primary evaluates to true if the difference between the file last access time and the time find was started is exactly n units. Possible time units are as follows:\n\ns\nsecond\n\nm\nminute (60 seconds)\n\nh\nhour (60 minutes)\n\nd\nday (24 hours)\n\nw\nweek (7 days)\n\nAny number of units may be combined in one -atime argument, for example, \"-atime -1h30m\". Units are probably only useful when used in conjunction with the + or - modifier.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "cmin",
+      "flags": ["-cmin"],
+      "argument": { "name": "[-|+]n", "optional": false },
+      "summary": "True if the difference between the time of last change of file status information and the time find was started, rounded up to the next full minute, is more than n (+n), less than n (-n), or exactly n minutes ago.",
+      "description": "True if the difference between the time of last change of file status information and the time find was started, rounded up to the next full minute, is more than n (+n), less than n (-n), or exactly n minutes ago.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "cnewer",
+      "flags": ["-cnewer"],
+      "argument": { "name": "file", "optional": false },
+      "summary": "Same as -newercm.",
+      "description": "Same as -newercm.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "ctime",
+      "flags": ["-ctime"],
+      "argument": { "name": "n[smhdw]", "optional": false },
+      "summary": "If no units are specified, this primary evaluates to true if the difference between the time of last change of file status information and the time find was started, rounded up to the next full 24-hour period, is n 24-hour periods.",
+      "description": "If no units are specified, this primary evaluates to true if the difference between the time of last change of file status information and the time find was started, rounded up to the next full 24-hour period, is n 24-hour periods.\n\nIf units are specified, this primary evaluates to true if the difference between the time of last change of file status information and the time find was started is exactly n units. Please refer to the -atime primary description for information on supported time units.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "delete",
+      "flags": ["-delete"],
+      "summary": "Delete found files and/or directories.",
+      "description": "Delete found files and/or directories. Always returns true. This executes from the current working directory as find recurses down the tree. It will not attempt to delete a filename with a \"/\" character in its pathname relative to \"\". for security reasons. Depth-first traversal processing is implied by this option. The -delete primary will fail to delete a directory if it is not empty. Following symlinks is incompatible with this option.\n\nWARNING: The -delete primary will immediately attempt to delete the current path when evaluated. Be mindful of its place in the expression; as a general rule, it should almost always come last. If in doubt, try running with -print in place of -delete first. See OPERATORS below for additional information on the order of evaluation.",
+      "tier": "core",
+      "examples": [
+        {
+          "command": "find path/to/directory -type f|d -empty -delete -print",
+          "description": "Search for either empty files or directories and delete them verbosely"
+        }
+      ],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "depth",
+      "flags": ["-depth"],
+      "summary": "Always true; same as the non-portable -d option.",
+      "description": "Always true; same as the non-portable -d option. Cause find to perform a depth-first traversal, i.e., directories are visited in post-order and all entries in a directory will be acted on before the directory itself. By default, find visits directories in pre-order, i.e., before their contents. Note, the default is not a breadth-first traversal.\n\nThe -depth primary can be useful when find is used with cpio(1) to process files that are contained in directories with unusual permissions. It ensures that you have write permission while you are placing files in a directory, then sets the directory's permissions as the last thing.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "empty",
+      "flags": ["-empty"],
+      "summary": "True if the current file or directory is empty.",
+      "description": "True if the current file or directory is empty.",
+      "tier": "core",
+      "examples": [
+        {
+          "command": "find path/to/directory -type f|d -empty -delete -print",
+          "description": "Search for either empty files or directories and delete them verbosely"
+        }
+      ],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "exec",
+      "flags": ["-exec"],
+      "argument": { "name": "utility [argument...];", "optional": false },
+      "summary": "True if the program named utility returns a zero value as its exit status.",
+      "description": "True if the program named utility returns a zero value as its exit status. Optional arguments may be passed to the utility. The expression must be terminated by a semicolon (\"\");. If you invoke find from a shell you may need to quote the semicolon if the shell would otherwise treat it as a control operator. If the string \"{}\" appears anywhere in the utility name or the arguments it is replaced by the pathname of the current file. Utility will be executed from the directory from which find was executed. Utility and arguments are not subject to the further expansion of shell patterns and constructs.",
+      "tier": "core",
+      "examples": [
+        {
+          "command": "find path/to/directory -name '*.ext' -exec wc -l {} \\;",
+          "description": "Run a command for each file (use `{}` within the command to access the filename)"
+        },
+        {
+          "command": "find path/to/directory -daystart -mtime -1 -exec tar -cvf archive.tar {} \\+",
+          "description": "Find all files modified today and pass the results to a single command as arguments"
+        }
+      ],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "execdir",
+      "flags": ["-execdir"],
+      "argument": { "name": "utility [argument...];", "optional": false },
+      "summary": "Same as -execdir, except that \"{}\" is replaced with as many pathnames as possible for each invocation of utility.",
+      "description": "Same as -execdir, except that \"{}\" is replaced with as many pathnames as possible for each invocation of utility. This behaviour is similar to that of xargs(1). The primary always returns true; if at least one invocation of utility returns a non-zero exit status, find will return a non-zero exit status.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "executable",
+      "flags": ["-executable"],
+      "summary": "Matches files which are executable by the current user.",
+      "description": "Matches files which are executable by the current user. This test makes use of the access(2) system call, and so can be fooled by NFS servers which do UID mapping (or root-squashing). This is a GNU find extension.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "flags",
+      "flags": ["-flags"],
+      "argument": { "name": "[-|+]flags,notflags", "optional": false },
+      "summary": "The flags are specified using symbolic names (see chflags(1)).",
+      "description": "The flags are specified using symbolic names (see chflags(1)). Those with the \"no\" prefix (except \"nodump\") are said to be notflags. Flags in flags are checked to be set, and flags in notflags are checked to be not set. Note that this is different from -perm, which only allows the user to specify mode bits that are set.\n\nIf flags are preceded by a dash (\"-\"), this primary evaluates to true if at least all of the bits in flags and none of the bits in notflags are set in the file's flags bits. If flags are preceded by a plus (\"+\"), this primary evaluates to true if any of the bits in flags is set in the file's flags bits, or any of the bits in notflags is not set in the file's flags bits. Otherwise, this primary evaluates to true if the bits in flags exactly match the file's flags bits, and none of the flags bits match those of notflags.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "fprint",
+      "flags": ["-fprint"],
+      "argument": { "name": "filename", "optional": false },
+      "summary": "This primary always evaluates to true.",
+      "description": "This primary always evaluates to true. This creates filename or truncates the file if it already exists. The file is created at startup. It writes the pathname of the current file to this file, followed by a newline character. The file will be empty if no files are matched.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "fprint0",
+      "flags": ["-fprint0"],
+      "argument": { "name": "filename", "optional": false },
+      "summary": "This primary always evaluates to true.",
+      "description": "This primary always evaluates to true. This creates filename or truncates the file if it already exists. The file is created at startup. It writes the pathname of the current file to this file, followed by an ASCII NUL character (character code 0). The file will be empty if no files are matched.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "fstype",
+      "flags": ["-fstype"],
+      "argument": { "name": "type", "optional": false },
+      "summary": "True if the file is contained in a file system of type type.",
+      "description": "True if the file is contained in a file system of type type. The lsvfs(1) command can be used to find out the types of file systems that are available on the system. In addition, there are two pseudo-types, \"local\" and \"rdonly\". The former matches any file system physically mounted on the system where the find is being executed and the latter matches any file system which is mounted read-only.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "gid",
+      "flags": ["-gid"],
+      "argument": { "name": "gname", "optional": false },
+      "summary": "The same thing as -group gname for compatibility with GNU find.",
+      "description": "The same thing as -group gname for compatibility with GNU find. GNU find imposes a restriction that gname is numeric, while find does not.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "group",
+      "flags": ["-group"],
+      "argument": { "name": "gname", "optional": false },
+      "summary": "True if the file belongs to the group gname.",
+      "description": "True if the file belongs to the group gname. If gname is numeric and there is no such group name, then gname is treated as a group ID.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "ignore_readdir_race",
+      "flags": ["-ignore_readdir_race"],
+      "summary": "Ignore errors because a file or a directory is deleted after reading the name from a directory.",
+      "description": "Ignore errors because a file or a directory is deleted after reading the name from a directory. This option does not affect errors occurring on starting points.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "ilname",
+      "flags": ["-ilname"],
+      "argument": { "name": "pattern", "optional": false },
+      "summary": "Like -lname, but the match is case insensitive.",
+      "description": "Like -lname, but the match is case insensitive. This is a GNU find extension.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "iname",
+      "flags": ["-iname"],
+      "argument": { "name": "pattern", "optional": false },
+      "summary": "Like -name, but the match is case insensitive.",
+      "description": "Like -name, but the match is case insensitive.",
+      "tier": "core",
+      "examples": [
+        {
+          "command": "find path/to/directory -type d -iname '*lib*'",
+          "description": "Find directories matching a given name, in case-insensitive mode"
+        }
+      ],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "inum",
+      "flags": ["-inum"],
+      "argument": { "name": "n", "optional": false },
+      "summary": "True if the file has inode number n.",
+      "description": "True if the file has inode number n.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "ipath",
+      "flags": ["-ipath"],
+      "argument": { "name": "pattern", "optional": false },
+      "summary": "Like -path, but the match is case insensitive.",
+      "description": "Like -path, but the match is case insensitive.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "iregex",
+      "flags": ["-iregex"],
+      "argument": { "name": "pattern", "optional": false },
+      "summary": "Like -regex, but the match is case insensitive.",
+      "description": "Like -regex, but the match is case insensitive.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "iwholename",
+      "flags": ["-iwholename"],
+      "argument": { "name": "pattern", "optional": false },
+      "summary": "The same thing as -ipath, for GNU find compatibility.",
+      "description": "The same thing as -ipath, for GNU find compatibility.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "links",
+      "flags": ["-links"],
+      "argument": { "name": "n", "optional": false },
+      "summary": "True if the file has n links.",
+      "description": "True if the file has n links.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "lname",
+      "flags": ["-lname"],
+      "argument": { "name": "pattern", "optional": false },
+      "summary": "Like -name, but the contents of the symbolic link are matched instead of the file name.",
+      "description": "Like -name, but the contents of the symbolic link are matched instead of the file name. Note that this only matches broken symbolic links if symbolic links are being followed. This is a GNU find extension.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "ls",
+      "flags": ["-ls"],
+      "summary": "This primary always evaluates to true.",
+      "description": "This primary always evaluates to true. The following information for the current file is written to standard output: its inode number, size in 512-byte blocks, file permissions, number of hard links, owner, group, size in bytes, last modification time, and pathname. If the file is a block or character special file, the device number will be displayed instead of the size in bytes. If the file is a symbolic link, the pathname of the linked-to file will be displayed preceded by \"->\". The format is identical to that produced by Bk -words \"ls -dils\". Ek",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "maxdepth",
+      "flags": ["-maxdepth"],
+      "argument": { "name": "n", "optional": false },
+      "summary": "Always true; descend at most n directory levels below the command line arguments.",
+      "description": "Always true; descend at most n directory levels below the command line arguments. If any -maxdepth primary is specified, it applies to the entire expression even if it would not normally be evaluated. \"-maxdepth 0\" limits the whole search to the command line arguments.",
+      "tier": "core",
+      "examples": [
+        {
+          "command": "find path/to/directory -maxdepth 1 -size +500k -size -10M",
+          "description": "Find files matching a given size range, limiting the recursive depth to \"1\""
+        }
+      ],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "mindepth",
+      "flags": ["-mindepth"],
+      "argument": { "name": "n", "optional": false },
+      "summary": "Always true; do not apply any tests or actions at levels less than n.",
+      "description": "Always true; do not apply any tests or actions at levels less than n. If any -mindepth primary is specified, it applies to the entire expression even if it would not normally be evaluated. \"-mindepth 1\" processes all but the command line arguments.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "mmin",
+      "flags": ["-mmin"],
+      "argument": { "name": "[-|+]n", "optional": false },
+      "summary": "True if the difference between the file last modification time and the time find was started, rounded up to the next full minute, is more than n (+n), less than n (-n), or exactly n minutes ago.",
+      "description": "True if the difference between the file last modification time and the time find was started, rounded up to the next full minute, is more than n (+n), less than n (-n), or exactly n minutes ago.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "mnewer",
+      "flags": ["-mnewer"],
+      "argument": { "name": "file", "optional": false },
+      "summary": "Same as -newer.",
+      "description": "Same as -newer.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "mount",
+      "flags": ["-mount"],
+      "summary": "The same thing as -xdev, for GNU find compatibility.",
+      "description": "The same thing as -xdev, for GNU find compatibility.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "mtime",
+      "flags": ["-mtime"],
+      "argument": { "name": "n[smhdw]", "optional": false },
+      "summary": "If no units are specified, this primary evaluates to true if the difference between the file last modification time and the time find was started, rounded up to the next full 24-hour period, is n 24-hour periods.",
+      "description": "If no units are specified, this primary evaluates to true if the difference between the file last modification time and the time find was started, rounded up to the next full 24-hour period, is n 24-hour periods.\n\nIf units are specified, this primary evaluates to true if the difference between the file last modification time and the time find was started is exactly n units. Please refer to the -atime primary description for information on supported time units.",
+      "tier": "core",
+      "examples": [
+        {
+          "command": "find path/to/directory -daystart -mtime -1 -exec tar -cvf archive.tar {} \\+",
+          "description": "Find all files modified today and pass the results to a single command as arguments"
+        }
+      ],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "name",
+      "flags": ["-name"],
+      "argument": { "name": "pattern", "optional": false },
+      "summary": "True if the last component of the pathname being examined matches pattern.",
+      "description": "True if the last component of the pathname being examined matches pattern. Special shell pattern matching characters \"([\", \"\"], \"*\", and \"\"?) may be used as part of pattern. These characters may be matched explicitly by escaping them with a backslash (\"\\\").",
+      "tier": "core",
+      "examples": [
+        {
+          "command": "find path/to/directory -name '*.ext'",
+          "description": "Find files by extension"
+        },
+        {
+          "command": "find path/to/directory -path '*/path/*/*.ext' -or -name '*pattern*'",
+          "description": "Find files matching multiple path/name patterns"
+        },
+        {
+          "command": "find path/to/directory -name '*.ext' -exec wc -l {} \\;",
+          "description": "Run a command for each file (use `{}` within the command to access the filename)"
+        }
+      ],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "newer",
+      "flags": ["-newer"],
+      "argument": { "name": "file", "optional": false },
+      "summary": "True if the current file has a more recent last modification time than file.",
+      "description": "True if the current file has a more recent last modification time than file.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "newerXY",
+      "flags": ["-newerXY"],
+      "argument": { "name": "file", "optional": false },
+      "summary": "True if the current file has a more recent last access time (X=a), inode creation time (X=B), change time (X=c), or modification time (X=m) than the last access time (Y=a), inode creation time (Y=B), change time (Y=c), or modification time (Y=m) of file.",
+      "description": "True if the current file has a more recent last access time (X=a), inode creation time (X=B), change time (X=c), or modification time (X=m) than the last access time (Y=a), inode creation time (Y=B), change time (Y=c), or modification time (Y=m) of file. In addition, if Y=t, then file is instead interpreted as a direct date specification of the form understood by ISO8601 or RFC822. Note that -newermm is equivalent to -newer.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "nogroup",
+      "flags": ["-nogroup"],
+      "summary": "True if the file belongs to an unknown group.",
+      "description": "True if the file belongs to an unknown group.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "noignore_readdir_race",
+      "flags": ["-noignore_readdir_race"],
+      "summary": "Turn off the effect of -ignore_readdir_race.",
+      "description": "Turn off the effect of -ignore_readdir_race. This is default behaviour.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "noleaf",
+      "flags": ["-noleaf"],
+      "summary": "This option is for GNU find compatibility.",
+      "description": "This option is for GNU find compatibility. In GNU find it disables an optimization not relevant to find, so it is ignored.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "nouser",
+      "flags": ["-nouser"],
+      "summary": "True if the file belongs to an unknown user.",
+      "description": "True if the file belongs to an unknown user.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "ok",
+      "flags": ["-ok"],
+      "argument": { "name": "utility [argument...];", "optional": false },
+      "summary": "The -ok primary is identical to the -exec primary with the exception that find requests user affirmation for the execution of the utility by printing a message to the terminal and reading a response.",
+      "description": "The -ok primary is identical to the -exec primary with the exception that find requests user affirmation for the execution of the utility by printing a message to the terminal and reading a response. If the response is not affirmative '(y' in the \"POSIX\" locale), the command is not executed and the value of the -ok expression is false.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "okdir",
+      "flags": ["-okdir"],
+      "argument": { "name": "utility [argument...];", "optional": false },
+      "summary": "The -okdir primary is identical to the -execdir primary with the same exception as described for the -ok primary.",
+      "description": "The -okdir primary is identical to the -execdir primary with the same exception as described for the -ok primary.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "path",
+      "flags": ["-path"],
+      "argument": { "name": "pattern", "optional": false },
+      "summary": "True if the pathname being examined matches pattern.",
+      "description": "True if the pathname being examined matches pattern. Special shell pattern matching characters \"([\", \"\"], \"*\", and \"\"?) may be used as part of pattern. These characters may be matched explicitly by escaping them with a backslash (\"\\\"). Slashes (\"/\") are treated as normal characters and do not have to be matched explicitly.",
+      "tier": "core",
+      "examples": [
+        {
+          "command": "find path/to/directory -path '*/path/*/*.ext' -or -name '*pattern*'",
+          "description": "Find files matching multiple path/name patterns"
+        },
+        {
+          "command": "find path/to/directory -name '*.py' -not -path '*/site-packages/*'",
+          "description": "Find files matching a given pattern, excluding specific paths"
+        }
+      ],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "perm",
+      "flags": ["-perm"],
+      "argument": { "name": "[-|+|/]mode", "optional": false },
+      "summary": "The mode may be either symbolic (see chmod(1)) or an octal number.",
+      "description": "The mode may be either symbolic (see chmod(1)) or an octal number. If the mode is symbolic, a starting value of zero is assumed and the mode sets or clears permissions without regard to the process' file mode creation mask. If the mode is octal, only bits 07777 (S_ISUID | S_ISGID | S_ISTXT | S_IRWXU | S_IRWXG | S_IRWXO) of the file's mode bits participate in the comparison. If the mode is preceded by a dash (\"-\"), this primary evaluates to true if at least all of the bits in the mode are set in the file's mode bits. If the mode is preceded by a plus (\"+\") this primary evaluates to true if any of the bits in the mode are set in the file's mode bits. A slash (\"/\") is also accepted with the same meaning as plus for compatibility with GNU find. Otherwise, this primary evaluates to true if the bits in the mode exactly match the file's mode bits. Note, the first character of a symbolic mode may not be a dash (\"-\").",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "print",
+      "flags": ["-print"],
+      "summary": "This primary always evaluates to true.",
+      "description": "This primary always evaluates to true. It prints the pathname of the current file to standard output. If none of -exec, -ls, -print0, or -ok is specified, the given expression shall be effectively replaced by (given expression) -print.",
+      "tier": "core",
+      "examples": [
+        {
+          "command": "find path/to/directory -type f|d -empty -delete -print",
+          "description": "Search for either empty files or directories and delete them verbosely"
+        }
+      ],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "print0",
+      "flags": ["-print0"],
+      "summary": "This primary always evaluates to true.",
+      "description": "This primary always evaluates to true. It prints the pathname of the current file to standard output, followed by an ASCII NUL character (character code 0).",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "printf",
+      "flags": ["-printf"],
+      "argument": { "name": "fmt", "optional": false },
+      "summary": "This primary always evaluates to true.",
+      "description": "This primary always evaluates to true. It prints information about the file, interpreting 'and' '%' escape sequences as described in the PRINTF FORMATS section. Unlike -print, -printf does not add a newline automatically.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "prune",
+      "flags": ["-prune"],
+      "summary": "This primary always evaluates to true.",
+      "description": "This primary always evaluates to true. It causes find to not descend into the current file. Note, the -prune primary has no effect if the -d option was specified.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "quit",
+      "flags": ["-quit"],
+      "summary": "Causes find to terminate immediately.",
+      "description": "Causes find to terminate immediately.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "readable",
+      "flags": ["-readable"],
+      "summary": "Matches files which are readable by the current user.",
+      "description": "Matches files which are readable by the current user. This test makes use of the access(2) system call, and so can be fooled by NFS servers which do UID mapping (or root-squashing). This is a GNU find extension.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "regex",
+      "flags": ["-regex"],
+      "argument": { "name": "pattern", "optional": false },
+      "summary": "True if the whole path of the file matches pattern using regular expression.",
+      "description": "True if the whole path of the file matches pattern using regular expression. To match a file named \"./foo/xyzzy\", you can use the regular expression \".*/[xyz]*\" or \".*/foo/.*\", but not \"xyzzy\" or \"/foo/\".",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "samefile",
+      "flags": ["-samefile"],
+      "argument": { "name": "name", "optional": false },
+      "summary": "True if the file is a hard link to name.",
+      "description": "True if the file is a hard link to name. If the command option -L is specified, it is also true if the file is a symbolic link and points to name.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "size",
+      "flags": ["-size"],
+      "argument": { "name": "n[ckMGTP]", "optional": false },
+      "summary": "True if the file's size, rounded up, in 512-byte blocks is n.",
+      "description": "True if the file's size, rounded up, in 512-byte blocks is n. If n is followed by a c, then the primary is true if the file's size is n bytes (characters). Similarly if n is followed by a scale indicator then the file's size is compared to n scaled as:\n\nk\nkilobytes (1024 bytes)\n\nM\nmegabytes (1024 kilobytes)\n\nG\ngigabytes (1024 megabytes)\n\nT\nterabytes (1024 gigabytes)\n\nP\npetabytes (1024 terabytes)",
+      "tier": "core",
+      "examples": [
+        {
+          "command": "find path/to/directory -maxdepth 1 -size +500k -size -10M",
+          "description": "Find files matching a given size range, limiting the recursive depth to \"1\""
+        }
+      ],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "sparse",
+      "flags": ["-sparse"],
+      "summary": "True if the current file is sparse, i.e. has fewer blocks allocated than expected based on its size in bytes.",
+      "description": "True if the current file is sparse, i.e. has fewer blocks allocated than expected based on its size in bytes. This might also match files that have been compressed by the filesystem.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "type",
+      "flags": ["-type"],
+      "argument": { "name": "t", "optional": false },
+      "summary": "True if the file is of the specified type.",
+      "description": "True if the file is of the specified type. Possible file types are as follows:\n\nb\nblock special\n\nc\ncharacter special\n\nd\ndirectory\n\nf\nregular file\n\nl\nsymbolic link\n\np\nFIFO\n\ns\nsocket",
+      "tier": "core",
+      "examples": [
+        {
+          "command": "find path/to/directory -type d -iname '*lib*'",
+          "description": "Find directories matching a given name, in case-insensitive mode"
+        },
+        {
+          "command": "find path/to/directory -type f|d -empty -delete -print",
+          "description": "Search for either empty files or directories and delete them verbosely"
+        }
+      ],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "uid",
+      "flags": ["-uid"],
+      "argument": { "name": "uname", "optional": false },
+      "summary": "The same thing as -user uname for compatibility with GNU find.",
+      "description": "The same thing as -user uname for compatibility with GNU find. GNU find imposes a restriction that uname is numeric, while find does not.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "user",
+      "flags": ["-user"],
+      "argument": { "name": "uname", "optional": false },
+      "summary": "True if the file belongs to the user uname.",
+      "description": "True if the file belongs to the user uname. If uname is numeric and there is no such user name, then uname is treated as a user ID.",
+      "tier": "common",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "wholename",
+      "flags": ["-wholename"],
+      "argument": { "name": "pattern", "optional": false },
+      "summary": "The same thing as -path, for GNU find compatibility.",
+      "description": "The same thing as -path, for GNU find compatibility.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "writable",
+      "flags": ["-writable"],
+      "summary": "Matches files which are writable by the current user.",
+      "description": "Matches files which are writable by the current user. This test makes use of the access(2) system call, and so can be fooled by NFS servers which do UID mapping (or root-squashing). This is a GNU find extension.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "xattr",
+      "flags": ["-xattr"],
+      "summary": "Matches files which have extended attributes set in any supported namespace.",
+      "description": "Matches files which have extended attributes set in any supported namespace.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "xattrname",
+      "flags": ["-xattrname"],
+      "argument": { "name": "xattr", "optional": false },
+      "summary": "Matches files which have the specified xattr extended attribute set.",
+      "description": "Matches files which have the specified xattr extended attribute set. All supported namespaces are searched by default, but xattr may be prefixed with \"user:\" or \"system:\" to filter by namespace.\n\nNote that named attributes are not supported, only extended attributes as set by, e.g., setextattr(8).",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "not",
+      "flags": ["-not"],
+      "argument": { "name": "expression", "optional": false },
+      "summary": "This is the unary NOT operator.",
+      "description": "This is the unary NOT operator. It evaluates to true if the expression is false.",
+      "tier": "core",
+      "examples": [
+        {
+          "command": "find path/to/directory -name '*.py' -not -path '*/site-packages/*'",
+          "description": "Find files matching a given pattern, excluding specific paths"
+        }
+      ],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "false",
+      "flags": ["-false"],
+      "summary": "Always false.",
+      "description": "Always false.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    },
+    {
+      "id": "true",
+      "flags": ["-true"],
+      "summary": "Always true.",
+      "description": "Always true.",
+      "tier": "obscure",
+      "examples": [],
+      "tags": [],
+      "hidden": false
+    }
+  ]
+}

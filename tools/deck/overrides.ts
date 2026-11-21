@@ -64,7 +64,8 @@ export function applyOverrides(generated: Deck, overrides: Overrides): ApplyResu
     if (patch.hidden !== undefined) option.hidden = patch.hidden
     if (patch.argument === null) delete option.argument
     else if (patch.argument !== undefined) option.argument = patch.argument
-    if (patch.examples) option.examples = [...(option.examples ?? []), ...patch.examples]
+    if (patch.replaceExamples) option.examples = [...(patch.examples ?? [])]
+    else if (patch.examples) option.examples = [...(option.examples ?? []), ...patch.examples]
     if (patch.tags) option.tags = unique([...(option.tags ?? []), ...patch.tags])
   }
 

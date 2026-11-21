@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=../../schemas/overrides.schema.json
+#
+# Curation for the GNU grep deck. Applied on top of gnu.generated.json by
+# `pnpm deck:build`; regenerating the deck keeps these edits.
+
+options:
+  colour:
+    primary: --color
+    summary: Highlight matches; WHEN is never, always or auto
+  with-filename:
+    summary: Prefix each match with its file name
+  recursive:
+    summary: Search directories recursively (symlinks only when named on the command line)
+  extended-regexp:
+    summary: Use extended regular expressions, so | + ? ( ) need no backslash
+  fixed-strings:
+    summary: Treat the pattern as a literal string, not a regex
+  ignore-case:
+    summary: Match regardless of upper or lower case
+  invert-match:
+    summary: Show the lines that do NOT match
+  only-matching:
+    summary: Print just the matched text, one match per line
+  line-number:
+    summary: Show where each match is, as a line number before it
+  short-I:
+    summary: Skip binary files
+  word-regexp:
+    tier: core
+    summary: Only match whole words
+    examples:
+      - command: grep -w 'is' path/to/file
+        description: Match "is" but not "this" or "island"
+  count:
+    tier: core
+    summary: Print how many lines matched instead of the lines
+    examples:
+      - command: grep -c TODO path/to/file
+  files-with-matches:
+    tier: core
+    summary: List only the names of files that contain a match
+    examples:
+      - command: grep -rl 'search_pattern' path/to/directory
+  after-context:
+    tier: core
+    summary: Also print N lines after each match
+    examples:
+      - command: grep -A 3 'error' path/to/log
+  before-context:
+    tier: core
+    summary: Also print N lines before each match
+    examples:
+      - command: grep -B 2 'error' path/to/log
+  context:
+    tier: core
+    summary: Print N lines of context on both sides of each match
+    examples:
+      - command: grep -C 2 'error' path/to/log
+  regexp:
+    tier: core
+    summary: Give a pattern explicitly; repeat for several, or use for patterns starting with -
+    examples:
+      - command: grep -e '-v' -e '--verbose' path/to/file
+  silent:
+    tier: core
+    summary: Print nothing; only set the exit status (0 if anything matched)
+    examples:
+      - command: grep -q 'search_pattern' path/to/file && echo found
+  dereference-recursive:
+    tier: common
+    summary: Search directories recursively, following every symlink
+  include:
+    tier: common
+  exclude:
+    tier: common
+  exclude-dir:
+    tier: common
+  perl-regexp:
+    tier: common
+  files-without-match:
+    tier: common
+  max-count:
+    tier: common
+  no-filename:
+    tier: common

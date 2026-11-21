@@ -93,6 +93,9 @@
               ]
             }
           },
+          "replaceExamples": {
+            "type": "boolean"
+          },
           "tags": {
             "type": "array",
             "items": {
