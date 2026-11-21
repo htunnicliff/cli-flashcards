@@ -22,3 +22,12 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
+
+// Release lint on third-party plugin modules crashes inside lint itself
+// (NoSuchMethodError in JavaDocParser on file_selector_android). Lint still
+// runs on the app module; plugin code is the plugin authors' to lint.
+subprojects {
+    if (name != "app") {
+        tasks.matching { it.name.startsWith("lintVital") }.configureEach { enabled = false }
+    }
+}
