@@ -2,6 +2,7 @@
 /// settings components.
 library;
 
+import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../core/backup.dart';
@@ -455,9 +456,18 @@ class _BackupSettingsState extends State<_BackupSettings> {
       children: [
         Text(
           'Your progress lives only on this device. Export a backup to keep it '
-          'safe or move it to another device. Backups work with the web app too.',
+          'safe or move it to another device.',
           style: context.hint,
         ),
+        if (kIsWeb) ...[
+          const SizedBox(height: Space.s2),
+          SelectableText(
+            'Used the earlier version of this site? Its progress is still at '
+            '${Uri.base.resolve('classic/')}. Export a backup there, then '
+            'import it here.',
+            style: context.hint,
+          ),
+        ],
         const SizedBox(height: Space.s2),
         Text(last, style: context.hint),
         const SizedBox(height: Space.s3),

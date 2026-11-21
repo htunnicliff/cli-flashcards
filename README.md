@@ -4,7 +4,7 @@ A spaced repetition web app for learning the flags of well-known command-line to
 
 **Live:** <https://htunnicliff.github.io/cli-flashcards/>
 
-A cross-platform Flutter version (web, iOS, iPadOS, Android, macOS) is being built in [`app/`](app/README.md). It will replace this Vue app once it reaches feature parity.
+The live site is the cross-platform Flutter app in [`app/`](app/README.md) (web, iOS, iPadOS, Android, macOS). The Vue app in `src/` is still deployed at [`/cli-flashcards/classic/`](https://htunnicliff.github.io/cli-flashcards/classic/) so anyone with progress there can export a backup and import it in the new app.
 
 ## Prerequisites
 
@@ -47,7 +47,7 @@ New deploys apply themselves with no prompt. A new version downloads in the back
 
 ## Deploy
 
-Every push to `main` deploys to [GitHub Pages](https://htunnicliff.github.io/cli-flashcards/) from the `deploy` job in [`ci.yml`](.github/workflows/ci.yml). It runs only after the unit, deck and E2E jobs pass, builds the decks, fails if any deck is invalid, then builds the app with `BASE_PATH=/cli-flashcards/` so assets, the manifest and the service worker scope sit under the subpath. `404.html` is a copy of `index.html`, so deep links like `/cli-flashcards/decks` load the app.
+Every push to `main` deploys to [GitHub Pages](https://htunnicliff.github.io/cli-flashcards/) from the `deploy` job in [`ci.yml`](.github/workflows/ci.yml). It runs only after the unit, deck, E2E and Flutter jobs pass, builds the decks, and fails if any deck is invalid. Then it builds the Flutter app at `/cli-flashcards/` (with `--no-web-resources-cdn` and the Workbox service worker from `pnpm flutter:sw`) and the Vue app at `/cli-flashcards/classic/`. Deck data is served from `/cli-flashcards/data/decks/`. `404.html` is a copy of the Flutter `index.html`, so deep links like `/cli-flashcards/decks` load the app; a missing page under `/classic/` sends you to the classic app's start page.
 
 To try the subpath build locally: `BASE_PATH=/cli-flashcards/ pnpm exec vite build && BASE_PATH=/cli-flashcards/ pnpm preview`, then open <http://localhost:4173/cli-flashcards/>.
 

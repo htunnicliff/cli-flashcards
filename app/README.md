@@ -1,6 +1,6 @@
 # CLI Flashcards (Flutter)
 
-The cross-platform app: web, iOS, iPadOS, Android and macOS from one Dart codebase. It is replacing the Vue web app in `src/`, which stays live until this app reaches feature parity.
+The cross-platform app: web, iOS, iPadOS, Android and macOS from one Dart codebase. It is the live site at <https://htunnicliff.github.io/cli-flashcards/>. The previous Vue app stays at `/classic/` so its saved progress can be exported as a backup and imported here.
 
 ## Setup
 

@@ -24,13 +24,14 @@ const { count, size, warnings } = await generateSW({
     'canvaskit/canvaskit.{js,wasm}',
     'canvaskit/chromium/*.{js,wasm}',
   ],
-  globIgnores: ['sw.js', 'flutter_service_worker.js', 'data/**', '**/*.symbols'],
+  // classic/ is the old Vue app, which has its own service worker.
+  globIgnores: ['sw.js', 'flutter_service_worker.js', 'data/**', 'classic/**', '**/*.symbols'],
   // main.dart.js and canvaskit.wasm are several megabytes each.
   maximumFileSizeToCacheInBytes: 16 * 1024 * 1024,
   // Flutter fingerprints neither main.dart.js nor its assets, so Workbox's
   // revision hashes decide what changed.
   navigateFallback: 'index.html',
-  navigateFallbackDenylist: [/\/data\//],
+  navigateFallbackDenylist: [/\/data\//, /\/classic(\/|$)/],
   cleanupOutdatedCaches: true,
   // Wait for the page to hand over (see web/flutter_bootstrap.js).
   skipWaiting: false,
