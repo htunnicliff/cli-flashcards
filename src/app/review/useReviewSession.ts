@@ -302,7 +302,7 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     for (const id of cardIds) pending.add(id)
     const message =
       how === 'bury'
-        ? 'Buried until tomorrow.'
+        ? 'Skipped until tomorrow.'
         : scope === 'option'
           ? `Suspended every card for ${frontFlag(item.card)}.`
           : 'Card suspended.'
