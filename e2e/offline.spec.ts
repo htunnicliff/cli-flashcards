@@ -32,10 +32,10 @@ test('the header says when the browser is offline', async ({ page, context }) =>
 test('the deck list falls back to the cache offline', async ({ page, context, baseURL }) => {
   await page.goto('/')
   await waitForServiceWorker(page)
-  const online = await page.evaluate(() => fetch('decks/index.json').then((r) => r.json()))
+  const online = await page.evaluate(() => fetch('data/decks/index.json').then((r) => r.json()))
 
   await simulateOutage(context, baseURL!)
-  const offline = await page.evaluate(() => fetch('decks/index.json').then((r) => r.json()))
+  const offline = await page.evaluate(() => fetch('data/decks/index.json').then((r) => r.json()))
   expect(offline).toEqual(online)
 })
 
@@ -77,4 +77,33 @@ test('Chromium considers the app installable', async ({ page, browserName }) => 
   const cdp = await page.context().newCDPSession(page)
   const { installabilityErrors } = await cdp.send('Page.getInstallabilityErrors')
   expect(installabilityErrors).toEqual([])
+})
+
+test('installed decks stay available offline, and installing waits for a connection', async ({
+  page,
+  context,
+  baseURL,
+}) => {
+  await page.goto('/decks')
+  await waitForServiceWorker(page)
+  const deck = page.locator('[data-deck="ripgrep-fixture"]')
+  await deck.getByRole('button', { name: 'Install' }).click()
+  await expect(deck).toHaveAttribute('data-installed', 'true')
+
+  await simulateOutage(context, baseURL!)
+  await page.reload()
+  await expect(deck).toHaveAttribute('data-installed', 'true')
+  await page.goto('/decks/ripgrep-fixture')
+  await expect(page.getByText('--ignore-case')).toBeVisible()
+
+  await page.goto('/decks')
+  await context.setOffline(true)
+  await expect(page.getByText("You're offline")).toBeVisible()
+  await deck.getByRole('button', { name: 'Remove' }).click()
+  await page.getByRole('button', { name: 'Remove deck' }).click()
+  await expect(deck).toHaveAttribute('data-installed', 'false')
+  await expect(deck.getByRole('button', { name: 'Install' })).toBeDisabled()
+
+  await context.setOffline(false)
+  await expect(deck.getByRole('button', { name: 'Install' })).toBeEnabled()
 })
