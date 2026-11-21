@@ -1,25 +1,31 @@
 /**
- * Writes the deck JSON Schema generated from the Zod schema.
+ * Writes the JSON Schemas generated from the Zod schemas.
  *
- *   pnpm schema:export          write schemas/deck.schema.json
- *   pnpm schema:export --check  fail if the committed file is out of date
+ *   pnpm schema:export          write schemas/*.schema.json
+ *   pnpm schema:export --check  fail if a committed file is out of date
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
-import { DECK_JSON_SCHEMA_PATH, deckJsonSchemaText } from '../src/schema/json-schema'
+import { jsonSchemaFiles } from '../src/schema/json-schema'
 
-const target = resolve(process.cwd(), DECK_JSON_SCHEMA_PATH)
-const text = deckJsonSchemaText()
+const check = process.argv.includes('--check')
+let stale = false
 
-if (process.argv.includes('--check')) {
-  const current = await readFile(target, 'utf8').catch(() => '')
-  if (current !== text) {
-    console.error(`${DECK_JSON_SCHEMA_PATH} is out of date. Run \`pnpm schema:export\`.`)
-    process.exit(1)
+for (const { path, text } of jsonSchemaFiles()) {
+  const target = resolve(process.cwd(), path)
+  if (check) {
+    const current = await readFile(target, 'utf8').catch(() => '')
+    if (current !== text) {
+      console.error(`${path} is out of date. Run \`pnpm schema:export\`.`)
+      stale = true
+    } else {
+      console.log(`${path} is up to date.`)
+    }
+  } else {
+    await mkdir(dirname(target), { recursive: true })
+    await writeFile(target, text)
+    console.log(`Wrote ${path}`)
   }
-  console.log(`${DECK_JSON_SCHEMA_PATH} is up to date.`)
-} else {
-  await mkdir(dirname(target), { recursive: true })
-  await writeFile(target, text)
-  console.log(`Wrote ${DECK_JSON_SCHEMA_PATH}`)
 }
+
+if (stale) process.exit(1)

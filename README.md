@@ -72,6 +72,28 @@ pnpm deck:generate sed --variant gnu --license GPL-3.0-or-later
 
 The parser in `tools/deck/` reads roff source directly, both man(7) pages (GNU, help2man, asciidoc/docbook) and mdoc(7) pages (BSD, macOS), so it needs no extra tools. It is pure (manpage text in, deck out) and covered by snapshot tests over the real pages in `tools/deck/manpage/fixtures/`. Run `pnpm test -u` to update the snapshots after a parser change and review the diff.
 
+### Curating with overrides
+
+Generated decks are never edited by hand. Fixes go in `decks/<tool>/<variant>.overrides.yaml`, which `pnpm deck:build` applies on top of the generated deck to produce `public/decks/<tool>-<variant>.json` (the file the app loads) and the `public/decks/index.json` manifest. Regenerating a deck keeps every override.
+
+```yaml
+# yaml-language-server: $schema=../../schemas/overrides.schema.json
+deck:
+  license: MIT OR Unlicense
+options: # patches, keyed by option ID
+  ignore-case:
+    tier: core
+    summary: Match case-insensitively
+    examples: [{ command: 'rg -i todo' }] # added to the generated examples
+  sort-files: { hidden: true } # stays in the deck, makes no cards
+merge: # fold aliases into one option
+  - { into: color, from: [colour] }
+add: # options the parser missed
+  - { flags: ['-0', '--null'], summary: Print NUL after file names }
+```
+
+`deckVersion` goes up by one whenever a deck's built content changes, which is how the app spots deck updates. Overrides that name an option the generated deck no longer has are reported as stale; CI runs `pnpm deck:build --check`, which fails on stale overrides, invalid or duplicate flags, and built files that are out of date.
+
 ## Tests
 
 Tests sit next to the code they cover as `*.test.ts`. Vitest runs two projects:

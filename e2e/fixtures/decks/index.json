@@ -1,12 +1,22 @@
 {
+  "manifestVersion": 1,
   "decks": [
     {
       "id": "ripgrep-fixture",
       "tool": "rg",
       "variant": "fixture",
+      "toolVersion": "14.1.0",
       "deckVersion": 1,
-      "path": "ripgrep-fixture.json",
-      "counts": { "core": 2, "common": 1, "obscure": 1 }
+      "source": "manual",
+      "license": "MIT",
+      "file": "ripgrep-fixture.json",
+      "bytes": 1046,
+      "optionCount": 4,
+      "tiers": {
+        "core": 2,
+        "common": 1,
+        "obscure": 1
+      }
     }
   ]
 }
