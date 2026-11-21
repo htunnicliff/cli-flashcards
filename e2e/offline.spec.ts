@@ -98,6 +98,9 @@ test('installed decks stay available offline, and installing waits for a connect
   await expect(page.getByText('--ignore-case')).toBeVisible()
 
   await page.goto('/decks')
+  // Let the deck list finish loading first: WebKit's setOffline() also fails requests
+  // still in flight to the service worker, which would leave the list empty.
+  await expect(deck).toHaveAttribute('data-installed', 'true')
   await context.setOffline(true)
   await expect(page.getByText("You're offline")).toBeVisible()
   await deck.getByRole('button', { name: 'Remove' }).click()
