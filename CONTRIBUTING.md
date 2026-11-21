@@ -94,12 +94,12 @@ YAML treats `: ` as the start of a key, so quote any value that contains one: `s
 ### 4. Build and validate
 
 ```sh
-pnpm deck:build           # writes public/decks/ and ATTRIBUTIONS.md
+pnpm deck:build           # writes public/data/decks/ and ATTRIBUTIONS.md
 pnpm deck:build --check   # what CI runs
 pnpm decks:check
 ```
 
-`deck:build` applies your overrides, validates the result, and writes `public/decks/<tool>-<variant>.json`, the manifest `public/decks/index.json`, and `ATTRIBUTIONS.md`. It raises a deck's `deckVersion` whenever its content changes, which is how the app notices updates. Run `pnpm dev` to try the deck in the app.
+`deck:build` applies your overrides, validates the result, and writes `public/data/decks/<tool>-<variant>.json`, the manifest `public/data/decks/index.json`, and `ATTRIBUTIONS.md`. It raises a deck's `deckVersion` whenever its content changes, which is how the app notices updates. Run `pnpm dev` to try the deck in the app.
 
 With `--check`, or whenever `CI` is set, these are errors:
 
@@ -113,7 +113,7 @@ Locally they are warnings, so you can build while you work.
 
 ### 5. Open a pull request
 
-Commit the generated JSON, the overrides file, the built files in `public/decks/`, `ATTRIBUTIONS.md` and your line in `decks/README.md`, then open a pull request. The [pull request template](.github/pull_request_template.md) has a checklist for deck changes.
+Commit the generated JSON, the overrides file, the built files in `public/data/decks/`, `ATTRIBUTIONS.md` and your line in `decks/README.md`, then open a pull request. The [pull request template](.github/pull_request_template.md) has a checklist for deck changes.
 
 ## Licensing
 

@@ -1,14 +1,14 @@
 /**
  * Fails if any built deck is invalid, so a broken deck never deploys.
  *
- *   pnpm decks:check            check public/decks/
+ *   pnpm decks:check            check public/data/decks/
  *   pnpm decks:check some/dir   check another directory
  */
 import { resolve } from 'node:path'
 
 import { checkDecks } from './check-decks-lib'
 
-const dir = resolve(process.cwd(), process.argv[2] ?? 'public/decks')
+const dir = resolve(process.cwd(), process.argv[2] ?? 'public/data/decks')
 const problems = await checkDecks(dir)
 
 if (problems.length > 0) {

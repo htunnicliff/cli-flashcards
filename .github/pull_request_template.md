@@ -14,5 +14,5 @@
 - [ ] Core options are the flags people use first; every core summary is in my own words
 - [ ] Every core option has an example that spells its flag on its own, using the short flag where there is one
 - [ ] No existing option ID was renamed (that resets learners' progress)
-- [ ] `pnpm deck:build --check` passes, and `public/decks/` and `ATTRIBUTIONS.md` are committed
+- [ ] `pnpm deck:build --check` passes, and `public/data/decks/` and `ATTRIBUTIONS.md` are committed
 - [ ] Parser fixes come with a fixture, a focused test and reviewed snapshot changes
