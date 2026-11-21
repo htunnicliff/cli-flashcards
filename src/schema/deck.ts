@@ -21,7 +21,8 @@ export const FlagSchema = z
   .string()
   .regex(FLAG_PATTERN, 'A flag looks like "-x", "--long-name" or "-name"')
 
-export const TierSchema = z.enum(['core', 'common', 'obscure'])
+export const TIERS = ['core', 'common', 'obscure'] as const
+export const TierSchema = z.enum(TIERS)
 export type Tier = z.infer<typeof TierSchema>
 
 export const SourceSchema = z.enum(['manpage', 'help', 'manual'])
@@ -43,49 +44,50 @@ export const ExampleSchema = z.object({
 })
 export type Example = z.infer<typeof ExampleSchema>
 
-export const OptionSchema = z
-  .object({
-    /** Stable identity, normally `deriveOptionId(flags)`. */
-    id: OptionIdSchema,
-    /** Every spelling of the option, short forms first. */
-    flags: z.array(FlagSchema).min(1),
-    /** Overrides the default primary flag; must be one of `flags`. */
-    primary: FlagSchema.optional(),
-    argument: ArgumentSchema.optional(),
-    /** One line; the front or back of a card. */
-    summary: z.string().min(1),
-    /** Full text; shown on the card back as "more detail". */
-    description: z.string().default(''),
-    tier: TierSchema,
-    examples: z.array(ExampleSchema).default([]),
-    tags: z.array(z.string().min(1)).default([]),
-    /** Hidden options stay in the deck but produce no cards. */
-    hidden: z.boolean().default(false),
-    /**
-     * For tools with subcommands (`git log`, `git commit`), the subcommand the
-     * option belongs to. Flags only need to be unique within a subcommand.
-     */
-    subcommand: Slug.optional(),
-  })
-  .superRefine((option, ctx) => {
-    if (!isShortFirst(option.flags)) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['flags'],
-        message: 'List short flags before long flags',
-      })
-    }
-    if (new Set(option.flags).size !== option.flags.length) {
-      ctx.addIssue({ code: 'custom', path: ['flags'], message: 'Flags must be unique' })
-    }
-    if (option.primary !== undefined && !option.flags.includes(option.primary)) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['primary'],
-        message: '`primary` must be one of `flags`',
-      })
-    }
-  })
+/** Option fields without the cross-field checks, for schemas that extend it. */
+export const OptionBaseSchema = z.object({
+  /** Stable identity, normally `deriveOptionId(flags)`. */
+  id: OptionIdSchema,
+  /** Every spelling of the option, short forms first. */
+  flags: z.array(FlagSchema).min(1),
+  /** Overrides the default primary flag; must be one of `flags`. */
+  primary: FlagSchema.optional(),
+  argument: ArgumentSchema.optional(),
+  /** One line; the front or back of a card. */
+  summary: z.string().min(1),
+  /** Full text; shown on the card back as "more detail". */
+  description: z.string().default(''),
+  tier: TierSchema,
+  examples: z.array(ExampleSchema).default([]),
+  tags: z.array(z.string().min(1)).default([]),
+  /** Hidden options stay in the deck but produce no cards. */
+  hidden: z.boolean().default(false),
+  /**
+   * For tools with subcommands (`git log`, `git commit`), the subcommand the
+   * option belongs to. Flags only need to be unique within a subcommand.
+   */
+  subcommand: Slug.optional(),
+})
+
+export const OptionSchema = OptionBaseSchema.superRefine((option, ctx) => {
+  if (!isShortFirst(option.flags)) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['flags'],
+      message: 'List short flags before long flags',
+    })
+  }
+  if (new Set(option.flags).size !== option.flags.length) {
+    ctx.addIssue({ code: 'custom', path: ['flags'], message: 'Flags must be unique' })
+  }
+  if (option.primary !== undefined && !option.flags.includes(option.primary)) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['primary'],
+      message: '`primary` must be one of `flags`',
+    })
+  }
+})
 export type Option = z.infer<typeof OptionSchema>
 export type OptionInput = z.input<typeof OptionSchema>
 

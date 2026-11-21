@@ -22,7 +22,8 @@
     "test:e2e": "playwright test",
     "schema:export": "jiti tools/export-schema.ts",
     "deck:generate": "jiti tools/deck-generate.ts",
-    "decks:check": "jiti tools/check-decks.ts"
+    "decks:check": "jiti tools/check-decks.ts",
+    "deck:build": "jiti tools/deck-build.ts"
   },
   "dependencies": {
     "dexie": "^4.4.7",
@@ -56,6 +57,7 @@
     "unplugin-vue-components": "^32.1.0",
     "vite": "^8.3.8",
     "vitest": "^5.1.1",
-    "vue-tsc": "^3.3.14"
+    "vue-tsc": "^3.3.14",
+    "yaml": "^2.9.1"
   }
 }

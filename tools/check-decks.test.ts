@@ -32,9 +32,28 @@ describe('checkDecks', () => {
   const write = (file: string, value: unknown) =>
     writeFile(join(dir, file), typeof value === 'string' ? value : JSON.stringify(value))
 
+  const manifest = (file: string) => ({
+    manifestVersion: 1,
+    decks: [
+      {
+        id: 'rg',
+        tool: 'rg',
+        variant: 'default',
+        toolVersion: '14.1.0',
+        deckVersion: 1,
+        source: 'manual',
+        license: 'MIT',
+        file,
+        bytes: 10,
+        optionCount: 1,
+        tiers: { core: 1, common: 0, obscure: 0 },
+      },
+    ],
+  })
+
   it('passes valid decks and a consistent index', async () => {
     await write('rg.json', validDeck)
-    await write('index.json', { decks: [{ id: 'rg', path: 'rg.json' }] })
+    await write('index.json', manifest('rg.json'))
     expect(await checkDecks(dir)).toEqual([])
   })
 
@@ -57,8 +76,13 @@ describe('checkDecks', () => {
   })
 
   it('reports index entries that point at missing files', async () => {
+    await write('index.json', manifest('rg.json'))
+    expect(await checkDecks(dir)).toEqual(['index.json: decks.0.file: rg.json does not exist'])
+  })
+
+  it('reports a malformed index', async () => {
     await write('index.json', { decks: [{ id: 'rg', path: 'rg.json' }] })
-    expect(await checkDecks(dir)).toEqual(['index.json: decks.0.path: rg.json does not exist'])
+    expect((await checkDecks(dir))[0]).toMatch(/^index\.json: manifestVersion/)
   })
 
   it('checks the E2E fixture decks', async () => {

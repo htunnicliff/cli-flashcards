@@ -1,0 +1,18 @@
+{
+  "manifestVersion": 1,
+  "decks": [
+    {
+      "id": "rg-default",
+      "tool": "rg",
+      "variant": "default",
+      "toolVersion": "14.1.0",
+      "deckVersion": 1,
+      "source": "manpage",
+      "license": "MIT OR Unlicense",
+      "file": "rg-default.json",
+      "bytes": 82897,
+      "optionCount": 101,
+      "tiers": { "core": 0, "common": 101, "obscure": 0 }
+    }
+  ]
+}

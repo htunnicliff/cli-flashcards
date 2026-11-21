@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 import { DeckSchema } from '../../src/schema/deck'
+import { DeckManifestSchema } from '../../src/schema/manifest'
 
 const dir = fileURLToPath(new URL('./decks/', import.meta.url))
 const deckFiles = readdirSync(dir).filter((file) => file.endsWith('.json') && file !== 'index.json')
@@ -16,9 +17,7 @@ describe('E2E fixture decks', () => {
   })
 
   it('index.json lists every fixture deck', () => {
-    const index = JSON.parse(readFileSync(dir + 'index.json', 'utf8')) as {
-      decks: { path: string }[]
-    }
-    expect(index.decks.map((deck) => deck.path).sort()).toEqual([...deckFiles].sort())
+    const index = DeckManifestSchema.parse(JSON.parse(readFileSync(dir + 'index.json', 'utf8')))
+    expect(index.decks.map((deck) => deck.file).sort()).toEqual([...deckFiles].sort())
   })
 })
