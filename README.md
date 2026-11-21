@@ -2,6 +2,8 @@
 
 A spaced repetition web app for learning the flags of well-known command-line tools (git, ripgrep, sed, …). It is a Vue 3 single-page app that will become an offline-first PWA. See the [roadmap](https://github.com/htunnicliff/cli-flashcards/issues/1) for the plan.
 
+**Live:** <https://htunnicliff.github.io/cli-flashcards/>
+
 ## Prerequisites
 
 - **Node.js 22** (22.12 or later). The exact version is pinned in [`.nvmrc`](.nvmrc), so `nvm use` or `fnm use` picks it up.
@@ -31,8 +33,15 @@ pnpm install
 | `pnpm test:e2e --ui` | Open Playwright's UI mode to run and debug E2E tests.           |
 | `pnpm schema:export` | Regenerate `schemas/deck.schema.json` from the Zod deck schema. |
 | `pnpm deck:generate` | Generate a deck from a tool's manpage (see below).              |
+| `pnpm decks:check`   | Validate the built decks in `public/decks/` against the schema. |
 
-CI runs lint, typecheck, tests with coverage and a build on every pull request and every push to `main`. A separate job runs the E2E tests and uploads the Playwright report and traces when they fail.
+CI runs lint, typecheck, tests with coverage and a build on every pull request and every push to `main`. Separate jobs check the decks and run the E2E tests (uploading the Playwright report and traces when they fail).
+
+## Deploy
+
+Every push to `main` deploys to [GitHub Pages](https://htunnicliff.github.io/cli-flashcards/) from the `deploy` job in [`ci.yml`](.github/workflows/ci.yml). It runs only after the unit, deck and E2E jobs pass, builds the decks, fails if any deck is invalid, then builds the app with `BASE_PATH=/cli-flashcards/` so assets, the manifest and the service worker scope sit under the subpath. `404.html` is a copy of `index.html`, so deep links like `/cli-flashcards/decks` load the app.
+
+To try the subpath build locally: `BASE_PATH=/cli-flashcards/ pnpm exec vite build && BASE_PATH=/cli-flashcards/ pnpm preview`, then open <http://localhost:4173/cli-flashcards/>.
 
 ## Layout
 
