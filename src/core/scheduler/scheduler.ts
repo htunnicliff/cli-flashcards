@@ -62,7 +62,8 @@ export function createScheduler(repository: SchedulerRepository): Scheduler {
 
   async function findCard(cardId: string): Promise<Card> {
     for (const stored of await repository.decks.list()) {
-      const card = deriveCards(stored.deck).find((c) => c.id === cardId)
+      // Every card type, so a card can be graded or set aside whatever the settings.
+      const card = deriveCards(stored.deck, { flagPairs: true }).find((c) => c.id === cardId)
       if (card) return card
     }
     throw new Error(`grade: no installed deck has card "${cardId}"`)
@@ -82,9 +83,10 @@ export function createScheduler(repository: SchedulerRepository): Scheduler {
 
     async nextDue(now) {
       const decks = (await repository.decks.list()).filter((stored) => !stored.paused)
+      const flagPairs = await repository.settings.get('flagPairs')
       let next: number | undefined
       for (const stored of decks) {
-        const current = new Set(deriveCards(stored.deck).map((card) => card.id))
+        const current = new Set(deriveCards(stored.deck, { flagPairs }).map((card) => card.id))
         for (const state of await repository.cardStates.listByDeck(stored.id)) {
           if (!current.has(state.cardId) || state.suspended || state.fsrs.phase === 'new') continue
           const due = Math.max(state.fsrs.due, state.buriedUntil ?? 0)

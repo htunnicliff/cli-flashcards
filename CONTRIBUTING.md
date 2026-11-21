@@ -4,7 +4,7 @@ Setup, scripts and the project layout are in the [README](README.md). This guide
 
 ## Adding a deck
 
-A deck is the set of options for one tool, such as `jq` or `grep`. The app turns each option into flashcards: one asks what a flag does, one asks for the flag that does something, and a cloze card blanks the flag out of an example command. So a good deck needs three things from you: the right options marked as worth learning first, a short summary for each, and an example that uses each flag.
+A deck is the set of options for one tool, such as `jq` or `grep`. The app turns each option into flashcards: one asks what a flag does, one asks for the flag that does something, and a cloze card blanks the flag out of an example command. With flag pair practice on (Settings › Practice), an option that has both a short and a long form also gets two cards that show one form and ask for the other. So a good deck needs three things from you: the right options marked as worth learning first, a short summary for each, and an example that uses each flag.
 
 Most of that is generated. `pnpm deck:generate` reads the tool's manpage or `--help` output, and you correct the result in a small YAML file of overrides. You never edit generated JSON by hand, so the deck can be regenerated for a new tool version without losing your work.
 

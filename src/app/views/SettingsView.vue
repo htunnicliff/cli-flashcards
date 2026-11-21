@@ -2,6 +2,7 @@
 import { storeToRefs } from 'pinia'
 
 import BackupSettings from '../components/settings/BackupSettings.vue'
+import PracticeSettings from '../components/settings/PracticeSettings.vue'
 import SchedulingSettings from '../components/settings/SchedulingSettings.vue'
 import StorageSettings from '../components/settings/StorageSettings.vue'
 import {
@@ -69,6 +70,8 @@ const motionOptions: { value: MotionPreference; label: string }[] = [
         On keeps fades but drops movement. System follows your device's reduced motion setting.
       </p>
     </fieldset>
+
+    <PracticeSettings />
 
     <SchedulingSettings />
 

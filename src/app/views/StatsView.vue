@@ -12,15 +12,16 @@ const repository = useRepository()
 const stats = shallowRef<Stats>()
 
 onMounted(async () => {
-  const [decks, log, rolloverHour] = await Promise.all([
+  const [decks, log, rolloverHour, flagPairs] = await Promise.all([
     repository.decks.list(),
     repository.reviewLog.all(),
     repository.settings.get('dayRolloverHour'),
+    repository.settings.get('flagPairs'),
   ])
   const states = (
     await Promise.all(decks.map((d) => repository.cardStates.listByDeck(d.id)))
   ).flat()
-  stats.value = computeStats({ decks, states, log, now: Date.now(), rolloverHour })
+  stats.value = computeStats({ decks, states, log, now: Date.now(), rolloverHour, flagPairs })
 })
 
 const percent = (value: number) => `${Math.round(value * 100)}%`

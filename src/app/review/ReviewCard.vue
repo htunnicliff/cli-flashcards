@@ -14,6 +14,8 @@ const props = defineProps<{
   /** The program name as typed, e.g. `rg` or `git`. */
   tool: string
   revealed: boolean
+  /** Flag pair practice is on: the front shows one form of the flag, never both. */
+  flagPairs?: boolean
 }>()
 
 /** `git log` for a subcommand option, otherwise the tool alone. */
@@ -21,6 +23,8 @@ const command = computed(() =>
   props.option?.subcommand ? `${props.tool} ${props.option.subcommand}` : props.tool,
 )
 const aliases = computed(() => props.card.answers.slice(1))
+/** Other spellings for the front, left off while flag pair practice is on. */
+const frontAliases = computed(() => (props.flagPairs ? [] : aliases.value))
 const argument = computed(() => {
   const arg = props.option?.argument
   if (!arg) return undefined
@@ -51,6 +55,8 @@ const prompt: Record<Card['type'], string> = {
   'flag-to-meaning': 'What does this flag do?',
   'meaning-to-flag': 'Which flag does this?',
   cloze: 'Fill in the blank.',
+  'short-to-long': "What's the long form?",
+  'long-to-short': "What's the short form?",
 }
 </script>
 
@@ -64,14 +70,20 @@ const prompt: Record<Card['type'], string> = {
         <p class="tool mono">{{ command }}</p>
         <p class="flags mono" data-testid="front-flag">
           <span class="flag-primary">{{ card.flag }}</span>
-          <span v-for="alias in aliases" :key="alias" class="flag-alias">{{ alias }}</span>
+          <span v-for="alias in frontAliases" :key="alias" class="flag-alias">{{ alias }}</span>
+        </p>
+      </template>
+      <template v-else-if="card.type === 'short-to-long' || card.type === 'long-to-short'">
+        <p class="tool mono">{{ command }}</p>
+        <p class="flags mono" data-testid="front-flag">
+          <span class="flag-primary">{{ card.shown }}</span>
         </p>
       </template>
       <template v-else-if="card.type === 'meaning-to-flag'">
         <p class="tool mono">{{ command }}</p>
         <p class="meaning" data-testid="front-meaning">{{ card.summary }}</p>
       </template>
-      <template v-else>
+      <template v-else-if="card.type === 'cloze'">
         <CommandLine :parts="clozeParts" block data-testid="front-cloze" />
         <p v-if="card.exampleDescription" class="hint">{{ card.exampleDescription }}</p>
       </template>

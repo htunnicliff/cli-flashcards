@@ -63,6 +63,7 @@ const BackupSettingsSchema = z
     maxReviewsPerDay: z.number(),
     dayRolloverHour: z.number(),
     leechThreshold: z.number(),
+    flagPairs: z.boolean(),
   })
   .partial()
 export type BackupSettings = z.infer<typeof BackupSettingsSchema>
@@ -255,9 +256,9 @@ function withoutId(entry: ReviewLogEntry): ReviewLogEntry {
 }
 
 function pickBackupSettings(settings: Settings): BackupSettings {
-  const picked: BackupSettings = {}
+  const picked: Record<string, unknown> = {}
   for (const key of BACKUP_SETTING_KEYS) picked[key] = settings[key]
-  return picked
+  return picked as BackupSettings
 }
 
 /** `recall-backup-2026-01-31.json`, by local date. */

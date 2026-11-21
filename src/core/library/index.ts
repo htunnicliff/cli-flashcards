@@ -3,7 +3,7 @@
  * diffing deck versions and summarising learning status. Framework-free.
  */
 import type { DeckManifestEntry } from '../../schema/manifest'
-import { deriveCards, type Deck, type Option } from '../../schema'
+import { deriveCards, type Deck, type DeriveOptions, type Option } from '../../schema'
 import type { CardState } from '../storage'
 
 export interface ToolDecks {
@@ -90,10 +90,11 @@ export type OptionStatus = 'new' | 'learning' | 'review' | 'suspended'
 export function optionStatuses(
   deck: Deck,
   states: readonly CardState[],
+  derive: DeriveOptions = {},
 ): Map<string, OptionStatus> {
   const byCard = new Map(states.map((state) => [state.cardId, state]))
   const cardsByOption = new Map<string, string[]>()
-  for (const card of deriveCards(deck)) {
+  for (const card of deriveCards(deck, derive)) {
     cardsByOption.set(card.optionId, [...(cardsByOption.get(card.optionId) ?? []), card.id])
   }
   const result = new Map<string, OptionStatus>()

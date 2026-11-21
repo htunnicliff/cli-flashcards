@@ -13,6 +13,12 @@ export interface AnswerContext {
   options: readonly Option[]
   /** How the tool reads its command line. Defaults to `gnu`. */
   style?: ParsingStyle
+  /**
+   * Accept only these exact spellings, the expected one first, with no prefixes
+   * or combined short flags. Flag pair cards use it: the point is to recall the
+   * other form, so typing the flag the card shows, or `--rec`, is not enough.
+   */
+  only?: readonly string[]
 }
 
 export interface AnswerResult {
@@ -73,14 +79,20 @@ export function optionsNamedBy(
  * the tool's name, so `rg -i`, `--max-count 5` and `--color=always` are all fine.
  */
 export function checkAnswer(input: string, context: AnswerContext): AnswerResult {
-  const { option } = context
-  const expected = primaryFlag(option)
+  const { option, only } = context
+  const expected = only?.[0] ?? primaryFlag(option)
   const scope = context.options.filter((o) => o.subcommand === option.subcommand)
   const flagWords = input
     .trim()
     .split(/\s+/)
     .filter((word) => word.startsWith('-'))
   if (flagWords.length !== 1) return { correct: false, expected }
+
+  if (only) {
+    const name = flagWords[0]!.split('=')[0]!
+    if (!only.includes(name)) return { correct: false, expected }
+    return { correct: true, expected, matched: name }
+  }
 
   const named = optionsNamedBy(flagWords[0]!, scope, context.style)
   const hit = named.find((n) => n.option.id === option.id)

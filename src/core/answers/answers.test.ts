@@ -200,3 +200,29 @@ describe('checkAnswer properties', () => {
     )
   })
 })
+
+describe('checkAnswer with only', () => {
+  const pair = (input: string, only: string[]) =>
+    checkAnswer(input, { option: byId('ignore-case'), options: deck.options, only })
+
+  it('accepts the expected form, with a value or the tool name', () => {
+    expect(pair('--ignore-case', ['--ignore-case'])).toEqual({
+      correct: true,
+      expected: '--ignore-case',
+      matched: '--ignore-case',
+    })
+    expect(pair('grep --ignore-case', ['--ignore-case']).correct).toBe(true)
+    expect(pair('--ignore-case=x', ['--ignore-case']).correct).toBe(true)
+  })
+
+  it('rejects the form the card shows, prefixes and combined short flags', () => {
+    expect(pair('-i', ['--ignore-case'])).toEqual({ correct: false, expected: '--ignore-case' })
+    expect(pair('--ignore', ['--ignore-case']).correct).toBe(false)
+    expect(pair('--ignore-case', ['-i']).correct).toBe(false)
+    expect(pair('-iw', ['-i']).correct).toBe(false)
+  })
+
+  it('accepts any listed spelling, expecting the first', () => {
+    expect(pair('-y', ['-i', '-y'])).toMatchObject({ correct: true, expected: '-i', matched: '-y' })
+  })
+})

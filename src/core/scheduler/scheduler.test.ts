@@ -76,6 +76,30 @@ describe('getQueue', () => {
     ])
   })
 
+  it('adds flag pair cards while flag pair practice is on, and drops them when off', async () => {
+    const pairCards = async (now: number) =>
+      (await scheduler.getQueue(now)).items
+        .map((i) => i.card.id)
+        .filter((id) => id.endsWith('-to-long') || id.endsWith('-to-short'))
+    // Graduate both forward cards so -i's next new card is a flag pair card.
+    for (const type of ['flag-to-meaning', 'meaning-to-flag']) {
+      await graduate(`grep:gnu:ignore-case:${type}`, at(10))
+    }
+    expect(await pairCards(at(11))).toEqual(['grep:gnu:ignore-case:short-to-long'])
+
+    await repo.settings.set('flagPairs', false)
+    expect(await pairCards(at(11))).toEqual([])
+  })
+
+  it('keeps flag pair progress while the practice is off, without scheduling it', async () => {
+    const due = await graduate('grep:gnu:ignore-case:long-to-short', at(10))
+    expect(await scheduler.nextDue(at(10, 13))).toBe(due)
+    await repo.settings.set('flagPairs', false)
+    expect(await scheduler.nextDue(at(10, 13))).toBeUndefined()
+    await repo.settings.set('flagPairs', true)
+    expect(await scheduler.nextDue(at(10, 13))).toBe(due)
+  })
+
   it('includes obscure options when the deck opts in', async () => {
     await repo.decks.setIncludeObscure('grep-gnu', true)
     expect(await ids(at(10))).toContain('grep:gnu:perl-regexp:flag-to-meaning')

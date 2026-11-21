@@ -34,7 +34,8 @@ export interface QueueInput {
   states: readonly CardState[]
   /** Every review in the current study day. */
   todaysLog: readonly ReviewLogEntry[]
-  settings: Pick<Settings, 'newCardsPerDay' | 'maxReviewsPerDay' | 'dayRolloverHour'>
+  settings: Pick<Settings, 'newCardsPerDay' | 'maxReviewsPerDay' | 'dayRolloverHour'> &
+    Partial<Pick<Settings, 'flagPairs'>>
   now: number
 }
 
@@ -63,6 +64,7 @@ function countsAs(entry: ReviewLogEntry): 'new' | 'review' | 'learning' {
  *   is already in the queue, that option's other cards wait until tomorrow.
  *   A card graded today still returns for its own learning steps.
  * - Suspended cards, cards buried past `now` and paused decks are skipped.
+ * - Flag pair cards are only built when `settings.flagPairs` is on.
  */
 export function buildQueue({ decks, states, todaysLog, settings, now }: QueueInput): Queue {
   const dayEnd = nextStudyDayStart(now, settings.dayRolloverHour)
@@ -91,7 +93,7 @@ export function buildQueue({ decks, states, todaysLog, settings, now }: QueueInp
   decks.forEach((stored, deckIndex) => {
     if (stored.paused) return
     const tierByOption = new Map(stored.deck.options.map((o) => [o.id, o.tier]))
-    deriveCards(stored.deck).forEach((card, order) => {
+    deriveCards(stored.deck, { flagPairs: settings.flagPairs }).forEach((card, order) => {
       const tier = tierByOption.get(card.optionId) ?? 'common'
       const state = stateById.get(card.id)
       if (state?.suspended) return

@@ -1,12 +1,19 @@
 import { z } from 'zod'
 import type { Deck, Option } from './deck'
+import { isLongFlag, isShortFlag } from './flags'
 
 /**
  * Cards are never stored in deck files. They are derived from options at
  * runtime, one per applicable card type, so new card types can be added
  * without regenerating decks.
  */
-export const CARD_TYPES = ['flag-to-meaning', 'meaning-to-flag', 'cloze'] as const
+export const CARD_TYPES = [
+  'flag-to-meaning',
+  'meaning-to-flag',
+  'cloze',
+  'short-to-long',
+  'long-to-short',
+] as const
 export const CardTypeSchema = z.enum(CARD_TYPES)
 export type CardType = z.infer<typeof CardTypeSchema>
 
@@ -50,7 +57,32 @@ export interface ClozeCard extends CardBase {
   exampleDescription?: string
 }
 
-export type Card = FlagToMeaningCard | MeaningToFlagCard | ClozeCard
+/**
+ * Flag pair cards, for learning which short flag goes with which long one.
+ * Front: one form alone. Back: every spelling. Only options with both a short
+ * and a long form get them, and only while flag pair practice is on.
+ */
+export interface FlagPairCard extends CardBase {
+  type: 'short-to-long' | 'long-to-short'
+  /** The one spelling the front shows. */
+  shown: string
+  /** The spellings of the other form that count as right, the expected one first. */
+  targets: string[]
+}
+
+export type Card = FlagToMeaningCard | MeaningToFlagCard | ClozeCard | FlagPairCard
+
+/** Card types that pair a short flag with its long form. */
+export const FLAG_PAIR_TYPES = ['short-to-long', 'long-to-short'] as const
+
+export function isFlagPairCard(card: Card): card is FlagPairCard {
+  return card.type === 'short-to-long' || card.type === 'long-to-short'
+}
+
+export interface DeriveOptions {
+  /** Adds short ↔ long flag pair cards. Off unless the caller passes the setting. */
+  flagPairs?: boolean
+}
 
 export function cardId(
   deck: Pick<Deck, 'tool' | 'variant'>,
@@ -108,7 +140,20 @@ export function findCloze(option: Option): ClozeMatch | undefined {
   return undefined
 }
 
-function optionCards(deck: Deck, option: Option): Card[] {
+/**
+ * The option's short and long spellings, each led by the primary flag when it
+ * is of that form, or `undefined` when the option lacks one of the two forms.
+ */
+export function flagPair(
+  option: Pick<Option, 'flags' | 'primary'>,
+): { short: string[]; long: string[] } | undefined {
+  const flags = answerFlags(option)
+  const short = flags.filter(isShortFlag)
+  const long = flags.filter(isLongFlag)
+  return short.length && long.length ? { short, long } : undefined
+}
+
+function optionCards(deck: Deck, option: Option, derive: DeriveOptions): Card[] {
   const base = {
     deckId: deck.id,
     optionId: option.id,
@@ -133,16 +178,36 @@ function optionCards(deck: Deck, option: Option): Card[] {
       ...(cloze.description === undefined ? {} : { exampleDescription: cloze.description }),
     })
   }
+  const pair = derive.flagPairs ? flagPair(option) : undefined
+  if (pair) {
+    cards.push(
+      {
+        ...base,
+        id: cardId(deck, option.id, 'short-to-long'),
+        type: 'short-to-long',
+        shown: pair.short[0]!,
+        targets: pair.long,
+      },
+      {
+        ...base,
+        id: cardId(deck, option.id, 'long-to-short'),
+        type: 'long-to-short',
+        shown: pair.long[0]!,
+        targets: pair.short,
+      },
+    )
+  }
   return cards
 }
 
 /**
  * Derives every card for a parsed deck: each visible option × each card type
- * that applies to it. Hidden options produce no cards, and `cloze` needs an
- * example that contains one of the option's flags.
+ * that applies to it. Hidden options produce no cards, `cloze` needs an
+ * example that contains one of the option's flags, and the flag pair types
+ * need `flagPairs` plus both a short and a long form.
  */
-export function deriveCards(deck: Deck): Card[] {
+export function deriveCards(deck: Deck, derive: DeriveOptions = {}): Card[] {
   return deck.options
     .filter((option) => !option.hidden)
-    .flatMap((option) => optionCards(deck, option))
+    .flatMap((option) => optionCards(deck, option, derive))
 }
