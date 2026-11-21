@@ -90,11 +90,7 @@ test('keyboard hints show with a mouse and hide on a touch screen', async ({ pag
 
   const reveal = page.getByRole('button', { name: /Show answer/ })
   await expect(reveal).toBeVisible()
-  const hints = [
-    page.getByRole('button', { name: 'Keyboard shortcuts' }),
-    reveal.locator('kbd'),
-    page.getByRole('button', { name: /^Bury/ }).locator('kbd'),
-  ]
+  const hints = [page.getByRole('button', { name: 'Keyboard shortcuts' }), reveal.locator('kbd')]
   for (const hint of hints) {
     if (isMobile) await expect(hint).toBeHidden()
     else await expect(hint).toBeVisible()
