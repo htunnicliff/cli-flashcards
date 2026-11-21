@@ -120,7 +120,20 @@ jobs:
         run: flutter test
 
       - name: Build web
-        run: flutter build web
+        run: flutter build web --no-web-resources-cdn
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Write the offline service worker
+        working-directory: .
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm flutter:sw
 
   native:
     name: Build ${{ matrix.name }}
