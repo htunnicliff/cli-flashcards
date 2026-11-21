@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { m } from 'motion-v'
-import { computed, onMounted, ref, shallowRef } from 'vue'
+import { computed, nextTick, onMounted, ref, shallowRef } from 'vue'
 import { RouterLink } from 'vue-router'
 
 import { optionStatuses, searchOptions, type OptionStatus } from '@/core/library'
+import { createScheduler } from '@/core/scheduler'
 import type { CardState } from '@/core/storage'
-import { answerFlags, type Deck } from '@/schema'
+import { answerFlags, type CardType, type Deck, type Option } from '@/schema'
 
-import { UiChip } from '../components/ui'
+import { UiButton, UiChip } from '../components/ui'
 import { fetchDeck, fetchManifest, type FetchLike } from '../decks/catalog'
 import { fade, spring } from '../motion/tokens'
 import { useRepository } from '../repository'
@@ -15,6 +16,9 @@ import { useRepository } from '../repository'
 const props = defineProps<{ id: string; fetch?: FetchLike }>()
 
 const repository = useRepository()
+const scheduler = createScheduler(repository)
+/** The option whose full description is open, from a `#option-…` link. */
+const openOption = ref<string>()
 const deck = shallowRef<Deck>()
 const installed = ref(false)
 const states = shallowRef<CardState[]>([])
@@ -41,7 +45,49 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+  const hash = typeof location === 'undefined' ? '' : decodeURIComponent(location.hash)
+  if (hash.startsWith('#option-')) void showOption(hash.slice('#option-'.length))
 })
+
+/** Opens an option's full description and scrolls to it. */
+async function showOption(id: string) {
+  query.value = ''
+  openOption.value = id
+  await nextTick()
+  document.getElementById(`option-${id}`)?.scrollIntoView?.({ block: 'start' })
+}
+
+const CARD_TYPE_LABELS: Record<CardType, string> = {
+  'flag-to-meaning': 'Flag → meaning',
+  'meaning-to-flag': 'Meaning → flag',
+  cloze: 'Fill in the blank',
+}
+
+interface SetAsideCard {
+  state: CardState
+  option: Option
+  type: string
+}
+
+/** Stored states for cards of options the deck still shows, with their option. */
+const cardsWithOptions = computed<SetAsideCard[]>(() => {
+  const options = new Map((deck.value?.options ?? []).map((o) => [o.id, o]))
+  return states.value.flatMap((state) => {
+    const option = options.get(state.optionId)
+    if (!option || option.hidden) return []
+    const type = state.cardId.split(':').at(-1) as CardType
+    return [{ state, option, type: CARD_TYPE_LABELS[type] ?? type }]
+  })
+})
+const leeches = computed(() => cardsWithOptions.value.filter((c) => c.state.leech))
+const suspended = computed(() =>
+  cardsWithOptions.value.filter((c) => c.state.suspended && !c.state.leech),
+)
+
+async function unsuspend(cardIds: string[]) {
+  await scheduler.unsuspend(cardIds)
+  states.value = await repository.cardStates.listByDeck(props.id)
+}
 
 const statuses = computed(() =>
   deck.value ? optionStatuses(deck.value, states.value) : new Map<string, OptionStatus>(),
@@ -75,6 +121,38 @@ const statusLabel: Record<OptionStatus, string> = {
     <p v-if="error" class="error" role="alert">{{ error }}</p>
 
     <template v-if="deck">
+      <section v-if="leeches.length" class="set-aside" aria-labelledby="leeches-heading">
+        <h2 id="leeches-heading">Leeches</h2>
+        <p class="hint">
+          These cards keep slipping away. Try rewriting the meaning in your own words: read the full
+          description, then picture when you'd use the flag.
+        </p>
+        <ul>
+          <li v-for="{ state, option, type } in leeches" :key="state.cardId" data-leech>
+            <code class="mono primary">{{ answerFlags(option)[0] }}</code>
+            <span class="hint">{{ type }} · forgotten {{ state.fsrs.lapses }} times</span>
+            <a :href="`#option-${option.id}`" @click="showOption(option.id)">Full description</a>
+            <UiButton v-if="state.suspended" @click="unsuspend([state.cardId])">Unsuspend</UiButton>
+          </li>
+        </ul>
+      </section>
+
+      <section v-if="suspended.length" class="set-aside" aria-labelledby="suspended-heading">
+        <h2 id="suspended-heading">Suspended</h2>
+        <ul>
+          <li v-for="{ state, option, type } in suspended" :key="state.cardId" data-suspended>
+            <code class="mono primary">{{ answerFlags(option)[0] }}</code>
+            <span class="hint">{{ type }}</span>
+            <UiButton @click="unsuspend([state.cardId])">Unsuspend</UiButton>
+          </li>
+        </ul>
+        <UiButton
+          v-if="suspended.length > 1"
+          @click="unsuspend(suspended.map((c) => c.state.cardId))"
+          >Unsuspend all</UiButton
+        >
+      </section>
+
       <label class="search">
         <span class="visually-hidden">Search options</span>
         <input
@@ -104,6 +182,7 @@ const statusLabel: Record<OptionStatus, string> = {
             :initial="{ opacity: 0 }"
             :animate="{ opacity: 1, transition: fade.quick }"
             :exit="{ opacity: 0, transition: fade.quick }"
+            :id="`option-${option.id}`"
             class="option"
             :data-option="option.id"
           >
@@ -126,7 +205,10 @@ const statusLabel: Record<OptionStatus, string> = {
               </span>
             </div>
             <p class="summary">{{ option.summary }}</p>
-            <details v-if="option.description && option.description !== option.summary">
+            <details
+              v-if="option.description && option.description !== option.summary"
+              :open="openOption === option.id"
+            >
               <summary>Full description</summary>
               <p class="description">{{ option.description }}</p>
             </details>
@@ -237,6 +319,43 @@ p {
   white-space: pre-wrap;
   color: var(--color-muted);
   font-size: var(--text-sm);
+}
+
+.set-aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-button);
+  background: var(--color-surface);
+}
+
+.set-aside h2 {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.set-aside ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.set-aside li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.set-aside a {
+  color: var(--color-accent);
+  font-size: var(--text-sm);
+  font-weight: 600;
 }
 
 details summary {

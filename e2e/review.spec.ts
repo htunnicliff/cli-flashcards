@@ -57,3 +57,26 @@ test('grade the last card and see when the next review is', async ({ page }) => 
   await expect(done).toContainText('All done for today')
   await expect(done).toContainText('Your next review is')
 })
+
+test('suspend a card while reviewing, then unsuspend it from the deck', async ({ page }) => {
+  await page.goto('/decks')
+  const deck = page.locator('[data-deck="ripgrep-fixture"]')
+  await deck.getByRole('button', { name: 'Install' }).click()
+  await expect(deck).toHaveAttribute('data-installed', 'true')
+  await page.goto('/')
+  await expect(page.getByTestId('count-new')).toHaveText('3')
+
+  const first = await page.locator('[data-card]').getAttribute('data-card')
+  await page.keyboard.press('s')
+  await expect(page.getByTestId('notice')).toContainText('Card suspended.')
+  await expect(page.locator('[data-card]')).not.toHaveAttribute('data-card', first!)
+
+  await page.goto('/decks/ripgrep-fixture')
+  const row = page.locator('[data-suspended]')
+  await expect(row).toHaveCount(1)
+  await row.getByRole('button', { name: 'Unsuspend' }).click()
+  await expect(row).toHaveCount(0)
+
+  await page.goto('/')
+  await expect(page.locator('[data-card]')).toHaveAttribute('data-card', first!)
+})

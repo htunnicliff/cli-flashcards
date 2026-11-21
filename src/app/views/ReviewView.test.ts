@@ -282,4 +282,73 @@ describe('ReviewView', () => {
       expect(w.find('[data-testid="back"]').exists()).toBe(false)
     })
   })
+
+  describe('suspend and bury', () => {
+    it('suspends the card with s and undoes it from the snackbar', async () => {
+      await repo.decks.install(grep())
+      const w = await mountView()
+      const first = cardId(w)!
+      press('s')
+      await flushPromises()
+      expect(cardId(w)).not.toBe(first)
+      expect(w.get('[data-testid="notice"]').text()).toContain('Card suspended.')
+      await vi.waitFor(async () =>
+        expect(await repo.cardStates.get(first)).toMatchObject({ suspended: true }),
+      )
+      expect(await repo.reviewLog.count()).toBe(0)
+
+      await w.get('.snackbar-undo').trigger('click')
+      await vi.waitFor(async () => expect(await repo.cardStates.get(first)).toBeUndefined())
+      await flushPromises()
+      expect(cardId(w)).toBe(first)
+    })
+
+    it('suspends every card for the option with S', async () => {
+      await repo.decks.install(grep())
+      const w = await mountView()
+      expect(cardId(w)).toBe('grep:gnu:ignore-case:flag-to-meaning')
+      press('S')
+      await vi.waitFor(async () =>
+        expect((await repo.cardStates.listByDeck('grep-gnu')).map((s) => s.cardId).sort()).toEqual([
+          'grep:gnu:ignore-case:cloze',
+          'grep:gnu:ignore-case:flag-to-meaning',
+          'grep:gnu:ignore-case:meaning-to-flag',
+        ]),
+      )
+      expect(w.get('[data-testid="notice"]').text()).toContain('every card for -i')
+    })
+
+    it('buries the card with b', async () => {
+      await repo.decks.install(grep())
+      const w = await mountView()
+      const first = cardId(w)!
+      press('b')
+      await vi.waitFor(async () =>
+        expect((await repo.cardStates.get(first))?.buriedUntil).toBeGreaterThan(Date.now()),
+      )
+      await flushPromises()
+      expect(cardId(w)).not.toBe(first)
+      // Only that card waits: a sibling of the same option can take its place today.
+      expect(w.find(`[data-card="${first}"]`).exists()).toBe(false)
+    })
+
+    it('suspends a leech and links to its description', async () => {
+      await repo.decks.install(grep())
+      await repo.settings.set('leechThreshold', 2)
+      const id = 'grep:gnu:ignore-case:flag-to-meaning'
+      await repo.cardStates.put(
+        makeCardState(id, { fsrs: makeFsrsState({ due: Date.now() - 1000, lapses: 1 }) }),
+      )
+      const w = await mountView()
+      expect(cardId(w)).toBe(id)
+      press(' ')
+      press('1')
+      await vi.waitFor(() => expect(w.find('[data-testid="notice"]').exists()).toBe(true))
+      const notice = w.get('[data-testid="notice"]')
+      expect(notice.text()).toContain('Forgotten 2 times')
+      expect(notice.get('a').attributes('href')).toBe('/decks/grep-gnu#option-ignore-case')
+      expect(notice.find('.snackbar-undo').exists()).toBe(false)
+      expect(await repo.cardStates.get(id)).toMatchObject({ leech: true, suspended: true })
+    })
+  })
 })

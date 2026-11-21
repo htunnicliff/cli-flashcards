@@ -2,7 +2,12 @@ import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createRepository, type Repository } from '@/core/storage'
-import { fakeIndexedDB, uniqueDatabaseName } from '@/core/storage/test-utils'
+import {
+  fakeIndexedDB,
+  makeCardState,
+  makeFsrsState,
+  uniqueDatabaseName,
+} from '@/core/storage/test-utils'
 
 import { fakeFetch, grepDeck } from '../decks/test-fixtures'
 import { repositoryKey } from '../repository'
@@ -76,5 +81,50 @@ describe('DeckBrowseView', () => {
   it('reports unknown decks', async () => {
     const wrapper = await mountView('nope-gnu')
     expect(wrapper.get('[role="alert"]').text()).toMatch(/no deck called "nope-gnu"/)
+  })
+
+  it('lists suspended cards and unsuspends them', async () => {
+    await repo.decks.install(grepDeck())
+    await repo.cardStates.putMany([
+      makeCardState('grep:gnu:ignore-case:flag-to-meaning', { suspended: true }),
+      makeCardState('grep:gnu:invert-match:meaning-to-flag', { suspended: true }),
+    ])
+    const wrapper = await mountView()
+    const rows = wrapper.findAll('[data-suspended]')
+    expect(rows.map((r) => r.findAll('code, .hint').map((n) => n.text()))).toEqual([
+      ['-i', 'Flag → meaning'],
+      ['-v', 'Meaning → flag'],
+    ])
+    await rows[0]!.get('button').trigger('click')
+    await vi.waitFor(() => expect(wrapper.findAll('[data-suspended]')).toHaveLength(1))
+    expect(await repo.cardStates.get('grep:gnu:ignore-case:flag-to-meaning')).toMatchObject({
+      suspended: false,
+    })
+    expect(wrapper.text()).not.toContain('Unsuspend all')
+  })
+
+  it('lists leeches with a link that opens the full description', async () => {
+    await repo.decks.install(
+      grepDeck(1, [
+        [['-c', '--count'], { description: 'Print only a count of matching lines per file.' }],
+      ]),
+    )
+    await repo.cardStates.put(
+      makeCardState('grep:gnu:count:meaning-to-flag', {
+        suspended: true,
+        leech: true,
+        fsrs: makeFsrsState({ lapses: 6 }),
+      }),
+    )
+    const wrapper = await mountView()
+    const leech = wrapper.get('[data-leech]')
+    expect(leech.text()).toContain('-c')
+    expect(leech.text()).toContain('forgotten 6 times')
+    expect(wrapper.findAll('[data-suspended]')).toHaveLength(0)
+    expect(wrapper.get('[data-option="count"] details').attributes('open')).toBeUndefined()
+    await leech.get('a').trigger('click')
+    expect(leech.get('a').attributes('href')).toBe('#option-count')
+    expect(wrapper.get('[data-option="count"] details').attributes('open')).toBeDefined()
+    expect(wrapper.get('[data-option="count"]').attributes('id')).toBe('option-count')
   })
 })

@@ -192,6 +192,7 @@ describe('export and import', () => {
     expect(Object.keys(backup.settings).sort()).toEqual([
       'dayRolloverHour',
       'desiredRetention',
+      'leechThreshold',
       'maxReviewsPerDay',
       'newCardsPerDay',
     ])

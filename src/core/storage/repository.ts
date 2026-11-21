@@ -72,6 +72,8 @@ export interface CardStateRepository {
   dueBy(time: number): Promise<CardState[]>
   put(state: CardState): Promise<void>
   putMany(states: readonly CardState[]): Promise<void>
+  /** Removes states, so their cards are new again. For undoing a suspend or bury. */
+  deleteMany(cardIds: readonly string[]): Promise<void>
 }
 
 export interface ReviewLogRepository {
@@ -157,6 +159,9 @@ export function createRepository(
     },
     async putMany(states) {
       await db.cardStates.bulkPut([...states])
+    },
+    async deleteMany(cardIds) {
+      await db.cardStates.bulkDelete([...cardIds])
     },
   }
 

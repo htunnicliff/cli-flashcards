@@ -37,6 +37,7 @@ describe('SchedulingSettings', () => {
       'New cards per day',
       'Maximum reviews per day',
       'New day starts at',
+      'Leech after',
     ])
   })
 

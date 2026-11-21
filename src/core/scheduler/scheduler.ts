@@ -1,11 +1,20 @@
 import { deriveCards, type Card } from '../../schema'
 import type { CardState, Rating, Repository, ReviewLogEntry, StoredDeck } from '../storage'
-import { nextState } from './fsrs'
+import { nextStudyDayStart } from './day'
+import { newFsrsState, nextState } from './fsrs'
 import { buildQueue, studyDay, type Queue } from './queue'
 
 export interface GradeResult {
   state: CardState
   entry: ReviewLogEntry
+  /** True when this grade made the card a leech, which also suspended it. */
+  becameLeech: boolean
+}
+
+/** A card's state before a suspend or bury, so it can be put back. */
+export interface PreviousState {
+  cardId: string
+  state: CardState | undefined
 }
 
 export interface Scheduler {
@@ -22,6 +31,18 @@ export interface Scheduler {
    * they are limited per day, not due.
    */
   nextDue(now: number): Promise<number | undefined>
+  /**
+   * Sets cards aside without grading them: `suspend` until unsuspended, `bury`
+   * until the next study day. Returns their earlier states for `restore`.
+   */
+  setAside(
+    cardIds: readonly string[],
+    how: 'suspend' | 'bury',
+    now: number,
+  ): Promise<PreviousState[]>
+  /** Puts back states returned by `setAside`, removing ones that didn't exist. */
+  restore(previous: readonly PreviousState[]): Promise<void>
+  unsuspend(cardIds: readonly string[]): Promise<void>
 }
 
 type SchedulerRepository = Pick<
@@ -79,13 +100,17 @@ export function createScheduler(repository: SchedulerRepository): Scheduler {
       const identity = previous ?? (await findCard(cardId))
       const before = previous && previous.fsrs.phase !== 'new' ? previous.fsrs : null
       const after = nextState(before, rating, now, { desiredRetention })
+      const threshold = await repository.settings.get('leechThreshold')
+      const lapsed = after.lapses > (before?.lapses ?? 0)
+      const becameLeech = lapsed && after.lapses >= threshold && !previous?.leech
       const state: CardState = {
         cardId,
         deckId: identity.deckId,
         optionId: identity.optionId,
         fsrs: after,
-        suspended: previous?.suspended ?? false,
+        suspended: becameLeech || (previous?.suspended ?? false),
         ...(previous?.buriedUntil === undefined ? {} : { buriedUntil: previous.buriedUntil }),
+        ...(becameLeech || previous?.leech ? { leech: true } : {}),
       }
       const entry: ReviewLogEntry = {
         cardId,
@@ -97,7 +122,45 @@ export function createScheduler(repository: SchedulerRepository): Scheduler {
         after,
       }
       const id = await repository.recordReview(state, entry)
-      return { state, entry: { ...entry, id } }
+      return { state, entry: { ...entry, id }, becameLeech }
+    },
+
+    async setAside(cardIds, how, now) {
+      const rolloverHour = await repository.settings.get('dayRolloverHour')
+      const current = await repository.cardStates.getMany(cardIds)
+      const updated: CardState[] = []
+      for (const [index, cardId] of cardIds.entries()) {
+        const previous = current[index]
+        const identity = previous ?? (await findCard(cardId))
+        const base: CardState = previous ?? {
+          cardId,
+          deckId: identity.deckId,
+          optionId: identity.optionId,
+          fsrs: newFsrsState(now),
+          suspended: false,
+        }
+        updated.push(
+          how === 'suspend'
+            ? { ...base, suspended: true }
+            : { ...base, buriedUntil: nextStudyDayStart(now, rolloverHour) },
+        )
+      }
+      await repository.cardStates.putMany(updated)
+      return cardIds.map((cardId, index) => ({ cardId, state: current[index] }))
+    },
+
+    async restore(previous) {
+      const existing = previous.flatMap((p) => (p.state ? [p.state] : []))
+      const missing = previous.filter((p) => !p.state).map((p) => p.cardId)
+      await repository.cardStates.putMany(existing)
+      await repository.cardStates.deleteMany(missing)
+    },
+
+    async unsuspend(cardIds) {
+      const states = (await repository.cardStates.getMany(cardIds)).flatMap((state) =>
+        state?.suspended ? [{ ...state, suspended: false }] : [],
+      )
+      await repository.cardStates.putMany(states)
     },
   }
 }
