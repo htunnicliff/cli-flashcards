@@ -5,6 +5,7 @@ library;
 
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -412,14 +413,23 @@ class Glass extends StatelessWidget {
   final bool blur;
   final Color? color;
 
+  /// No backdrop blur on the web. The web renderer redraws a blurred layer
+  /// whenever anything beneath it moves, which made scrolling and swiping
+  /// stutter in Safari on iPhone. Without the blur, the header and tab bar
+  /// get an opaque fill so text scrolling under them stays readable.
+  static const _blurs = !kIsWeb;
+
   @override
   Widget build(BuildContext context) {
     final f = Frost.of(context);
     final shape = BorderRadius.circular(radius);
+    final fill = chrome
+        ? (_blurs || f.solid ? f.chrome : Color.alphaBlend(f.chrome, f.surface))
+        : f.card;
     final pane = DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: shape,
-        color: color ?? (chrome ? f.chrome : f.card),
+        color: color ?? fill,
         border: Border.all(color: f.rim),
         gradient: f.solid || color != null
             ? null
@@ -432,9 +442,9 @@ class Glass extends StatelessWidget {
                     Colors.white.withValues(
                       alpha: f.brightness == Brightness.light ? 0.5 : 0.05,
                     ),
-                    chrome ? f.chrome : f.card,
+                    fill,
                   ),
-                  chrome ? f.chrome : f.card,
+                  fill,
                 ],
               ),
       ),
@@ -444,7 +454,7 @@ class Glass extends StatelessWidget {
         child: Padding(padding: padding, child: child),
       ),
     );
-    final blurred = f.solid || !blur
+    final blurred = f.solid || !blur || !_blurs
         ? pane
         : ClipRRect(
             borderRadius: shape,

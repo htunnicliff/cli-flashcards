@@ -47,7 +47,9 @@ The app ID is `dev.seafarer.cliflashcards` on every platform. The icons are draw
 
 To publish a release, run **Release app** from the Actions tab with a version like `0.2.0`, or push a tag like `app-v0.2.0`. It attaches the APK and the zipped macOS app to a GitHub release.
 
-For the web, build with `flutter build web --no-web-resources-cdn` and then run `pnpm flutter:sw` from the repo root. The flag serves CanvasKit from our own origin instead of Google's CDN, so the service worker can cache it. The service worker precaches the app (about 18 MB) so it works offline and can be added to a phone's home screen. A new version installs in the background and takes over the next time the page is hidden.
+For the web, build with `flutter build web --wasm --no-web-resources-cdn` and then run `pnpm flutter:sw` from the repo root. The flag serves CanvasKit from our own origin instead of Google's CDN, so the service worker can cache it. The service worker precaches the app (about 18 MB) so it works offline and can be added to a phone's home screen. A new version installs in the background and takes over the next time the page is hidden.
+
+Every browser runs the JavaScript build with CanvasKit by default. `--wasm` also builds a WebAssembly version with the skwasm renderer, which a browser runs only after you turn on **Settings › Renderer** (or open the site with `?wasm=1`; `?wasm=0` turns it off). Flutter falls back to the JavaScript build where the browser can't run it. The service worker caches the Wasm files once they have loaded, without precaching them. On the web, glass panes skip the backdrop blur, because redrawing it whenever content moves underneath made scrolling stutter in Safari on iPhone.
 
 To point a build at another deck host, pass `--dart-define=DECKS_URL=https://example.com/data/decks/`.
 

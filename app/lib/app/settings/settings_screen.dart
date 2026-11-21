@@ -9,6 +9,7 @@ import '../../core/backup.dart';
 import '../../core/models.dart';
 import '../../core/setting_limits.dart';
 import '../app_state.dart';
+import '../platform/web_renderer.dart';
 import '../theme.dart';
 import '../widgets.dart';
 import 'backup_files.dart';
@@ -81,6 +82,7 @@ class SettingsScreen extends StatelessWidget {
             ),
           ],
         ),
+        if (kIsWeb) const _Renderer(),
         Section(
           title: 'Practice',
           children: [
@@ -563,6 +565,37 @@ class _BackupSettingsState extends State<_BackupSettings> {
           const SizedBox(height: Space.s2),
           Semantics(liveRegion: true, child: Text(_importMessage!)),
         ],
+      ],
+    );
+  }
+}
+
+/// The experimental Wasm renderer, web only.
+class _Renderer extends StatelessWidget {
+  const _Renderer();
+
+  @override
+  Widget build(BuildContext context) {
+    final requested = wasmRequested();
+    return Section(
+      title: 'Renderer',
+      children: [
+        CheckRow(
+          label: 'Try the WebAssembly renderer',
+          value: requested,
+          onChanged: requestWasm,
+          hint: Text(switch ((requested, runningWasm)) {
+            (_, true) =>
+              'In use. Experimental, and may draw faster. '
+                  'Turning it off reloads the app.',
+            (true, false) =>
+              "This browser can't run it, so the app is using "
+                  'the standard renderer.',
+            _ =>
+              'Experimental, and may draw faster. Turning it on reloads '
+                  'the app.',
+          }),
+        ),
       ],
     );
   }
