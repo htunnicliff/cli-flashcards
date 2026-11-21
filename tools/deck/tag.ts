@@ -76,7 +76,9 @@ function parseArgument(rest: string): Argument | undefined | null {
   return null
 }
 
-function parsePart(part: string): Part | null {
+function parsePart(text: string): Part | null {
+  // `--verbose...` marks a repeatable flag in clap help output.
+  const part = text.replace(/\.\.\.$/, '')
   const match = FLAG_START.exec(part)
   if (!match) return null
   const [whole, dashes, negation, name] = match

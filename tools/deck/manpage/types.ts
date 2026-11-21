@@ -10,7 +10,7 @@ export interface RawEntry {
 }
 
 export interface RawPage {
-  format: 'man' | 'mdoc'
+  format: 'man' | 'mdoc' | 'help'
   /** Page name from `.TH` / `.Dt`, e.g. `RG` or `SED`. */
   title: string
   section: string | undefined

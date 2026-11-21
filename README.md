@@ -70,6 +70,16 @@ pnpm deck:generate git --pages git-log,git-commit   # options get IDs like log.o
 pnpm deck:generate sed --variant gnu --license GPL-3.0-or-later
 ```
 
+Decks are keyed by tool **and variant**, because flags differ between implementations (GNU `sed -i` takes an optional suffix, BSD `sed -i` requires one). The variant is always given explicitly, and `--file` builds from any manpage file, so a BSD deck can be built on Linux and vice versa. Tools with no manpage can use their `--help` output instead:
+
+```sh
+pnpm deck:generate sed --variant bsd --file vendor/freebsd/sed.1 --tool-version freebsd-14
+pnpm deck:generate ruff --source help --pages check,format   # runs `ruff check --help`, …
+pnpm deck:generate fd --source help --file fd-help.txt
+```
+
+The deck's `source` field records which parser produced it (`manpage` or `help`).
+
 The parser in `tools/deck/` reads roff source directly, both man(7) pages (GNU, help2man, asciidoc/docbook) and mdoc(7) pages (BSD, macOS), so it needs no extra tools. It is pure (manpage text in, deck out) and covered by snapshot tests over the real pages in `tools/deck/manpage/fixtures/`. Run `pnpm test -u` to update the snapshots after a parser change and review the diff.
 
 ### Relevance tiers

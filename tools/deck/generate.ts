@@ -4,6 +4,7 @@
  */
 import { DeckSchema, SCHEMA_VERSION, type Deck, type OptionInput } from '../../src/schema/deck'
 import { deriveOptionId } from '../../src/schema/flags'
+import { parseHelp, stripHelpAnnotations } from './help'
 import { parseManpage } from './manpage'
 import type { RawEntry } from './manpage/types'
 import { firstSentence } from './manpage/text'
@@ -43,8 +44,10 @@ export const TLDR_ATTRIBUTION =
 export interface PageInput {
   /** Page name, e.g. `rg` or `git-log`. */
   name: string
-  /** The page's roff source (man or mdoc). */
+  /** The page's roff source (man or mdoc), or `--help` output when `format` is `help`. */
   source: string
+  /** Default `manpage`. */
+  format?: 'manpage' | 'help'
   /** Where it was read from, recorded in the deck. */
   path?: string
   /** Tag options from this page with a subcommand (`git log`). */
@@ -140,7 +143,7 @@ export function generateDeck(input: GenerateInput): GenerateResult {
   const parsedPages: { scope: string; text: string }[] = []
 
   for (const page of input.pages) {
-    const parsed = parseManpage(page.source)
+    const parsed = page.format === 'help' ? parseHelp(page.source) : parseManpage(page.source)
     parsedPages.push({
       scope: page.subcommand ?? '',
       text: MENTION_SECTIONS.map((name) => parsed.sectionText[name] ?? '').join('\n'),
@@ -188,7 +191,9 @@ export function generateDeck(input: GenerateInput): GenerateResult {
       }
       ids.add(id)
       for (const flag of flags) owners.set(`${scope} ${flag}`, id)
-      const summary = firstSentence(entry.description) || `The ${flags.at(-1)} option.`
+      const prose =
+        page.format === 'help' ? stripHelpAnnotations(entry.description) : entry.description
+      const summary = firstSentence(prose) || `The ${flags.at(-1)} option.`
       options.push({
         id,
         flags,
@@ -223,11 +228,15 @@ export function generateDeck(input: GenerateInput): GenerateResult {
     variant: input.variant,
     toolVersion: input.toolVersion,
     deckVersion: input.deckVersion ?? 1,
-    source: 'manpage' as const,
+    source: input.pages.every((page) => page.format === 'help')
+      ? ('help' as const)
+      : ('manpage' as const),
     license: input.license ?? 'NOASSERTION',
     attribution:
       (input.attribution ??
-        `Generated from the ${pageList} manual page${sourcePages.length > 1 ? 's' : ''}.`) +
+        (input.pages.every((page) => page.format === 'help')
+          ? `Generated from the ${input.tool} --help output.`
+          : `Generated from the ${pageList} manual page${sourcePages.length > 1 ? 's' : ''}.`)) +
       (usesTldr ? TLDR_ATTRIBUTION : ''),
     sourcePages,
     options,
