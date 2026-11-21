@@ -68,6 +68,13 @@ describe('getQueue', () => {
     expect(await ids(at(10))).toContain('grep:gnu:perl-regexp:flag-to-meaning')
   })
 
+  it('skips paused decks and picks them up again when resumed', async () => {
+    await repo.decks.setPaused('grep-gnu', true)
+    expect(await ids(at(10))).toEqual([])
+    await repo.decks.setPaused('grep-gnu', false)
+    expect(await ids(at(10))).toHaveLength(3)
+  })
+
   it('respects the daily new-card limit, counting cards already introduced today', async () => {
     await repo.settings.set('newCardsPerDay', 2)
     const first = await scheduler.getQueue(at(10))
