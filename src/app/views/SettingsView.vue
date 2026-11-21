@@ -2,9 +2,14 @@
 import { storeToRefs } from 'pinia'
 
 import StorageSettings from '../components/settings/StorageSettings.vue'
-import { useAppearanceStore, type FontSize, type ThemePreference } from '../stores/appearance'
+import {
+  useAppearanceStore,
+  type FontSize,
+  type MotionPreference,
+  type ThemePreference,
+} from '../stores/appearance'
 
-const { theme, fontSize } = storeToRefs(useAppearanceStore())
+const { theme, fontSize, motion } = storeToRefs(useAppearanceStore())
 
 const themeOptions: { value: ThemePreference; label: string }[] = [
   { value: 'light', label: 'Light' },
@@ -16,6 +21,12 @@ const fontSizeOptions: { value: FontSize; label: string }[] = [
   { value: 's', label: 'S' },
   { value: 'm', label: 'M' },
   { value: 'l', label: 'L' },
+]
+
+const motionOptions: { value: MotionPreference; label: string }[] = [
+  { value: 'system', label: 'System' },
+  { value: 'reduce', label: 'On' },
+  { value: 'full', label: 'Off' },
 ]
 </script>
 
@@ -42,6 +53,19 @@ const fontSizeOptions: { value: FontSize; label: string }[] = [
           <span>{{ option.label }}</span>
         </label>
       </div>
+    </fieldset>
+
+    <fieldset class="setting">
+      <legend>Reduce motion</legend>
+      <div class="segmented">
+        <label v-for="option in motionOptions" :key="option.value" class="segment">
+          <input v-model="motion" type="radio" name="motion" :value="option.value" />
+          <span>{{ option.label }}</span>
+        </label>
+      </div>
+      <p class="hint casual">
+        On keeps fades but drops movement. System follows your device's reduced motion setting.
+      </p>
     </fieldset>
 
     <StorageSettings />
