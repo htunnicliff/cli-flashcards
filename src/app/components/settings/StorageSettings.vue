@@ -62,6 +62,8 @@ h2 {
 p {
   margin: 0;
   max-width: 60ch;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
 }
 
 .hint {

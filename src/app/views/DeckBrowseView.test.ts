@@ -58,7 +58,7 @@ describe('DeckBrowseView', () => {
     const first = wrapper.get('[data-option="ignore-case"]')
     expect(first.get('.primary').text()).toBe('-i')
     expect(first.get('.alias').text()).toBe('--ignore-case')
-    expect(first.get('[data-tier]').text()).toBe('core')
+    expect(first.get('[data-tier]').text()).toBe('most used')
     expect(first.get('[data-status]').text()).toBe('Learning')
     expect(wrapper.get('[data-option="invert-match"] [data-status]').text()).toBe('New')
   })

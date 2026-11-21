@@ -132,7 +132,7 @@ export function useLibrary(options: LibraryOptions = {}) {
       const deck = await fetchDeck(entry, (p) => (task.progress = p), fetchFn)
       await repository.decks.install(deck)
       await reloadInstalled()
-      status.value = `Installed ${entry.tool} (${entry.variant}).`
+      status.value = `Installed ${entry.tool}.`
     })
   }
 

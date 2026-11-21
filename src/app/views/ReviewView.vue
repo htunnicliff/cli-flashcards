@@ -56,7 +56,7 @@ const now = props.sessionOptions?.now ?? (() => Date.now())
 const COUNT_LABELS = [
   { kind: 'new', label: 'New' },
   { kind: 'learning', label: 'Learning' },
-  { kind: 'review', label: 'Review' },
+  { kind: 'review', label: 'Due' },
 ] as const
 
 /**
@@ -98,6 +98,13 @@ const nextDueText = computed(() => {
 function reveal() {
   if (!current.value || revealed.value) return
   session.reveal()
+}
+
+const moreMenu = ref<HTMLDetailsElement>()
+
+function setAside(how: 'suspend' | 'bury', scope: 'card' | 'option' = 'card') {
+  if (moreMenu.value) moreMenu.value.open = false
+  session.setAside(how, scope)
 }
 
 function grade(rating: Rating) {
@@ -203,7 +210,7 @@ const swipeHint = computed(() => {
   <section class="review" :aria-busy="loading">
     <header class="session-header">
       <h1 class="title">Review</h1>
-      <ul class="counts" aria-label="Cards left">
+      <ul v-if="!done" class="counts" aria-label="Cards left">
         <li
           v-for="{ kind, label } in COUNT_LABELS"
           :key="kind"
@@ -265,7 +272,7 @@ const swipeHint = computed(() => {
           </div>
           <div>
             <dt><UiKbd>u</UiKbd></dt>
-            <dd>Undo the last grade, suspend or bury</dd>
+            <dd>Undo the last grade, skip or suspend</dd>
           </div>
           <div>
             <dt><UiKbd>s</UiKbd></dt>
@@ -277,7 +284,7 @@ const swipeHint = computed(() => {
           </div>
           <div>
             <dt><UiKbd>b</UiKbd></dt>
-            <dd>Bury this card until tomorrow</dd>
+            <dd>Skip this card until tomorrow</dd>
           </div>
           <div>
             <dt><UiKbd>?</UiKbd></dt>
@@ -302,9 +309,8 @@ const swipeHint = computed(() => {
       </template>
       <template v-else>
         <h2>No decks yet</h2>
-        <p class="hint">
-          <RouterLink to="/decks">Install a deck</RouterLink> to start reviewing its flags.
-        </p>
+        <p class="hint">Pick a tool you use, and its most useful flags become your first cards.</p>
+        <RouterLink to="/decks" class="choose-deck">Choose a deck</RouterLink>
       </template>
     </div>
 
@@ -387,21 +393,27 @@ const swipeHint = computed(() => {
             >
           </UiButton>
         </div>
-        <div class="set-aside" role="group" aria-label="Set this card aside">
-          <button type="button" aria-keyshortcuts="b" @click="session.setAside('bury')">
-            Bury <UiKbd>b</UiKbd>
-          </button>
-          <button type="button" aria-keyshortcuts="s" @click="session.setAside('suspend')">
-            Suspend <UiKbd>s</UiKbd>
-          </button>
-          <button
-            type="button"
-            aria-keyshortcuts="Shift+S"
-            @click="session.setAside('suspend', 'option')"
-          >
-            Suspend all {{ frontFlag(current.card) }} cards <UiKbd>S</UiKbd>
-          </button>
-        </div>
+        <details ref="moreMenu" class="more">
+          <summary>More</summary>
+          <div class="set-aside" role="group" aria-label="Set this card aside">
+            <button type="button" aria-keyshortcuts="b" @click="setAside('bury')">
+              Skip until tomorrow <UiKbd>b</UiKbd>
+            </button>
+            <button type="button" aria-keyshortcuts="s" @click="setAside('suspend')">
+              Suspend this card <UiKbd>s</UiKbd>
+            </button>
+            <button
+              type="button"
+              aria-keyshortcuts="Shift+S"
+              @click="setAside('suspend', 'option')"
+            >
+              Suspend all {{ frontFlag(current.card) }} cards <UiKbd>S</UiKbd>
+            </button>
+          </div>
+          <p class="hint more-hint">
+            Suspended cards stop coming up until you unsuspend them from the deck's options.
+          </p>
+        </details>
       </div>
     </template>
 
@@ -554,6 +566,18 @@ p {
   font-weight: 600;
 }
 
+.done .choose-deck {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-button);
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+  text-decoration: none;
+}
+
 .card-stage {
   position: relative;
   touch-action: pan-y;
@@ -601,6 +625,47 @@ p {
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-1) var(--space-4);
+}
+
+.more {
+  align-self: center;
+  text-align: center;
+}
+
+.more summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-small);
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.more summary::-webkit-details-marker {
+  display: none;
+}
+
+.more summary::after {
+  content: '▾';
+  margin-left: var(--space-1);
+  font-size: var(--text-xs);
+}
+
+.more[open] summary::after {
+  content: '▴';
+}
+
+.more summary:hover,
+.more[open] summary {
+  color: var(--color-text);
+}
+
+.more-hint {
+  max-width: 36ch;
+  margin: var(--space-1) auto 0;
+  font-size: var(--text-xs);
 }
 
 .set-aside button,
@@ -677,6 +742,11 @@ p {
 }
 
 @media (max-width: 600px) {
+  /* Clear the bottom tab bar. */
+  .snackbar {
+    bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+
   .grades {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

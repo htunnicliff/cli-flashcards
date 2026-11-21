@@ -22,9 +22,28 @@ const resetProgress = ref(false)
 
 onMounted(() => library.refresh())
 
-function tierSummary(entry: DeckManifestEntry): string {
-  const { core, common, obscure } = entry.tiers
-  return `${core} core · ${common} common · ${obscure} obscure`
+/** How much there is to learn, in plain words: the deck opens with its core flags. */
+function sizeSummary(entry: DeckManifestEntry): string {
+  const { core } = entry.tiers
+  if (core === 0 || core >= entry.optionCount) return `${entry.optionCount} options`
+  return `${entry.optionCount} options, starting with the ${core} most used`
+}
+
+/** Variant names are implementation families; say where people meet them. */
+const VARIANT_LABELS: Record<string, string> = { gnu: 'GNU / Linux', bsd: 'BSD / macOS' }
+function variantLabel(variant: string): string {
+  return VARIANT_LABELS[variant] ?? variant
+}
+
+/** The deck just installed, so the next step (a first review) is one tap away. */
+const justInstalled = ref<string>()
+
+async function install(entry: DeckManifestEntry) {
+  justInstalled.value = undefined
+  await library.install(entry)
+  if (tools.value.some((tool) => tool.entry.id === entry.id && tool.stored)) {
+    justInstalled.value = entry.tool
+  }
 }
 
 function askRemove(id: string) {
@@ -53,7 +72,12 @@ function onToggle(id: string, kind: 'obscure' | 'paused' | 'typed', event: Event
       <p class="hint casual">Pick the tools you want to learn. Installed decks work offline.</p>
     </header>
 
-    <p class="status" role="status" aria-live="polite">{{ status }}</p>
+    <div class="status-row">
+      <p class="status" role="status" aria-live="polite">{{ status }}</p>
+      <RouterLink v-if="justInstalled" to="/" class="start-link" data-testid="start-reviewing"
+        >Start reviewing</RouterLink
+      >
+    </div>
     <p v-if="!online" class="offline-note">
       You're offline. Installed decks still work; installing or updating a deck needs a connection.
     </p>
@@ -84,7 +108,7 @@ function onToggle(id: string, kind: 'obscure' | 'paused' | 'typed', event: Event
           </div>
 
           <fieldset v-if="tool.variants.length > 1" class="variants">
-            <legend class="hint">Variant</legend>
+            <legend class="hint">Flavor</legend>
             <div class="segmented">
               <label v-for="variant in tool.variants" :key="variant.id" class="segment">
                 <input
@@ -94,21 +118,15 @@ function onToggle(id: string, kind: 'obscure' | 'paused' | 'typed', event: Event
                   :checked="variant.id === tool.entry.id"
                   @change="chosen[tool.tool] = variant.variant"
                 />
-                <span class="mono">{{ variant.variant }}</span>
+                <span>{{ variantLabel(variant.variant) }}</span>
               </label>
             </div>
           </fieldset>
           <p v-if="tool.otherInstalled" class="hint">
-            You have the {{ tool.otherInstalled.variant }} variant installed.
+            You have the {{ variantLabel(tool.otherInstalled.variant) }} flavor installed.
           </p>
 
-          <p class="meta">
-            <span>{{ tool.entry.optionCount }} options</span>
-            <span class="hint">{{ tierSummary(tool.entry) }}</span>
-            <span class="hint mono"
-              >v{{ tool.entry.deckVersion }} · {{ tool.entry.toolVersion }}</span
-            >
-          </p>
+          <p class="meta hint">{{ sizeSummary(tool.entry) }}</p>
 
           <div
             v-if="tasks[tool.entry.id] && tasks[tool.entry.id]!.kind !== 'remove'"
@@ -134,7 +152,7 @@ function onToggle(id: string, kind: 'obscure' | 'paused' | 'typed', event: Event
                 :checked="tool.stored.includeObscure"
                 @change="onToggle(tool.entry.id, 'obscure', $event)"
               />
-              Include obscure options
+              Include rarely used flags
             </label>
             <label class="check">
               <input
@@ -159,7 +177,7 @@ function onToggle(id: string, kind: 'obscure' | 'paused' | 'typed', event: Event
               <UiButton
                 variant="primary"
                 :disabled="Boolean(tasks[tool.entry.id]) || !online"
-                @click="library.install(tool.entry)"
+                @click="install(tool.entry)"
                 >Install</UiButton
               >
             </template>
@@ -237,8 +255,32 @@ p {
   font-size: var(--text-sm);
 }
 
-.status:empty {
+.status-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.status-row:has(.status:empty):not(:has(.start-link)) {
   display: none;
+}
+
+.start-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-button);
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.start-link::after {
+  content: ' →';
+  white-space: pre;
 }
 
 .error {
@@ -283,12 +325,6 @@ p {
 .deck-title {
   margin-right: var(--space-2);
   font-size: var(--text-xl);
-}
-
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-4);
 }
 
 .variants {

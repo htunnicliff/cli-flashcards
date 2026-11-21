@@ -10,6 +10,8 @@ import { useRepository } from '../repository'
 
 const repository = useRepository()
 const stats = shallowRef<Stats>()
+/** Deck names as people know them: the tool, plus its flavor when it has more than one. */
+const deckNames = shallowRef(new Map<string, string>())
 
 onMounted(async () => {
   const [decks, log, rolloverHour, flagPairs] = await Promise.all([
@@ -21,6 +23,12 @@ onMounted(async () => {
   const states = (
     await Promise.all(decks.map((d) => repository.cardStates.listByDeck(d.id)))
   ).flat()
+  deckNames.value = new Map(
+    decks.map((d) => [
+      d.id,
+      d.deck.variant === 'default' ? d.deck.tool : `${d.deck.tool} (${d.deck.variant})`,
+    ]),
+  )
   stats.value = computeStats({ decks, states, log, now: Date.now(), rolloverHour, flagPairs })
 })
 
@@ -84,13 +92,13 @@ const retention = computed(() => stats.value?.retention)
                 <th scope="col">Deck</th>
                 <th scope="col">New</th>
                 <th scope="col">Learning</th>
-                <th scope="col">Review</th>
+                <th scope="col">Learned</th>
                 <th scope="col">Suspended</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="deck in stats.cards" :key="deck.deckId">
-                <th scope="row" class="mono">{{ deck.deckId }}</th>
+                <th scope="row" class="mono">{{ deckNames.get(deck.deckId) ?? deck.deckId }}</th>
                 <td>{{ deck.new }}</td>
                 <td>{{ deck.learning }}</td>
                 <td>{{ deck.review }}</td>
