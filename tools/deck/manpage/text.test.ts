@@ -9,6 +9,7 @@ describe('firstSentence', () => {
     ['Respect .gitignore files. More.', 'Respect .gitignore files.'],
     ['Version 1.5 is required. More.', 'Version 1.5 is required.'],
     ['First paragraph\n\nSecond.', 'First paragraph'],
+    ['load filter from the file;', 'Load filter from the file'],
     ['', ''],
   ])('%j', (input, expected) => {
     expect(firstSentence(input)).toBe(expected)

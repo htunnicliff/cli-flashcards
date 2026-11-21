@@ -5,54 +5,64 @@
 #
 # tldr-pages writes tar options bundled without a dash (`tar czf`), which the
 # generator can't match to options, so the core set and its examples are
-# chosen here. Examples use the dashed form (`tar -czf`) so cloze cards work.
+# chosen here. Cloze cards need a flag on its own, so each core option has an
+# example like `tar -x -z -f` alongside the everyday `tar -xzf` spelling.
 
 options:
   create:
     tier: core
     summary: Make an archive from files and directories
     examples:
+      - command: tar -c -f archive.tar path/to/directory
       - command: tar -cf archive.tar path/to/directory
   extract:
     tier: core
     summary: Unpack an archive's files to disk
     examples:
+      - command: tar -x -f archive.tar
       - command: tar -xf archive.tar
   list:
     tier: core
     summary: List an archive's contents without extracting
     examples:
+      - command: tar -t -f archive.tar
       - command: tar -tvf archive.tar.gz
   file:
     tier: core
     summary: Name the archive file to read or write (- for stdin or stdout)
     examples:
+      - command: tar -x -f path/to/archive.tar
       - command: tar -xf path/to/archive.tar
   verbose:
     tier: core
     summary: Print each file name as it is processed
     examples:
+      - command: tar -x -v -f archive.tar
       - command: tar -xvf archive.tar
   gunzip:
     tier: core
     primary: -z
     summary: Compress or decompress with gzip (.tar.gz, .tgz)
     examples:
+      - command: tar -x -z -f archive.tar.gz
       - command: tar -czf archive.tar.gz path/to/directory
   bzip2:
     tier: core
     summary: Compress or decompress with bzip2 (.tar.bz2)
     examples:
+      - command: tar -x -j -f archive.tar.bz2
       - command: tar -cjf archive.tar.bz2 path/to/directory
   xz:
     tier: core
     summary: Compress or decompress with xz (.tar.xz)
     examples:
+      - command: tar -x -J -f archive.tar.xz
       - command: tar -cJf archive.tar.xz path/to/directory
   auto-compress:
     tier: core
     summary: Pick the compression program from the archive's file extension
     examples:
+      - command: tar -c -a -f archive.tar.zst path/to/directory
       - command: tar -caf archive.tar.zst path/to/directory
   directory:
     summary: Change to a directory first, e.g. to extract somewhere else

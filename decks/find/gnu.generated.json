@@ -239,7 +239,7 @@
     {
       "id": "short-n",
       "flags": ["-n"],
-      "summary": "For less than n,",
+      "summary": "For less than n",
       "description": "for less than n,",
       "tier": "obscure",
       "examples": [],

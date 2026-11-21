@@ -21,7 +21,7 @@ import { mkdir, rm, writeFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import { format } from 'prettier'
-import { parse as parseYaml } from 'yaml'
+import { parse as parseYaml, YAMLParseError } from 'yaml'
 import { MANIFEST_VERSION, type DeckManifest } from '../src/schema/manifest'
 import { buildDeck, manifestEntry } from './deck/build'
 import { DeckValidationError } from './deck/generate'
@@ -38,6 +38,19 @@ const outDir = resolve(root, 'public', 'decks')
 
 function readJson(path: string): unknown {
   return existsSync(path) ? JSON.parse(readFileSync(path, 'utf8')) : undefined
+}
+
+/** Parses an overrides file, turning YAML syntax errors into a short report. */
+function readOverrides(text: string, label: string): unknown {
+  try {
+    return parseYaml(text) ?? {}
+  } catch (error) {
+    if (!(error instanceof YAMLParseError)) throw error
+    const hint = error.code === 'BLOCK_AS_IMPLICIT_KEY' ? ' (quote values that contain ": ")' : ''
+    throw new DeckValidationError(`${label}: the overrides file is not valid YAML:`, [
+      `${error.message.split('\n')[0]}${hint}`,
+    ])
+  }
 }
 
 interface Source {
@@ -84,7 +97,7 @@ for (const source of findSources()) {
     const { deck, stale } = buildDeck(
       {
         generated,
-        overrides: overridesText === undefined ? undefined : (parseYaml(overridesText) ?? {}),
+        overrides: overridesText === undefined ? undefined : readOverrides(overridesText, label),
         previous: readJson(join(outDir, file)),
       },
       label,
@@ -106,7 +119,7 @@ for (const source of findSources()) {
     const bare = coreWithoutExamples(deck)
     if (bare.length > 0) {
       console[strict ? 'error' : 'warn'](
-        `${strict ? 'error' : 'warning'}: ${label}: core options need at least one example: ${bare.join(', ')}`,
+        `${strict ? 'error' : 'warning'}: ${label}: core options need an example that spells the flag on its own (not combined, like -rn): ${bare.join(', ')}`,
       )
       if (strict) failed = true
     }

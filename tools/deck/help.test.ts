@@ -57,6 +57,24 @@ describe('parseHelp', () => {
     ])
   })
 
+  it('splits a tag that runs into the description column with one space', () => {
+    // jq --help: "--slurpfile name file" is too long for two spaces of padding.
+    const page = parseHelp(
+      [
+        'Command options:',
+        '  -f, --from-file file      load filter from the file;',
+        '      --slurpfile name file set $name to an array of JSON values read',
+        '                            from the file;',
+        '      --rawfile name file   set $name to string contents of file;',
+      ].join('\n'),
+    )
+    expect(page.entries.map((e) => [e.tag, e.description])).toEqual([
+      ['-f, --from-file file', 'load filter from the file;'],
+      ['--slurpfile name file', 'set $name to an array of JSON values read from the file;'],
+      ['--rawfile name file', 'set $name to string contents of file;'],
+    ])
+  })
+
   it('skips positional arguments and subcommand lists', () => {
     const page = parseHelp(
       'Commands:\n  run   Run it\n\nArguments:\n  [FILES]...\n          Files\n',
@@ -77,6 +95,7 @@ describe('--help fixtures', () => {
   it.each([
     { file: 'ruff-check.txt', tool: 'ruff', subcommand: 'check' },
     { file: 'uv.txt', tool: 'uv', subcommand: undefined },
+    { file: 'jq.txt', tool: 'jq', subcommand: undefined },
   ])('generates a deck from $file', async ({ file, tool, subcommand }) => {
     const { deck, warnings } = generateDeck({
       tool,

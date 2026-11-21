@@ -68,6 +68,8 @@ All persistent state lives in IndexedDB through [Dexie](https://dexie.org/), beh
 
 ## Generating decks
 
+To add a deck for a new tool, follow the step-by-step guide in [CONTRIBUTING.md](CONTRIBUTING.md#adding-a-deck). This section is a reference for the tools it uses.
+
 `pnpm deck:generate <tool>` finds the tool's manpage with `man -w`, parses its options and writes `decks/<tool>/<variant>.generated.json`.
 
 ```sh

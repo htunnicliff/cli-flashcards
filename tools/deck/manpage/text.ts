@@ -80,7 +80,8 @@ export function firstSentence(description: string): string {
       continue
     return capitalize(trimLength(candidate))
   }
-  return capitalize(trimLength(paragraph))
+  // No full stop: drop the list punctuation --help output often ends with.
+  return capitalize(trimLength(paragraph.replace(/[;,]$/, '')))
 }
 
 function capitalize(text: string): string {

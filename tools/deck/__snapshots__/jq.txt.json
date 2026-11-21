@@ -1,0 +1,413 @@
+{
+  "deck": {
+    "schemaVersion": 1,
+    "id": "jq-default",
+    "tool": "jq",
+    "variant": "default",
+    "toolVersion": "fixture",
+    "deckVersion": 1,
+    "source": "help",
+    "license": "NOASSERTION",
+    "attribution": "Generated from the jq --help output.",
+    "sourcePages": [
+      {
+        "name": "jq"
+      }
+    ],
+    "options": [
+      {
+        "id": "null-input",
+        "flags": [
+          "-n",
+          "--null-input"
+        ],
+        "summary": "Use `null` as the single input value",
+        "description": "use `null` as the single input value;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "raw-input",
+        "flags": [
+          "-R",
+          "--raw-input"
+        ],
+        "summary": "Read each line as string instead of JSON",
+        "description": "read each line as string instead of JSON;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "slurp",
+        "flags": [
+          "-s",
+          "--slurp"
+        ],
+        "summary": "Read all inputs into an array and use it as the single input value",
+        "description": "read all inputs into an array and use it as the single input value;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "compact-output",
+        "flags": [
+          "-c",
+          "--compact-output"
+        ],
+        "summary": "Compact instead of pretty-printed output",
+        "description": "compact instead of pretty-printed output;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "raw-output",
+        "flags": [
+          "-r",
+          "--raw-output"
+        ],
+        "summary": "Output strings without escapes and quotes",
+        "description": "output strings without escapes and quotes;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "raw-output0",
+        "flags": [
+          "--raw-output0"
+        ],
+        "summary": "Implies -r and output NUL after each output",
+        "description": "implies -r and output NUL after each output;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "join-output",
+        "flags": [
+          "-j",
+          "--join-output"
+        ],
+        "summary": "Implies -r and output without newline after each output",
+        "description": "implies -r and output without newline after each output;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "ascii-output",
+        "flags": [
+          "-a",
+          "--ascii-output"
+        ],
+        "summary": "Output strings by only ASCII characters using escape sequences",
+        "description": "output strings by only ASCII characters using escape sequences;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "sort-keys",
+        "flags": [
+          "-S",
+          "--sort-keys"
+        ],
+        "summary": "Sort keys of each object on output",
+        "description": "sort keys of each object on output;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "color-output",
+        "flags": [
+          "-C",
+          "--color-output"
+        ],
+        "summary": "Colorize JSON output",
+        "description": "colorize JSON output;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "monochrome-output",
+        "flags": [
+          "-M",
+          "--monochrome-output"
+        ],
+        "summary": "Disable colored output",
+        "description": "disable colored output;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "tab",
+        "flags": [
+          "--tab"
+        ],
+        "summary": "Use tabs for indentation",
+        "description": "use tabs for indentation;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "indent",
+        "flags": [
+          "--indent"
+        ],
+        "argument": {
+          "name": "n",
+          "optional": false
+        },
+        "summary": "Use n spaces for indentation (max 7 spaces)",
+        "description": "use n spaces for indentation (max 7 spaces);",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "unbuffered",
+        "flags": [
+          "--unbuffered"
+        ],
+        "summary": "Flush output stream after each output",
+        "description": "flush output stream after each output;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "stream",
+        "flags": [
+          "--stream"
+        ],
+        "summary": "Parse the input value in streaming fashion",
+        "description": "parse the input value in streaming fashion;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "stream-errors",
+        "flags": [
+          "--stream-errors"
+        ],
+        "summary": "Implies --stream and report parse error as an array",
+        "description": "implies --stream and report parse error as an array;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "seq",
+        "flags": [
+          "--seq"
+        ],
+        "summary": "Parse input/output as application/json-seq",
+        "description": "parse input/output as application/json-seq;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "from-file",
+        "flags": [
+          "-f",
+          "--from-file"
+        ],
+        "argument": {
+          "name": "file",
+          "optional": false
+        },
+        "summary": "Load filter from the file",
+        "description": "load filter from the file;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "short-L",
+        "flags": [
+          "-L"
+        ],
+        "argument": {
+          "name": "directory",
+          "optional": false
+        },
+        "summary": "Search modules from the directory",
+        "description": "search modules from the directory;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "arg",
+        "flags": [
+          "--arg"
+        ],
+        "argument": {
+          "name": "name value",
+          "optional": false
+        },
+        "summary": "Set $name to the string value",
+        "description": "set $name to the string value;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "argjson",
+        "flags": [
+          "--argjson"
+        ],
+        "argument": {
+          "name": "name value",
+          "optional": false
+        },
+        "summary": "Set $name to the JSON value",
+        "description": "set $name to the JSON value;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "slurpfile",
+        "flags": [
+          "--slurpfile"
+        ],
+        "argument": {
+          "name": "name file",
+          "optional": false
+        },
+        "summary": "Set $name to an array of JSON values read from the file",
+        "description": "set $name to an array of JSON values read from the file;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "rawfile",
+        "flags": [
+          "--rawfile"
+        ],
+        "argument": {
+          "name": "name file",
+          "optional": false
+        },
+        "summary": "Set $name to string contents of file",
+        "description": "set $name to string contents of file;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "args",
+        "flags": [
+          "--args"
+        ],
+        "summary": "Consume remaining arguments as positional string values",
+        "description": "consume remaining arguments as positional string values;",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "jsonargs",
+        "flags": [
+          "--jsonargs"
+        ],
+        "summary": "Consume remaining arguments as positional JSON values",
+        "description": "consume remaining arguments as positional JSON values;",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "exit-status",
+        "flags": [
+          "-e",
+          "--exit-status"
+        ],
+        "summary": "Set exit status code based on the output",
+        "description": "set exit status code based on the output;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "version",
+        "flags": [
+          "-V",
+          "--version"
+        ],
+        "summary": "Show the version",
+        "description": "show the version;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "build-configuration",
+        "flags": [
+          "--build-configuration"
+        ],
+        "summary": "Show jq's build configuration",
+        "description": "show jq's build configuration;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "help",
+        "flags": [
+          "-h",
+          "--help"
+        ],
+        "summary": "Show the help",
+        "description": "show the help;",
+        "tier": "obscure",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      }
+    ]
+  },
+  "warnings": [
+    "jq: COMMAND OPTIONS: \"--\": no flags recognised, skipped"
+  ]
+}
