@@ -325,7 +325,7 @@ const swipeHint = computed(() => {
               :class="{ 'card-swipe--dragging': swipeX !== 0 }"
               :style="
                 swipeX
-                  ? { transform: `translateX(${swipeX}px) rotate(${swipeX / 40}deg)` }
+                  ? { transform: `translate3d(${swipeX}px, 0, 0) rotate(${swipeX / 40}deg)` }
                   : undefined
               "
               :data-card="current.card.id"
@@ -554,6 +554,10 @@ p {
 
 .card-swipe {
   transition: transform var(--duration-base) var(--ease-out);
+  /* Keep the card on its own compositing layer so a drag only moves it. Without
+     this, iOS WebKit repaints the rotated card tile by tile on every pointer move,
+     and half-updated tiles show the card torn in two (seen in Orion and Safari). */
+  will-change: transform;
 }
 
 .card-swipe--dragging {
@@ -562,10 +566,17 @@ p {
 
 .swipe-hint {
   position: absolute;
+  z-index: 1;
   top: var(--space-4);
   right: var(--space-4);
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
   color: var(--color-muted);
   font-weight: 700;
+  pointer-events: none;
 }
 
 .controls {
