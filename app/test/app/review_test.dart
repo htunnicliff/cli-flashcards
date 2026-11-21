@@ -50,17 +50,14 @@ void main() {
     expect(log!.single.rating, Rating.good);
   });
 
-  testWidgets('on a phone, revealing scrolls the grades above the tab bar', (
+  testWidgets('revealing the answer leaves the page where it is', (
     tester,
   ) async {
     await startApp(tester, size: const Size(390, 640));
+    final before = tester.getRect(find.text('What does this flag do?')).top;
     await tester.tap(find.text('Show answer'));
     await settle(tester);
-    for (final grade in ['Again', 'Hard', 'Good', 'Easy']) {
-      final rect = tester.getRect(find.text(grade).hitTestable().first);
-      expect(rect.bottom, lessThan(640 - 96), reason: grade);
-      expect(rect.top, greaterThan(0), reason: grade);
-    }
+    expect(tester.getRect(find.text('What does this flag do?')).top, before);
   });
 
   testWidgets('undo takes the grade back', (tester) async {

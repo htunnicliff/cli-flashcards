@@ -53,7 +53,6 @@ class _ReviewScreenState extends State<ReviewScreen>
           _settleFrom * (1 - Curves.easeOutCubic.transform(_settle.value)),
     );
   double _settleFrom = 0;
-  final _controlsKey = GlobalKey(debugLabel: 'grade controls');
   Timer? _noticeTimer;
   int? _noticeShown;
   final _focus = FocusNode(debugLabel: 'review');
@@ -90,41 +89,6 @@ class _ReviewScreenState extends State<ReviewScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) => _moveFocus());
   }
 
-  /// On a phone a revealed answer can push the grade buttons below the
-  /// screen or under the tab bar, so scroll them up into view.
-  void _showGrades() {
-    final box = _controlsKey.currentContext?.findRenderObject();
-    final scrollable = _controlsKey.currentContext == null
-        ? null
-        : Scrollable.maybeOf(_controlsKey.currentContext!);
-    if (box is! RenderBox || scrollable == null) return;
-    final position = scrollable.position;
-    final viewport = scrollable.context.findRenderObject();
-    if (viewport is! RenderBox) return;
-    final bottom = box
-        .localToGlobal(Offset(0, box.size.height), ancestor: viewport)
-        .dy;
-    final narrow = MediaQuery.sizeOf(context).width < 600;
-    // What covers the bottom of the page: the tab bar on phones.
-    final covered =
-        (narrow ? 96 : Space.s6) + MediaQuery.paddingOf(context).bottom;
-    final overflow = bottom - (viewport.size.height - covered);
-    if (overflow <= 0) return;
-    final target = (position.pixels + overflow).clamp(
-      position.minScrollExtent,
-      position.maxScrollExtent,
-    );
-    if (reducedMotion(context)) {
-      position.jumpTo(target);
-    } else {
-      position.animateTo(
-        target,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
-      );
-    }
-  }
-
   /// Focus follows the flow: the suggested (or Good) grade once revealed,
   /// otherwise the answer field or Show answer.
   void _moveFocus() {
@@ -137,16 +101,6 @@ class _ReviewScreenState extends State<ReviewScreen>
       _focus.requestFocus();
     } else if (s.revealed) {
       _gradeFocus[s.suggestedRating ?? Rating.good]!.requestFocus();
-      // After the answer has finished growing the card.
-      Future.delayed(motionDuration(context, 260), () {
-        if (!mounted || !_session!.revealed) return;
-        // Measure on the next frame, once layout has caught up.
-        WidgetsBinding.instance
-          ..addPostFrameCallback((_) {
-            if (mounted && _session!.revealed) _showGrades();
-          })
-          ..scheduleFrame();
-      });
     } else if (s.typing) {
       _typedFocus.requestFocus();
     } else {
@@ -279,7 +233,7 @@ class _ReviewScreenState extends State<ReviewScreen>
               else ...[
                 _stage(s, reduceMotion),
                 const SizedBox(height: Space.s6),
-                KeyedSubtree(key: _controlsKey, child: _controls(s)),
+                _controls(s),
               ],
             ],
           ),
