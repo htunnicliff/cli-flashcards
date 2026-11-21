@@ -80,6 +80,14 @@ describe('coreWithoutExamples', () => {
   it('reports core options that have no example', () => {
     expect(coreWithoutExamples(DeckSchema.parse(deck))).toEqual(['ignore-case'])
   })
+
+  it('does not count combined short flags', () => {
+    const combined = structuredClone(deck)
+    combined.options[0]!.examples = [{ command: 'grep -ri foo .' }]
+    expect(coreWithoutExamples(DeckSchema.parse(combined))).toEqual(['ignore-case'])
+    combined.options[0]!.examples = [{ command: 'grep -r -i foo .' }]
+    expect(coreWithoutExamples(DeckSchema.parse(combined))).toEqual([])
+  })
 })
 
 describe('attributionsMarkdown', () => {

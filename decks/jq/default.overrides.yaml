@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=../../schemas/overrides.schema.json
+#
+# Curation for the jq deck, generated from `jq --help`. Applied on top of
+# default.generated.json by `pnpm deck:build`; regenerating the deck keeps these edits.
+
+options:
+  raw-output:
+    tier: core
+    summary: Print strings without JSON quotes, e.g. for use in shell scripts
+    examples:
+      - command: jq -r '.name' package.json
+  compact-output:
+    tier: core
+    summary: Print each result on one line instead of pretty-printing it
+    examples:
+      - command: jq -c '.[]' path/to/file.json
+  slurp:
+    tier: core
+    summary: Read every input into one array before running the filter
+    examples:
+      - command: jq -s 'length' path/to/*.json
+        description: Count the JSON documents across several files
+  null-input:
+    tier: core
+    summary: Run the filter once with null as input, without reading stdin
+    examples:
+      - command: "jq -n '{created: now}'"
+  raw-input:
+    tier: core
+    summary: Treat each input line as a string, not as JSON
+    examples:
+      - command: jq -R 'split(",")' path/to/file.csv
+  sort-keys:
+    tier: core
+    summary: Sort object keys in the output
+    examples:
+      - command: jq -S . path/to/file.json
+  exit-status:
+    tier: core
+    summary: Exit 1 if the last output is false or null, so scripts can test it
+    examples:
+      - command: jq -e '.enabled' config.json && echo on
+  join-output:
+    tier: core
+    summary: Like -r, but with no newline between results
+    examples:
+      - command: jq -j '.parts[]' path/to/file.json
+  from-file:
+    summary: Read the filter from a file
+  arg:
+    summary: Bind a shell string to $name inside the filter
+    examples:
+      - command: jq --arg user "$USER" '.owner = $user' path/to/file.json
+  argjson:
+    tier: core
+    summary: Bind a JSON value to $name inside the filter
+    examples:
+      - command: jq --argjson n 3 '.items[:$n]' path/to/file.json
+  slurpfile:
+    tier: common
+  tab:
+    tier: common
+  indent:
+    tier: common
+  args:
+    summary: Treat the remaining arguments as strings, available as $ARGS.positional
+  jsonargs:
+    summary: Treat the remaining arguments as JSON values, available as $ARGS.positional

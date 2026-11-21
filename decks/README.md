@@ -29,6 +29,9 @@ pnpm deck:generate tar --variant gnu --license GPL-3.0-or-later \
 pnpm deck:generate curl --license curl \
   --attribution "curl manual page © Daniel Stenberg and contributors (https://curl.se/docs/manpage.html)."
 
+pnpm deck:generate jq --source help --license MIT \
+  --attribution "jq --help output © Stephen Dolan and jq contributors (https://jqlang.org)."
+
 pnpm deck:build
 ```
 
@@ -44,5 +47,6 @@ pnpm deck:build
 | `find-bsd`     | FreeBSD find(1)        | BSD-3-Clause     |
 | `tar-gnu`      | GNU tar 1.35           | GPL-3.0-or-later |
 | `curl-default` | curl 8.5.0             | curl             |
+| `jq-default`   | jq 1.7 `--help`        | MIT              |
 
 tldr-pages examples (CC BY 4.0) are attached to every deck. `ATTRIBUTIONS.md` at the repo root is generated from deck metadata by `pnpm deck:build`.

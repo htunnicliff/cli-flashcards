@@ -16,6 +16,7 @@
     "grep",
     "find",
     "tar",
-    "curl"
+    "curl",
+    "jq"
   ]
 }

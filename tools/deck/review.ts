@@ -7,6 +7,7 @@
  * `copiedSummaries` finds the ones that still read like the manpage, and
  * `attributionsMarkdown` renders ATTRIBUTIONS.md from deck metadata.
  */
+import { findCloze } from '../../src/schema/cards'
 import type { Deck, Option } from '../../src/schema/deck'
 
 function words(text: string): string[] {
@@ -41,10 +42,13 @@ export function copiedSummaries(deck: Deck): string[] {
     .map((option) => option.id)
 }
 
-/** IDs of visible `core` options with no example (core options feed cloze cards). */
+/**
+ * IDs of visible `core` options with no example that can make a cloze card:
+ * one that spells a flag as its own token. `tar -czf` doesn't count for `-z`.
+ */
 export function coreWithoutExamples(deck: Deck): string[] {
   return deck.options
-    .filter((option) => option.tier === 'core' && !option.hidden && option.examples.length === 0)
+    .filter((option) => option.tier === 'core' && !option.hidden && !findCloze(option))
     .map((option) => option.id)
 }
 
