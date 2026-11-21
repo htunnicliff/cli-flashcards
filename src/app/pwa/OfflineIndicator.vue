@@ -13,7 +13,7 @@ const online = useOnline()
       <m.span
         v-if="!online"
         class="offline"
-        title="You're offline. Reviews still work; installing or updating decks needs a connection."
+        title="You're offline. Reviews still work; new decks and updates download when you're back online."
         v-bind="presets.fade"
       >
         <span class="dot" aria-hidden="true"></span>Offline

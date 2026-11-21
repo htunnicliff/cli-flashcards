@@ -87,7 +87,7 @@
   --color-on-primary: #ffffff;
 
   --color-kbd: #efede8;
-  --color-kbd-on-primary: rgb(255 255 255 / 0.18);
+  --color-kbd-on-primary: rgb(255 255 255 / 0.14);
   --color-focus: var(--color-accent);
 
   /* Glass */

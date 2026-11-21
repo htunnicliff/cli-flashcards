@@ -84,7 +84,7 @@ const retention = computed(() => stats.value?.retention)
 
       <section class="panel" aria-labelledby="cards-heading">
         <h2 id="cards-heading">Cards</h2>
-        <p v-if="stats.cards.length === 0" class="hint">Install a deck to see its cards here.</p>
+        <p v-if="stats.cards.length === 0" class="hint">Study a deck to see its cards here.</p>
         <div v-else class="table-scroll" tabindex="0" role="region" aria-labelledby="cards-heading">
           <table>
             <thead>

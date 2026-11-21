@@ -3,7 +3,7 @@ import { expect, test } from './support/test'
 
 test.use({ onboarding: true })
 
-test('a first visit walks through the tour and lands on Decks', async ({ page }) => {
+test('a first visit walks through the tour and lands on Review', async ({ page }) => {
   await page.goto('/')
   const tour = page.getByRole('dialog', { name: /Welcome to/ })
   await expect(tour).toBeVisible()
@@ -23,14 +23,15 @@ test('a first visit walks through the tour and lands on Decks', async ({ page })
   await expect(page.getByRole('dialog', { name: 'Review your cards' })).toBeVisible()
   await page.getByRole('button', { name: 'Next' }).click()
 
-  await page.getByRole('button', { name: 'Choose a deck' }).click()
+  await page.getByRole('button', { name: 'Start reviewing' }).click()
   await expect(page.getByRole('dialog')).toHaveCount(0)
-  await expect(page).toHaveURL(/\/decks$/)
-  await expect(page.getByRole('heading', { level: 1, name: 'Decks' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Review' })).toBeVisible()
+  // The decks downloaded while the tour was open.
+  await expect(page.getByTestId('count-new')).toHaveText('3')
 
   // Seen once, never again on its own.
   await page.reload()
-  await expect(page.getByRole('heading', { level: 1, name: 'Decks' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'Review' })).toBeVisible()
   await expect(page.getByRole('dialog')).toHaveCount(0)
 })
 
@@ -75,17 +76,18 @@ test('shows keyboard shortcuts on desktop and swipes on touch screens', async ({
   await expect(tour.getByText(/Swipe a revealed card/)).toBeVisible({ visible: isMobile })
 })
 
-test('someone who already has decks is not shown the tour', async ({ page }) => {
-  // Like a learner from before the tour existed: decks installed, no tour record.
-  await page.goto('/decks')
+test('someone who has already reviewed is not shown the tour', async ({ page }) => {
+  // Like a learner from before the tour existed: reviews done, no tour record.
+  await page.goto('/')
   await page.getByRole('button', { name: 'Skip tour' }).click()
-  const deck = page.locator('[data-deck="ripgrep-fixture"]')
-  await deck.getByRole('button', { name: 'Install' }).click()
-  await expect(deck).toHaveAttribute('data-installed', 'true')
+  await expect(page.getByTestId('count-new')).toHaveText('3')
+  await page.keyboard.press('Space')
+  await page.keyboard.press('3')
+  await expect(page.getByTestId('count-new')).toHaveText('2')
   await page.evaluate(() => localStorage.removeItem('recall:onboarded'))
 
-  await page.goto('/')
-  await expect(page.getByTestId('count-new')).toHaveText('3')
+  await page.reload()
+  await expect(page.getByTestId('count-new')).toHaveText('2')
   await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect.poll(() => page.evaluate(() => localStorage.getItem('recall:onboarded'))).toBe('1')
 })

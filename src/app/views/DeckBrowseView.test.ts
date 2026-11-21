@@ -74,7 +74,7 @@ describe('DeckBrowseView', () => {
   it('browses a deck that is not installed from the network', async () => {
     const wrapper = await mountView()
     expect(optionIds(wrapper)).toEqual(['ignore-case', 'invert-match'])
-    expect(wrapper.text()).toContain('not installed')
+    expect(wrapper.text()).toContain('not downloaded yet')
     expect(wrapper.find('[data-status]').exists()).toBe(false)
   })
 

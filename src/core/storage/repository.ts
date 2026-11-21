@@ -4,6 +4,7 @@ import { openDatabase, type FlashcardsDatabase, type OpenDatabaseOptions } from 
 import {
   SETTING_DEFAULTS,
   type CardState,
+  type DeckPreferences,
   type ReviewLogEntry,
   type SettingKey,
   type Settings,
@@ -49,9 +50,10 @@ export interface Repository {
 export interface DeckRepository {
   /**
    * Installs a deck or replaces it with a newer version. Card states and the
-   * review log are left alone, and the deck's preferences are kept.
+   * review log are left alone, and the deck's preferences are kept. `initial`
+   * sets the preferences of a deck that isn't installed yet.
    */
-  install(deck: Deck, now?: number): Promise<StoredDeck>
+  install(deck: Deck, now?: number, initial?: DeckPreferences): Promise<StoredDeck>
   get(id: string): Promise<StoredDeck | undefined>
   list(): Promise<StoredDeck[]>
   setIncludeObscure(id: string, include: boolean): Promise<void>
@@ -113,17 +115,18 @@ export function createRepository(
   const db = 'transaction' in options ? options : openDatabase(options)
 
   const decks: DeckRepository = {
-    async install(deck, now = Date.now()) {
+    async install(deck, now = Date.now(), initial = {}) {
       return db.transaction('rw', db.decks, async () => {
         const existing = await db.decks.get(deck.id)
+        const prefs = existing ?? initial
         const stored: StoredDeck = {
           id: deck.id,
           deckVersion: deck.deckVersion,
           installedAt: existing?.installedAt ?? now,
           updatedAt: now,
-          includeObscure: existing?.includeObscure ?? false,
-          ...(existing?.paused ? { paused: true } : {}),
-          ...(existing?.typeAnswers ? { typeAnswers: true } : {}),
+          includeObscure: prefs.includeObscure ?? false,
+          ...(prefs.paused ? { paused: true } : {}),
+          ...(prefs.typeAnswers ? { typeAnswers: true } : {}),
           deck,
         }
         await db.decks.put(stored)

@@ -4,7 +4,7 @@
  */
 import type { DeckManifestEntry } from '../../schema/manifest'
 import { deriveCards, type Deck, type DeriveOptions, type Option } from '../../schema'
-import type { CardState } from '../storage'
+import type { CardState, DeckFlavor } from '../storage'
 
 export interface ToolDecks {
   tool: string
@@ -31,13 +31,42 @@ export function isApplePlatform(userAgent: string): boolean {
   return /Mac OS X|Macintosh|iPhone|iPad|Darwin/i.test(userAgent)
 }
 
+/** The flavor a platform's own tools have: BSD on macOS and iOS, GNU elsewhere. */
+export function platformFlavor(userAgent: string): DeckFlavor {
+  return isApplePlatform(userAgent) ? 'bsd' : 'gnu'
+}
+
+/** The variant of a tool that matches a flavor, falling back to the first variant it has. */
+export function variantForFlavor(
+  variants: readonly string[],
+  flavor: DeckFlavor,
+): string | undefined {
+  const preferred = flavor === 'bsd' ? ['bsd', 'macos'] : ['gnu', 'linux']
+  return preferred.find((name) => variants.includes(name)) ?? variants[0]
+}
+
 /**
  * The variant to preselect: BSD on macOS, GNU elsewhere, falling back to the
  * first variant the tool has.
  */
 export function defaultVariant(variants: readonly string[], userAgent: string): string | undefined {
-  const preferred = isApplePlatform(userAgent) ? ['bsd', 'macos'] : ['gnu', 'linux']
-  return preferred.find((name) => variants.includes(name)) ?? variants[0]
+  return variantForFlavor(variants, platformFlavor(userAgent))
+}
+
+/**
+ * The flavor to download new tools in: the one the user picked, else the one
+ * most of their downloaded decks use, else the platform's.
+ */
+export function resolveFlavor(
+  chosen: DeckFlavor | null,
+  installedVariants: readonly string[],
+  userAgent: string,
+): DeckFlavor {
+  if (chosen) return chosen
+  const gnu = installedVariants.filter((v) => v === 'gnu' || v === 'linux').length
+  const bsd = installedVariants.filter((v) => v === 'bsd' || v === 'macos').length
+  if (gnu !== bsd) return gnu > bsd ? 'gnu' : 'bsd'
+  return platformFlavor(userAgent)
 }
 
 export function isUpdateAvailable(

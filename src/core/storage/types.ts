@@ -117,7 +117,19 @@ export interface Settings {
    * library installs them when it can reach the deck files, then clears them.
    */
   pendingDeckInstalls: PendingDeckInstall[]
+  /**
+   * The flavor of tools like grep and sed that the user picked on the Decks
+   * page. `null` until they pick one: then each tool keeps whichever flavor is
+   * already downloaded, and new tools follow the platform (BSD on Apple).
+   */
+  deckFlavor: DeckFlavor | null
 }
+
+/** Implementation families of tools whose flags differ between them. */
+export type DeckFlavor = 'gnu' | 'bsd'
+
+/** Per-deck preferences, as set on the Decks page. */
+export type DeckPreferences = Partial<Pick<StoredDeck, 'includeObscure' | 'paused' | 'typeAnswers'>>
 
 export interface PendingDeckInstall {
   id: string
@@ -137,6 +149,7 @@ export const SETTING_DEFAULTS: Settings = {
   lastBackupAt: null,
   flagPairs: true,
   pendingDeckInstalls: [],
+  deckFlavor: null,
 }
 
 export interface SettingRow<K extends SettingKey = SettingKey> {

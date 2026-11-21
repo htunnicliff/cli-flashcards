@@ -99,7 +99,6 @@ test('a new version never interrupts a review, even in the background', async ({
   await page.goto('/decks')
   await waitForServiceWorker(page)
   const deck = page.locator('[data-deck="ripgrep-fixture"]')
-  await deck.getByRole('button', { name: 'Install' }).click()
   await expect(deck).toHaveAttribute('data-installed', 'true')
 
   await page.goto('/')
@@ -132,7 +131,7 @@ test('Chromium considers the app installable', async ({ page, browserName }) => 
   expect(installabilityErrors).toEqual([])
 })
 
-test('installed decks stay available offline, and installing waits for a connection', async ({
+test('downloaded decks stay available offline, and their settings still work', async ({
   page,
   context,
   baseURL,
@@ -140,7 +139,6 @@ test('installed decks stay available offline, and installing waits for a connect
   await page.goto('/decks')
   await waitForServiceWorker(page)
   const deck = page.locator('[data-deck="ripgrep-fixture"]')
-  await deck.getByRole('button', { name: 'Install' }).click()
   await expect(deck).toHaveAttribute('data-installed', 'true')
 
   await simulateOutage(context, baseURL!)
@@ -155,20 +153,17 @@ test('installed decks stay available offline, and installing waits for a connect
   await expect(deck).toHaveAttribute('data-installed', 'true')
   await context.setOffline(true)
   await expect(page.getByText("You're offline")).toBeVisible()
-  await deck.getByRole('button', { name: 'Remove' }).click()
-  await page.getByRole('button', { name: 'Remove deck' }).click()
-  await expect(deck).toHaveAttribute('data-installed', 'false')
-  await expect(deck.getByRole('button', { name: 'Install' })).toBeDisabled()
+  await deck.getByRole('checkbox', { name: 'Study this deck' }).uncheck()
+  await expect(deck).toHaveAttribute('data-studying', 'false')
 
   await context.setOffline(false)
-  await expect(deck.getByRole('button', { name: 'Install' })).toBeEnabled()
+  await expect(page.getByText("You're offline")).toHaveCount(0)
 })
 
 test('a whole review session works offline after a reload', async ({ page, context, baseURL }) => {
   await page.goto('/decks')
   await waitForServiceWorker(page)
   const deck = page.locator('[data-deck="ripgrep-fixture"]')
-  await deck.getByRole('button', { name: 'Install' }).click()
   await expect(deck).toHaveAttribute('data-installed', 'true')
 
   await simulateOutage(context, baseURL!)

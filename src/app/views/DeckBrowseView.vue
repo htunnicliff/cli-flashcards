@@ -127,7 +127,7 @@ const statusLabel: Record<OptionStatus, string> = {
       <p class="hint">
         {{ visible.length }} options · {{ deck.tool }} {{ deck.toolVersion }} · deck v{{
           deck.deckVersion
-        }}<template v-if="!installed"> · not installed</template>
+        }}<template v-if="!installed"> · not downloaded yet</template>
       </p>
     </header>
     <h1 v-else-if="!loading">Deck not found</h1>

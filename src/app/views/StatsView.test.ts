@@ -42,7 +42,7 @@ describe('StatsView', () => {
     expect(wrapper.get('[data-testid="retention"]').text()).toContain(
       'No mature cards reviewed yet',
     )
-    expect(wrapper.text()).toContain('Install a deck to see its cards here.')
+    expect(wrapper.text()).toContain('Study a deck to see its cards here.')
   })
 
   it('shows today’s reviews, streak, retention, forecast and card counts', async () => {

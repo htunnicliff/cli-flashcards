@@ -6,7 +6,6 @@ const DB = 'recall'
 test('review cards, reload, and find progress and counts unchanged', async ({ page }) => {
   await page.goto('/decks')
   const deck = page.locator('[data-deck="ripgrep-fixture"]')
-  await deck.getByRole('button', { name: 'Install' }).click()
   await expect(deck).toHaveAttribute('data-installed', 'true')
 
   await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Review' }).click()
@@ -44,7 +43,6 @@ test('review cards, reload, and find progress and counts unchanged', async ({ pa
 test('grade the last card and see when the next review is', async ({ page }) => {
   await page.goto('/decks')
   const deck = page.locator('[data-deck="ripgrep-fixture"]')
-  await deck.getByRole('button', { name: 'Install' }).click()
   await expect(deck).toHaveAttribute('data-installed', 'true')
   await page.goto('/')
   await expect(page.getByTestId('count-new')).toHaveText('3')
@@ -61,7 +59,6 @@ test('grade the last card and see when the next review is', async ({ page }) => 
 test('suspend a card while reviewing, then unsuspend it from the deck', async ({ page }) => {
   await page.goto('/decks')
   const deck = page.locator('[data-deck="ripgrep-fixture"]')
-  await deck.getByRole('button', { name: 'Install' }).click()
   await expect(deck).toHaveAttribute('data-installed', 'true')
   await page.goto('/')
   await expect(page.getByTestId('count-new')).toHaveText('3')
@@ -84,7 +81,6 @@ test('suspend a card while reviewing, then unsuspend it from the deck', async ({
 test('keyboard hints show with a mouse and hide on a touch screen', async ({ page, isMobile }) => {
   await page.goto('/decks')
   const deck = page.locator('[data-deck="ripgrep-fixture"]')
-  await deck.getByRole('button', { name: 'Install' }).click()
   await expect(deck).toHaveAttribute('data-installed', 'true')
   await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Review' }).click()
 

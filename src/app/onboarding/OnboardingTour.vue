@@ -68,9 +68,9 @@ function back() {
   if (index.value > 0) index.value--
 }
 
-function finish(toDecks = false) {
+function finish(toReview = false) {
   onboarding.finish()
-  if (toDecks) void router.push('/decks')
+  if (toReview) void router.push('/')
 }
 
 /** Escape closes the dialog natively; record it as skipped. */
@@ -119,7 +119,8 @@ function onCancel(event: Event) {
             </p>
             <p>
               Each deck covers one tool, such as <code class="mono">grep</code> or
-              <code class="mono">jq</code>, and starts with its most useful flags.
+              <code class="mono">jq</code>, and starts with its most useful flags. Every deck
+              downloads on its own, so there's nothing to set up.
             </p>
           </template>
 
@@ -148,15 +149,16 @@ function onCancel(event: Event) {
 
           <template v-else>
             <p>
-              Once a deck is installed, everything works without a connection. Add the app to your
-              home screen to open it like any other app.
+              Decks download once and keep themselves up to date, so everything works without a
+              connection. Add the app to your home screen to open it like any other app.
             </p>
             <p>
               Your progress stays on this device, so export a backup from
               <strong>Settings</strong> now and then.
             </p>
             <p class="hint casual">
-              Rather type your answers? Turn on <strong>Type answers</strong> for a deck in Decks.
+              Only care about some tools? Pause the rest in <strong>Decks</strong>, where you can
+              also turn on <strong>Type answers</strong>.
             </p>
           </template>
         </div>
@@ -170,7 +172,7 @@ function onCancel(event: Event) {
     <div class="tour-actions">
       <UiButton v-if="index > 0" @click="back">Back</UiButton>
       <UiButton variant="primary" class="tour-next" @click="next">
-        {{ !isLast ? 'Next' : replay ? 'Done' : 'Choose a deck' }}
+        {{ !isLast ? 'Next' : replay ? 'Done' : 'Start reviewing' }}
       </UiButton>
     </div>
   </dialog>
