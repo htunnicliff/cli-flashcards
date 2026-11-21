@@ -3,6 +3,14 @@
 <head>
   <!-- Replaced by `flutter build web --base-href`. -->
   <base href="$FLUTTER_BASE_HREF">
+  <script>
+    // This page is also the site's 404 page. A reload deep inside the classic
+    // app (/classic/settings) lands here, so send it to that app's start page.
+    (function () {
+      var m = location.pathname.match(/^(.*\/classic)(\/.*)?$/)
+      if (m && m[2] && m[2] !== '/') location.replace(m[1] + '/')
+    })()
+  </script>
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
