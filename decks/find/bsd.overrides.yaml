@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=../../schemas/overrides.schema.json
+#
+# Curation for the BSD (FreeBSD and macOS) find deck. Applied on top of
+# bsd.generated.json by `pnpm deck:build`; regenerating the deck keeps these edits.
+
+options:
+  mtime:
+    summary: Match by modification age; -N is newer than N, +N older (days unless a unit like h is given)
+    # The shared tldr example uses -daystart, which BSD find doesn't have.
+    replaceExamples: true
+    examples:
+      - command: find . -type f -mtime -7
+        description: Files changed in the last week
+      - command: find . -mtime -2h
+        description: Files changed in the last two hours
+  exec:
+    summary: Run a command on each match; {} is the path, end with \; (or + to batch)
+    replaceExamples: true
+    examples:
+      - command: find path/to/directory -name '*.ext' -exec wc -l {} \;
+      - command: find . -name '*.tmp' -exec rm {} +
+        description: Remove matches, passing many paths to each rm
+  maxdepth:
+    summary: Go no deeper than N levels into each starting directory
+  empty:
+    summary: Match empty regular files and empty directories
+  iname:
+    summary: Case-insensitive version of -name
+  name:
+    summary: Match the file's base name against a shell glob (quote it)
+  path:
+    summary: Match the whole path, slashes included, against a shell glob
+  size:
+    summary: Match by size; +N is bigger than N, -N smaller (suffixes like k, M, G)
+  type:
+    summary: Match by file type, e.g. f for regular files, d for directories, l for symlinks
+  delete:
+    summary: Delete each match (implies -depth, so put it last)
+  print:
+    summary: Print each match's path, one per line (the default action)
+  not:
+    summary: Negate the following test; same as !
+  print0:
+    tier: core
+    summary: Print paths separated by NUL bytes, for xargs -0
+    examples:
+      - command: find . -name '*.log' -print0 | xargs -0 rm
+        description: Delete log files even when their names contain spaces
+  prune:
+    tier: core
+    summary: Don't descend into the directory just matched
+    examples:
+      - command: find . -name node_modules -prune -o -name '*.js' -print
+        description: Find .js files, skipping node_modules directories
+  mindepth:
+    tier: core
+    summary: Ignore matches fewer than N levels below the starting points
+    examples:
+      - command: find . -mindepth 1 -maxdepth 1 -type d
+        description: List immediate subdirectories, but not . itself
+  newer:
+    tier: core
+    summary: Match files modified more recently than the given file
+    examples:
+      - command: find . -newer path/to/reference_file

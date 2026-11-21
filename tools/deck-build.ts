@@ -10,8 +10,11 @@
  *   pnpm deck:build --check   fail if the built files are out of date or any
  *                             override is stale (used in CI)
  *
- * Stale overrides (naming option IDs the generated deck no longer has) are
- * warnings locally and errors with --check or when CI is set.
+ * It also writes ATTRIBUTIONS.md from each deck's `license` and `attribution`.
+ *
+ * Stale overrides (naming option IDs the generated deck no longer has) and
+ * `core` summaries copied from the manpage or with no example are warnings locally and errors
+ * with --check or when CI is set.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { mkdir, rm, writeFile } from 'node:fs/promises'
@@ -22,6 +25,8 @@ import { parse as parseYaml } from 'yaml'
 import { MANIFEST_VERSION, type DeckManifest } from '../src/schema/manifest'
 import { buildDeck, manifestEntry } from './deck/build'
 import { DeckValidationError } from './deck/generate'
+import { attributionsMarkdown, copiedSummaries, coreWithoutExamples } from './deck/review'
+import type { Deck } from '../src/schema/deck'
 
 const { values } = parseArgs({ options: { check: { type: 'boolean', default: false } } })
 const check = values.check!
@@ -64,6 +69,7 @@ function findSources(): Source[] {
 
 const outputs = new Map<string, string>()
 const manifest: DeckManifest = { manifestVersion: MANIFEST_VERSION, decks: [] }
+const built: Deck[] = []
 let failed = false
 
 for (const source of findSources()) {
@@ -89,6 +95,22 @@ for (const source of findSources()) {
       )
     }
     if (stale.length > 0 && strict) failed = true
+    const copied = copiedSummaries(deck)
+    if (copied.length > 0) {
+      console[strict ? 'error' : 'warn'](
+        `${strict ? 'error' : 'warning'}: ${label}: core summaries copied from the manpage; ` +
+          `rewrite them in your own words in the overrides file: ${copied.join(', ')}`,
+      )
+      if (strict) failed = true
+    }
+    const bare = coreWithoutExamples(deck)
+    if (bare.length > 0) {
+      console[strict ? 'error' : 'warn'](
+        `${strict ? 'error' : 'warning'}: ${label}: core options need at least one example: ${bare.join(', ')}`,
+      )
+      if (strict) failed = true
+    }
+    built.push(deck)
     const text = `${JSON.stringify(deck)}\n`
     outputs.set(file, text)
     manifest.decks.push(manifestEntry(deck, file, Buffer.byteLength(text)))
@@ -104,7 +126,14 @@ outputs.set(
   await format(JSON.stringify(manifest), { parser: 'json', printWidth: 100 }),
 )
 
+const attributionsPath = join(root, 'ATTRIBUTIONS.md')
+const attributions = await format(attributionsMarkdown(built), { parser: 'markdown' })
+
 if (check) {
+  if (!existsSync(attributionsPath) || readFileSync(attributionsPath, 'utf8') !== attributions) {
+    console.error('error: ATTRIBUTIONS.md is out of date. Run `pnpm deck:build`.')
+    failed = true
+  }
   const existing = existsSync(outDir) ? readdirSync(outDir).filter((f) => f.endsWith('.json')) : []
   for (const [file, text] of outputs) {
     const path = join(outDir, file)
@@ -126,6 +155,7 @@ if (check) {
     if (!outputs.has(file)) await rm(join(outDir, file))
   }
   for (const [file, text] of outputs) await writeFile(join(outDir, file), text)
+  await writeFile(attributionsPath, attributions)
   for (const entry of manifest.decks) {
     console.log(`Built ${entry.file}: ${entry.optionCount} options, v${entry.deckVersion}`)
   }

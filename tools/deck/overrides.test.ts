@@ -52,6 +52,15 @@ describe('applyOverrides', () => {
     })
   })
 
+  it('replaces the generated examples with replaceExamples', () => {
+    const result = apply({
+      options: {
+        'ignore-case': { replaceExamples: true, examples: [{ command: 'grep -i bar' }] },
+      },
+    })
+    expect(find(result, 'ignore-case')?.examples).toEqual([{ command: 'grep -i bar' }])
+  })
+
   it('hides options and can drop an argument', () => {
     const result = apply({ options: { color: { hidden: true, argument: null } } })
     expect(find(result, 'color')?.hidden).toBe(true)

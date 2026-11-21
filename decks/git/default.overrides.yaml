@@ -1,0 +1,264 @@
+# yaml-language-server: $schema=../../schemas/overrides.schema.json
+#
+# Curation for the git deck (log, commit, rebase, reset, diff, stash,
+# checkout, switch, branch, push). Applied on top of default.generated.json by
+# `pnpm deck:build`; regenerating the deck keeps these edits.
+
+options:
+  # git log
+  log.max-count:
+    summary: Show at most N commits
+  log.after:
+    summary: Only show commits newer than a date
+    examples:
+      - command: git log --since "2 weeks ago"
+  log.before:
+    summary: Hide commits made after a date
+    examples:
+      - command: git log --until yesterday
+  log.committer:
+    primary: --author
+    summary: Only show commits whose author matches a pattern (--committer checks the committer)
+  log.grep:
+    summary: Only show commits whose message matches a pattern
+  log.regexp-ignore-case:
+    summary: Make --grep, --author and similar filters ignore case
+  log.all:
+    summary: Show commits from every branch and tag, not just HEAD
+  log.oneline:
+    summary: One line per commit, with a short hash and the subject
+  log.graph:
+    summary: Draw the branch and merge history as an ASCII graph
+  log.patch:
+    summary: Show each commit's diff
+  log.stat:
+    summary: Show which files each commit changed, with line counts
+  log.no-decorate:
+    tier: common
+    summary: Show branch and tag names next to the commits they point at
+  log.follow:
+    tier: core
+    summary: Keep following a single file's history across renames
+    examples:
+      - command: git log --follow -p path/to/file
+  log.no-merges:
+    tier: core
+    summary: Leave out merge commits
+    examples:
+      - command: git log --no-merges --oneline
+  log.short-S:
+    tier: core
+    summary: Find commits that add or remove a given string (the "pickaxe")
+    examples:
+      - command: git log -S 'functionName' --oneline
+  log.format:
+    tier: core
+    primary: --format
+    summary: Choose the output format, e.g. oneline, short or a custom '%h %s' template
+    examples:
+      - command: git log --format='%h %an %s'
+
+  # git commit
+  commit.all:
+    summary: Stage every modified and deleted tracked file before committing
+  commit.message:
+    summary: Give the commit message on the command line; repeat for more paragraphs
+  commit.amend:
+    summary: Replace the last commit with a new one that includes the staged changes
+  commit.file:
+    tier: common
+    summary: Read the commit message from a file
+  commit.no-gpg-sign:
+    tier: common
+    summary: GPG-sign the commit
+  commit.fixup:
+    tier: core
+    summary: Make a "fixup!" commit to squash into an earlier commit with rebase --autosquash
+    examples:
+      - command: git commit --fixup a1b2c3d
+  commit.no-edit:
+    tier: core
+    summary: Keep the existing message without opening an editor, e.g. with --amend
+    examples:
+      - command: git commit --amend --no-edit
+  commit.patch:
+    tier: core
+    summary: Choose hunks to commit interactively
+    examples:
+      - command: git commit -p
+  commit.no-verify:
+    tier: core
+    summary: Commit without running the pre-commit or commit-msg hooks
+    examples:
+      - command: git commit -n -m "message"
+
+  # git rebase
+  rebase.continue:
+    summary: Carry on after resolving a conflict
+  rebase.skip:
+    summary: Drop the commit that stopped the rebase and carry on
+  rebase.abort:
+    summary: Cancel the rebase and return the branch to where it started
+  rebase.onto:
+    summary: Replay commits onto a different base than the upstream
+  rebase.interactive:
+    summary: Edit the list of commits first, to reorder, squash, reword or drop them
+  rebase.strategy-option:
+    tier: common
+    summary: Pass an option such as ours or theirs to the merge strategy
+  rebase.no-autosquash:
+    tier: core
+    primary: --autosquash
+    summary: Move fixup! and squash! commits next to the commits they fix
+    examples:
+      - command: git rebase -i --autosquash main
+
+  # git reset
+  reset.soft:
+    summary: Move HEAD but keep the changes staged
+  reset.hard:
+    summary: Move HEAD and discard all staged and working tree changes
+  reset.mixed:
+    tier: core
+    summary: Move HEAD and unstage changes, but keep them in the working tree (the default)
+    examples:
+      - command: git reset --mixed HEAD~1
+
+  # git diff
+  diff.stat:
+    summary: Summarise changes as files with line counts
+  diff.summary:
+    tier: common
+  diff.name-only:
+    tier: core
+    summary: List only the names of changed files
+    examples:
+      - command: git diff --name-only main
+  diff.word-diff:
+    tier: core
+    summary: Show changes word by word instead of line by line
+    examples:
+      - command: git diff --word-diff
+  diff.ignore-all-space:
+    tier: core
+    summary: Treat lines that differ only in spacing as unchanged
+    examples:
+      - command: git diff -w
+
+  # git stash
+  stash.no-include-untracked:
+    summary: Also stash untracked files
+  stash.patch:
+    summary: Choose hunks to stash interactively
+  stash.no-keep-index:
+    tier: core
+    summary: Stash changes but leave the staged ones in place
+    examples:
+      - command: git stash -k
+  stash.staged:
+    tier: core
+    summary: Stash only the staged changes
+    examples:
+      - command: git stash -S
+
+  # git checkout
+  checkout.short-b:
+    summary: Create a new branch and switch to it
+  checkout.track:
+    tier: common
+    summary: Set up the new branch to track a remote branch
+
+  # git switch
+  switch.create:
+    summary: Create a new branch and switch to it
+  switch.detach:
+    summary: Switch to a commit or tag without a branch (detached HEAD)
+  switch.merge:
+    tier: common
+    summary: Carry local changes over to the new branch with a three-way merge
+  switch.track:
+    tier: common
+    summary: Set up the new branch to track a remote branch
+  switch.no-recurse-submodules:
+    tier: common
+    summary: Update submodules to match the branch being switched to
+  switch.force-create:
+    tier: core
+    summary: Create a branch, resetting it if it already exists, and switch to it
+    examples:
+      - command: git switch -C branch_name origin/main
+
+  # git branch
+  branch.delete:
+    summary: Delete a branch that has been merged
+  branch.move:
+    summary: Rename a branch
+  branch.all:
+    summary: Show local branches and remote ones together
+  branch.show-current:
+    summary: Output just the branch you're on
+  branch.contains:
+    summary: Only list branches that contain a given commit
+  branch.short-D:
+    tier: core
+    summary: Delete a branch even if it hasn't been merged
+    examples:
+      - command: git branch -D branch_name
+  branch.remotes:
+    tier: core
+    summary: Show the branches fetched from remotes, like origin/main
+    examples:
+      - command: git branch -r
+  branch.verbose:
+    tier: core
+    summary: Show each branch's last commit; -vv also shows its upstream
+    examples:
+      - command: git branch -vv
+  branch.set-upstream-to:
+    tier: core
+    summary: Set the remote branch the current branch tracks
+    examples:
+      - command: git branch -u origin/main
+  branch.merged:
+    tier: core
+    summary: Only list branches already merged into HEAD (or a given commit)
+    examples:
+      - command: git branch --merged main
+
+  # git push
+  push.delete:
+    summary: Delete the named branch or tag on the remote
+  push.tags:
+    summary: Push all tags as well
+  push.set-upstream:
+    summary: Make the pushed branch the current branch's upstream
+  push.branches:
+    tier: common
+    summary: Push every local branch
+  push.prune:
+    tier: common
+    summary: Delete remote branches that no longer exist locally
+  push.no-force-with-lease:
+    tier: core
+    primary: --force-with-lease
+    summary: Force-push, but only if the remote branch is where you last saw it
+    examples:
+      - command: git push --force-with-lease
+  push.force:
+    tier: core
+    summary: Overwrite the remote branch even if it isn't an ancestor of yours
+    examples:
+      - command: git push -f origin branch_name
+  push.dry-run:
+    tier: common
+
+add:
+  - subcommand: diff
+    flags: ['--cached', '--staged']
+    tier: core
+    summary: Show staged changes, compared with the last commit
+    description: >-
+      Compare the index (what is staged for the next commit) with HEAD, or with
+      the given commit. --staged is a synonym.
+    examples:
+      - command: git diff --cached
