@@ -1,22 +1,20 @@
-import { computed, reactive, ref, shallowRef } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 
-import {
-  defaultVariant,
-  describeChanges,
-  diffDecks,
-  groupByTool,
-  isUpdateAvailable,
-  type DeckChanges,
-} from '@/core/library'
-import type { StoredDeck } from '@/core/storage'
-import type { DeckManifest, DeckManifestEntry } from '@/schema/manifest'
+import { groupByTool, resolveFlavor, variantForFlavor } from '@/core/library'
+import type { DeckFlavor, StoredDeck } from '@/core/storage'
+import { manifestEntry, type DeckManifest } from '@/schema/manifest'
 
-import { holdUpdatesDuring } from '../pwa/update-holds'
+import { useOnline } from '../pwa/online'
 import { useRepository } from '../repository'
-import { fetchDeck, fetchManifest, type FetchLike } from './catalog'
-import { installPendingDecks } from './pending'
-
-export type DeckTask = { kind: 'install' | 'update' | 'remove'; progress: number }
+import { fetchManifest, type FetchLike } from './catalog'
+import {
+  describeSync,
+  setDeckFlavor,
+  syncDecks,
+  useDeckSync,
+  type SyncOptions,
+  type SyncResult,
+} from './sync'
 
 export interface LibraryOptions {
   fetch?: FetchLike
@@ -24,152 +22,133 @@ export interface LibraryOptions {
 }
 
 /**
- * State and actions for the deck library. Every view that needs it calls this;
- * the data lives in IndexedDB and the manifest, so there is nothing to share.
+ * State and actions for the Decks page. Decks download and update on their
+ * own (see `syncDecks`); this lists them and keeps each deck's settings.
  */
 export function useLibrary(options: LibraryOptions = {}) {
   const repository = useRepository()
+  const online = useOnline()
+  const sync = useDeckSync()
   const fetchFn = options.fetch ?? ((input, init) => fetch(input, init))
   const userAgent =
     options.userAgent ?? (typeof navigator === 'undefined' ? '' : navigator.userAgent)
+  const syncOptions: SyncOptions = { fetch: fetchFn, userAgent }
 
   const manifest = shallowRef<DeckManifest>()
   const installed = ref<StoredDeck[]>([])
+  const chosenFlavor = ref<DeckFlavor | null>(null)
   const loading = ref(true)
   const error = ref<string>()
-  const tasks = reactive<Record<string, DeckTask>>({})
   /** Last completed action, for the live status region. */
   const status = ref<string>()
-  /** Variant picked per tool, when a tool has more than one. */
-  const chosen = reactive<Record<string, string>>({})
 
   const installedById = computed(() => new Map(installed.value.map((d) => [d.id, d])))
 
+  /** The flavor new tools download in, and the one the picker shows. */
+  const flavor = computed(() =>
+    resolveFlavor(
+      chosenFlavor.value,
+      installed.value.map((d) => d.deck.variant),
+      userAgent,
+    ),
+  )
+
   async function reloadInstalled() {
-    installed.value = await repository.decks.list()
+    const [decks, chosen] = await Promise.all([
+      repository.decks.list(),
+      repository.settings.get('deckFlavor'),
+    ])
+    installed.value = decks
+    chosenFlavor.value = chosen
   }
 
+  function report(result: SyncResult) {
+    status.value = describeSync(result) ?? status.value
+    if (result.failed.length > 0 && online.value) {
+      error.value = `Couldn't download ${result.failed.join(', ')}. The app will try again later.`
+    }
+  }
+
+  // Background syncs (at start, after a backup import) land here too.
+  watch(sync.lastResult, async (result) => {
+    if (result) report(result)
+    await reloadInstalled().catch(() => {})
+  })
+
+  async function runSync(run: () => Promise<SyncResult>) {
+    error.value = undefined
+    try {
+      await run()
+    } catch (cause) {
+      if (online.value) error.value = cause instanceof Error ? cause.message : String(cause)
+    }
+  }
+
+  /** Loads the decks here and the deck list, then downloads anything missing or outdated. */
   async function refresh() {
     loading.value = true
     error.value = undefined
     try {
       await reloadInstalled()
       manifest.value = await fetchManifest(fetchFn)
-      await installPending(manifest.value)
     } catch (cause) {
-      error.value = cause instanceof Error ? cause.message : String(cause)
+      // Offline, the decks already here are still listed below.
+      if (online.value || installed.value.length === 0)
+        error.value = cause instanceof Error ? cause.message : String(cause)
     } finally {
       loading.value = false
     }
-  }
-
-  /** Installs decks a backup import queued, if the import couldn't reach them. */
-  async function installPending(current: DeckManifest) {
-    const { installed: done } = await installPendingDecks(repository, {
-      fetch: fetchFn,
-      manifest: current,
-    })
-    if (done.length === 0) return
-    await reloadInstalled()
-    status.value = `Installed ${done.length} deck${done.length === 1 ? '' : 's'} from your backup.`
-  }
-
-  /** Tools in the manifest, installed ones first, with the variant to show for each. */
-  const tools = computed(() => {
-    const groups = groupByTool(manifest.value?.decks ?? [])
-    const byId = installedById.value
-    return groups
-      .map((group) => {
-        const installedVariant = group.variants.find((v) => byId.has(v.id))
-        const variant =
-          group.variants.find((v) => v.variant === chosen[group.tool]) ??
-          installedVariant ??
-          group.variants.find(
-            (v) =>
-              v.variant ===
-              defaultVariant(
-                group.variants.map((x) => x.variant),
-                userAgent,
-              ),
-          )!
-        const stored = byId.get(variant.id)
-        return {
-          ...group,
-          entry: variant,
-          stored,
-          updateAvailable: stored ? isUpdateAvailable(stored, variant) : false,
-          /** Another variant of this tool is installed instead of the one shown. */
-          otherInstalled:
-            installedVariant && installedVariant.id !== variant.id ? installedVariant : undefined,
-        }
-      })
-      .sort(
-        (a, b) =>
-          Number(Boolean(b.stored)) - Number(Boolean(a.stored)) || a.tool.localeCompare(b.tool),
-      )
-  })
-
-  async function run<T>(
-    id: string,
-    kind: DeckTask['kind'],
-    action: (task: DeckTask) => Promise<T>,
-  ) {
-    tasks[id] = { kind, progress: 0 }
-    error.value = undefined
-    try {
-      // A reload into a new version would cut the download or write short.
-      return await holdUpdatesDuring(() => action(tasks[id]!))
-    } catch (cause) {
-      error.value = cause instanceof Error ? cause.message : String(cause)
-      return undefined
-    } finally {
-      delete tasks[id]
+    if (manifest.value && online.value) {
+      const current = manifest.value
+      await runSync(() => syncDecks(repository, { ...syncOptions, manifest: current }))
     }
   }
 
-  async function install(entry: DeckManifestEntry) {
-    await run(entry.id, 'install', async (task) => {
-      const deck = await fetchDeck(entry, (p) => (task.progress = p), fetchFn)
-      await repository.decks.install(deck)
-      await reloadInstalled()
-      status.value = `Installed ${entry.tool}.`
-    })
+  /** Tools to show: studied ones first, each with the deck in use or the one that will download. */
+  const tools = computed(() => {
+    const byId = installedById.value
+    const entries =
+      manifest.value?.decks ??
+      installed.value.map((stored) => manifestEntry(stored.deck, `${stored.id}.json`, 0))
+    return groupByTool(entries)
+      .map((group) => {
+        const wanted = variantForFlavor(
+          group.variants.map((v) => v.variant),
+          flavor.value,
+        )
+        const here = group.variants.filter((v) => byId.has(v.id))
+        const entry =
+          here.find((v) => v.variant === wanted) ??
+          here[0] ??
+          group.variants.find((v) => v.variant === wanted)!
+        const stored = byId.get(entry.id)
+        return { ...group, entry, stored, studying: Boolean(stored && !stored.paused) }
+      })
+      .sort(
+        (a, b) =>
+          Number(b.studying) - Number(a.studying) ||
+          Number(Boolean(b.stored)) - Number(Boolean(a.stored)) ||
+          a.tool.localeCompare(b.tool),
+      )
+  })
+
+  /** Tools that come in more than one flavor, which the flavor picker applies to. */
+  const flavoredTools = computed(() =>
+    tools.value.filter((tool) => tool.variants.length > 1).map((tool) => tool.tool),
+  )
+
+  async function setFlavor(next: DeckFlavor) {
+    chosenFlavor.value = next
+    await runSync(() => setDeckFlavor(repository, next, syncOptions))
   }
 
-  /** Installs the newer version; progress for unchanged card IDs is untouched. */
-  async function update(entry: DeckManifestEntry): Promise<DeckChanges | undefined> {
-    return run(entry.id, 'update', async (task) => {
-      const previous = installedById.value.get(entry.id)
-      const deck = await fetchDeck(entry, (p) => (task.progress = p), fetchFn)
-      await repository.decks.install(deck)
-      await reloadInstalled()
-      const changes = previous
-        ? diffDecks(previous.deck, deck)
-        : { added: deck.options, removed: [] }
-      status.value = `Updated ${entry.tool} to version ${deck.deckVersion}: ${describeChanges(changes)}.`
-      return changes
-    })
-  }
-
-  /** Removes a deck. Review history stays unless `resetProgress` is set. */
-  async function remove(id: string, { resetProgress = false } = {}) {
-    await run(id, 'remove', async () => {
-      await repository.decks.remove(id)
-      if (resetProgress) await repository.resetProgress(id)
-      await reloadInstalled()
-      status.value = resetProgress
-        ? `Removed ${id} and reset its progress.`
-        : `Removed ${id}. Your progress is kept if you install it again.`
-    })
+  async function setStudying(id: string, studying: boolean) {
+    await repository.decks.setPaused(id, !studying)
+    await reloadInstalled()
   }
 
   async function setIncludeObscure(id: string, include: boolean) {
     await repository.decks.setIncludeObscure(id, include)
-    await reloadInstalled()
-  }
-
-  async function setPaused(id: string, paused: boolean) {
-    await repository.decks.setPaused(id, paused)
     await reloadInstalled()
   }
 
@@ -178,23 +157,29 @@ export function useLibrary(options: LibraryOptions = {}) {
     await reloadInstalled()
   }
 
+  /** Clears a deck's review history; its cards start over as new. */
+  async function resetProgress(id: string, tool: string) {
+    await repository.resetProgress(id)
+    status.value = `Reset your progress on ${tool}.`
+  }
+
   return {
     manifest,
     installed,
     installedById,
     tools,
+    flavor,
+    flavoredTools,
     loading,
     error,
-    tasks,
     status,
-    chosen,
+    syncState: sync.state,
     refresh,
-    install,
-    update,
-    remove,
+    setFlavor,
+    setStudying,
     setIncludeObscure,
-    setPaused,
     setTypeAnswers,
+    resetProgress,
   }
 }
 

@@ -14,7 +14,7 @@ import {
 } from '@/core/backup'
 
 import type { FetchLike } from '../../decks/catalog'
-import { installPendingDecks } from '../../decks/pending'
+import { syncDecksAfterChange } from '../../decks/sync'
 import { holdUpdatesWhile } from '../../pwa/update-holds'
 import { useRepository } from '../../repository'
 import { UiButton } from '../ui'
@@ -94,21 +94,20 @@ async function onFileChosen(event: Event) {
   }
 }
 
-/** Installs the decks the backup used right away, so Review has them without a trip to Decks. */
+/** Downloads the decks the backup used right away, so Review has them without a trip to Decks. */
 async function installBackupDecks(): Promise<string> {
   let installed: string[] = []
-  let remaining = (await repository.settings.get('pendingDeckInstalls')).map((d) => d.id)
   try {
-    const result = await installPendingDecks(repository, { fetch: props.deckFetch })
-    installed = result.installed.map((d) => d.id)
-    remaining = result.remaining.map((d) => d.id)
+    const result = await syncDecksAfterChange(repository, { fetch: props.deckFetch })
+    installed = result.restored.map((d) => d.id)
   } catch {
     // Offline or the deck list failed to load: everything stays queued.
   }
+  const remaining = (await repository.settings.get('pendingDeckInstalls')).map((d) => d.id)
   return [
-    installed.length ? `Installed ${installed.join(', ')}.` : '',
+    installed.length ? `Downloaded ${installed.join(', ')}.` : '',
     remaining.length
-      ? `${remaining.join(', ')} will be installed when the deck library can reach ${remaining.length === 1 ? 'it' : 'them'}.`
+      ? `${remaining.join(', ')} will download when the app can reach ${remaining.length === 1 ? 'it' : 'them'}.`
       : '',
   ]
     .filter(Boolean)

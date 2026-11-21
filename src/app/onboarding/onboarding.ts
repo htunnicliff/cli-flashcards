@@ -30,22 +30,23 @@ function markSeen() {
 
 export const useOnboardingStore = defineStore('onboarding', () => {
   const open = ref(false)
-  /** True when Settings replayed the tour, so the last step closes instead of leading to Decks. */
+  /** True when Settings replayed the tour, so the last step closes instead of leading to Review. */
   const replay = ref(false)
 
   /**
-   * Opens the tour on a first visit. Someone who already has decks installed (they used
+   * Opens the tour on a first visit. Someone who has already reviewed cards (they used
    * the app before the tour existed, or restored a backup) is marked as onboarded instead.
+   * Decks download on their own, so having decks says nothing about being new.
    */
   async function startIfNew(repository: Repository) {
     if (hasSeenOnboarding(typeof localStorage === 'undefined' ? undefined : localStorage)) return
-    let decks = 0
+    let reviews = 0
     try {
-      decks = (await repository.decks.list()).length
+      reviews = await repository.reviewLog.count()
     } catch {
       // IndexedDB unavailable: treat as a new user.
     }
-    if (decks > 0) markSeen()
+    if (reviews > 0) markSeen()
     else {
       replay.value = false
       open.value = true

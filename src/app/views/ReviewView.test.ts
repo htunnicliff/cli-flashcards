@@ -13,7 +13,7 @@ import {
 import { DeckSchema } from '@/schema'
 import { makeDeck, makeOption } from '@/schema/fixtures'
 
-import { installPendingDecks } from '../decks/pending'
+import { syncDecks } from '../decks/sync'
 import { fakeFetch } from '../decks/test-fixtures'
 import { repositoryKey } from '../repository'
 import ReviewView from './ReviewView.vue'
@@ -73,13 +73,10 @@ describe('ReviewView', () => {
     expect(w.get('[data-testid="done"] a').attributes('href')).toBe('/decks')
   })
 
-  it('shows decks a backup restore installs while the screen is open', async () => {
+  it('shows decks that download while the screen is open', async () => {
     const w = await mountView()
     expect(w.get('[data-testid="done"]').text()).toContain('No decks yet')
-    await repo.settings.set('pendingDeckInstalls', [
-      { id: 'grep-gnu', deckVersion: 1, includeObscure: false },
-    ])
-    await installPendingDecks(repo, { fetch: fakeFetch([grep()]) })
+    await syncDecks(repo, { fetch: fakeFetch([grep()]) })
     await vi.waitFor(() => expect(w.find('[data-card]').exists()).toBe(true))
     expect(count(w, 'new')).toBe('3')
   })

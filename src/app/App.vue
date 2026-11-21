@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { onBeforeUnmount, onMounted, watch } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 
-import { installPendingDecks } from './decks/pending'
+import { syncDecks } from './decks/sync'
 import MotionRoot from './motion/MotionRoot.vue'
 import { useOnboardingStore } from './onboarding/onboarding'
 import OnboardingTour from './onboarding/OnboardingTour.vue'
@@ -18,19 +18,26 @@ useAppearanceStore()
 // New versions install in the background and take over at a quiet moment.
 useServiceWorker()
 
-// Decks a backup import couldn't fetch (it was offline) install on the next
-// start or when the connection comes back, without a visit to Decks.
+// Every deck downloads and updates on its own: at start, and whenever the
+// connection comes back. The first-visit tour (replayable from Settings)
+// checks for a new learner before anything downloads.
 const repository = useRepository()
 const online = useOnline()
-function retryPendingDecks() {
-  if (online.value) installPendingDecks(repository).catch(() => {})
-}
-onMounted(retryPendingDecks)
-
-// First visit: a short tour of decks, reviewing and offline use (replayable from Settings).
 const onboarding = useOnboardingStore()
-onMounted(() => onboarding.startIfNew(repository))
-watch(online, retryPendingDecks)
+function sync() {
+  if (online.value) syncDecks(repository).catch(() => {})
+}
+onMounted(async () => {
+  await onboarding.startIfNew(repository)
+  sync()
+})
+watch(online, sync)
+// A newer deck may have shipped while the app sat in the background.
+function onVisible() {
+  if (document.visibilityState === 'visible') sync()
+}
+onMounted(() => document.addEventListener('visibilitychange', onVisible))
+onBeforeUnmount(() => document.removeEventListener('visibilitychange', onVisible))
 
 const links = [
   { to: '/', label: 'Review' },

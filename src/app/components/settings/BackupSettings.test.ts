@@ -107,7 +107,7 @@ describe('BackupSettings', () => {
       .trigger('click')
     await vi.waitFor(() =>
       expect(wrapper.get('[role="status"]').text()).toBe(
-        'Merged 0 reviews. Installed grep-gnu. grep-gone will be installed when the deck library can reach it.',
+        'Merged 0 reviews. Downloaded grep-gnu. grep-gone will download when the app can reach it.',
       ),
     )
     expect(await repo.decks.get('grep-gnu')).toBeDefined()

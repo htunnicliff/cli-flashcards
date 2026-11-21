@@ -24,13 +24,13 @@ interface StoredCardState {
   fsrs: { phase: string; reps: number }
 }
 
-test('install a deck, then update it without losing progress', async ({ page }) => {
+test('decks download and update on their own without losing progress', async ({ page }) => {
   await page.goto('/decks')
   const deck = page.locator('[data-deck="ripgrep-fixture"]')
   await expect(deck).toContainText('4 options')
-  await deck.getByRole('button', { name: 'Install' }).click()
   await expect(deck).toHaveAttribute('data-installed', 'true')
-  await expect(page.getByRole('status').first()).toHaveText('Installed rg.')
+  await expect(deck).toHaveAttribute('data-studying', 'true')
+  await expect(page.getByRole('status').first()).toHaveText('Downloaded rg.')
 
   // Progress on one unchanged card, as a review would leave it.
   await page.evaluate((name) => {
@@ -80,12 +80,9 @@ test('install a deck, then update it without losing progress', async ({ page }) 
   )
   await page.reload()
 
-  await expect(deck).toContainText('Update available')
-  await deck.getByRole('button', { name: 'Update to v2' }).click()
   await expect(page.getByRole('status').first()).toHaveText(
     'Updated rg to version 2: 1 option added, 1 removed.',
   )
-  await expect(deck).not.toContainText('Update available')
 
   const states = await readStore<StoredCardState>(page, DB, 'cardStates')
   expect(states).toEqual([
@@ -106,13 +103,20 @@ test('install a deck, then update it without losing progress', async ({ page }) 
   await expect(page.locator('[data-option]')).toHaveCount(1)
 })
 
-test('remove a deck and keep its progress', async ({ page }) => {
+test('a paused deck shows no cards until it is turned back on', async ({ page }) => {
   await page.goto('/decks')
   const deck = page.locator('[data-deck="ripgrep-fixture"]')
-  await deck.getByRole('button', { name: 'Install' }).click()
   await expect(deck).toHaveAttribute('data-installed', 'true')
-  await deck.getByRole('button', { name: 'Remove' }).click()
-  await deck.getByRole('button', { name: 'Remove deck' }).click()
-  await expect(deck).toHaveAttribute('data-installed', 'false')
-  await expect(page.getByRole('status').first()).toContainText('Your progress is kept')
+  await deck.getByRole('checkbox', { name: 'Study this deck' }).uncheck()
+  await expect(deck).toHaveAttribute('data-studying', 'false')
+  await expect(deck).toContainText('Paused')
+
+  await page.goto('/')
+  await expect(page.getByTestId('done')).toBeVisible()
+  await expect(page.locator('[data-card]')).toHaveCount(0)
+
+  await page.goto('/decks')
+  await deck.getByRole('checkbox', { name: 'Study this deck' }).check()
+  await page.getByTestId('start-reviewing').click()
+  await expect(page.getByTestId('count-new')).toHaveText('3')
 })

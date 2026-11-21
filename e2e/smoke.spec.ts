@@ -15,6 +15,9 @@ test('every route in the main navigation loads without accessibility violations'
     await test.step(href, async () => {
       await page.goto(href)
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+      // Decks download on their own, so Review fills in with a card; check it once it has.
+      if (href === '/') await expect(page.locator('[data-card]')).toBeVisible()
+      await page.waitForFunction(() => document.getAnimations().length === 0)
       await expectNoA11yViolations(page)
     })
   }

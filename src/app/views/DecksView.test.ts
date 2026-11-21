@@ -1,4 +1,4 @@
-import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
+import { enableAutoUnmount, flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryHistory, createRouter } from 'vue-router'
 
@@ -11,6 +11,8 @@ import { repositoryKey } from '../repository'
 import DecksView from './DecksView.vue'
 
 let repo: Repository
+
+enableAutoUnmount(afterEach)
 
 beforeEach(() => {
   repo = createRepository({ name: uniqueDatabaseName(), dependencies: fakeIndexedDB })
@@ -32,6 +34,9 @@ async function mountView(decks: Deck[], userAgent = LINUX) {
     global: { provide: { [repositoryKey]: repo }, plugins: [router] },
   })
   await vi.waitFor(() => expect(wrapper.get('section').attributes('aria-busy')).toBe('false'))
+  // Then the background download that the page starts.
+  await vi.waitFor(() => expect(wrapper.find('[data-testid="deck-sync"]').exists()).toBe(false))
+  await flushPromises()
   return wrapper
 }
 
@@ -42,34 +47,38 @@ const button = (wrapper: VueWrapper, tool: string, text: string) =>
     .find((b) => b.text().startsWith(text))
 
 describe('DecksView', () => {
-  it('lists available decks with how many options they start with', async () => {
+  it('downloads every deck on its own and lists how many options each starts with', async () => {
     const wrapper = await mountView([grepDeck()])
     const grep = card(wrapper, 'grep')
     expect(grep.text()).toContain('2 options, starting with the 1 most used')
-    expect(grep.attributes('data-installed')).toBe('false')
+    expect(grep.attributes('data-installed')).toBe('true')
+    expect(grep.attributes('data-studying')).toBe('true')
+    expect(grep.find('button').exists() && grep.text()).not.toContain('Install')
+    expect(await repo.decks.get('grep-gnu')).toBeDefined()
+    expect(wrapper.get('[role="status"]').text()).toBe('Downloaded grep.')
   })
 
-  it('installs a deck into IndexedDB', async () => {
-    const wrapper = await mountView([grepDeck()])
-    await button(wrapper, 'grep', 'Install')!.trigger('click')
-    await vi.waitFor(async () => expect(await repo.decks.get('grep-gnu')).toBeDefined())
-    await flushPromises()
-    expect(card(wrapper, 'grep').attributes('data-installed')).toBe('true')
-    expect(wrapper.get('[role="status"]').text()).toBe('Installed grep.')
-    // The next step, a first review, is one tap away.
-    expect(wrapper.get('[data-testid="start-reviewing"]').attributes('href')).toBe('/')
-  })
-
-  it('preselects the BSD variant on macOS and GNU elsewhere', async () => {
+  it('downloads the BSD flavor on macOS and GNU elsewhere', async () => {
     const mac = await mountView([sedDeck('gnu'), sedDeck('bsd')], MAC)
     expect(card(mac, 'sed').attributes('data-deck')).toBe('sed-bsd')
-    const linux = await mountView([sedDeck('gnu'), sedDeck('bsd')], LINUX)
-    expect(card(linux, 'sed').attributes('data-deck')).toBe('sed-gnu')
-    await linux.get('input[value="bsd"]').setValue(true)
-    expect(card(linux, 'sed').attributes('data-deck')).toBe('sed-bsd')
+    expect(await repo.decks.get('sed-bsd')).toBeDefined()
+    expect(await repo.decks.get('sed-gnu')).toBeUndefined()
   })
 
-  it('offers updates and reports added and removed options, keeping progress', async () => {
+  it('switches every tool to the flavor picked, keeping its settings', async () => {
+    const wrapper = await mountView([sedDeck('gnu'), sedDeck('bsd')], LINUX)
+    expect(card(wrapper, 'sed').attributes('data-deck')).toBe('sed-gnu')
+    await repo.decks.setTypeAnswers('sed-gnu', true)
+    await wrapper.get('input[value="bsd"]').setValue(true)
+    await vi.waitFor(async () => expect(await repo.decks.get('sed-gnu')).toBeUndefined())
+    await flushPromises()
+    expect(await repo.decks.get('sed-bsd')).toMatchObject({ typeAnswers: true })
+    expect(await repo.settings.get('deckFlavor')).toBe('bsd')
+    expect(card(wrapper, 'sed').attributes('data-deck')).toBe('sed-bsd')
+    expect(wrapper.get('[role="status"]').text()).toBe('Switched sed to BSD / macOS.')
+  })
+
+  it('updates decks on its own and reports added and removed options, keeping progress', async () => {
     await repo.decks.install(grepDeck(1))
     const state = {
       cardId: 'grep:gnu:ignore-case:flag-to-meaning',
@@ -93,17 +102,34 @@ describe('DecksView', () => {
     v2.options = v2.options.filter((o) => o.id !== 'invert-match')
 
     const wrapper = await mountView([v2])
-    expect(card(wrapper, 'grep').text()).toContain('Update available')
-    await button(wrapper, 'grep', 'Update to v2')!.trigger('click')
-    await vi.waitFor(async () => expect((await repo.decks.get('grep-gnu'))?.deckVersion).toBe(2))
-    await flushPromises()
+    expect((await repo.decks.get('grep-gnu'))?.deckVersion).toBe(2)
     expect(wrapper.get('[role="status"]').text()).toBe(
       'Updated grep to version 2: 1 option added, 1 removed.',
     )
     expect(await repo.cardStates.get(state.cardId)).toEqual(state)
   })
 
-  it('removes a deck but keeps its history unless asked to reset', async () => {
+  it('pauses a deck and offers a review when one is turned back on', async () => {
+    const wrapper = await mountView([grepDeck()])
+    const study = () => card(wrapper, 'grep').get('.deck-settings input')
+    await study().setValue(false)
+    await vi.waitFor(async () =>
+      expect(await repo.decks.get('grep-gnu')).toMatchObject({ paused: true }),
+    )
+    await flushPromises()
+    expect(card(wrapper, 'grep').text()).toContain('Paused')
+    expect(wrapper.find('[data-testid="start-reviewing"]').exists()).toBe(false)
+
+    await study().setValue(true)
+    await vi.waitFor(async () =>
+      expect(await repo.decks.get('grep-gnu')).toMatchObject({ paused: false }),
+    )
+    await flushPromises()
+    expect(wrapper.get('[role="status"]').text()).toBe('Studying grep.')
+    expect(wrapper.get('[data-testid="start-reviewing"]').attributes('href')).toBe('/')
+  })
+
+  it("resets a deck's progress after asking", async () => {
     await repo.decks.install(grepDeck())
     await repo.reviewLog.append({
       cardId: 'grep:gnu:ignore-case:flag-to-meaning',
@@ -125,46 +151,39 @@ describe('DecksView', () => {
       },
     })
     const wrapper = await mountView([grepDeck()])
-    await button(wrapper, 'grep', 'Remove')!.trigger('click')
-    await button(wrapper, 'grep', 'Remove deck')!.trigger('click')
-    await vi.waitFor(async () => expect(await repo.decks.get('grep-gnu')).toBeUndefined())
+    await button(wrapper, 'grep', 'Reset progress')!.trigger('click')
+    await button(wrapper, 'grep', 'Cancel')!.trigger('click')
     expect(await repo.reviewLog.count()).toBe(1)
-
-    await repo.decks.install(grepDeck())
-    const again = await mountView([grepDeck()])
-    await button(again, 'grep', 'Remove')!.trigger('click')
-    await card(again, 'grep').get('.confirm input[type="checkbox"]').setValue(true)
-    await button(again, 'grep', 'Remove deck')!.trigger('click')
+    await button(wrapper, 'grep', 'Reset progress')!.trigger('click')
+    await card(wrapper, 'grep').get('.confirm button').trigger('click')
     await vi.waitFor(async () => expect(await repo.reviewLog.count()).toBe(0))
+    expect(await repo.decks.get('grep-gnu')).toBeDefined()
   })
 
   it('saves per-deck settings', async () => {
     await repo.decks.install(grepDeck())
     const wrapper = await mountView([grepDeck()])
-    const [obscure, typed, pause] = card(wrapper, 'grep').findAll('.deck-settings input')
+    const [, obscure, typed] = card(wrapper, 'grep').findAll('.deck-settings input')
     await obscure!.setValue(true)
     await typed!.setValue(true)
-    await pause!.setValue(true)
     await vi.waitFor(async () =>
       expect(await repo.decks.get('grep-gnu')).toMatchObject({
         includeObscure: true,
         typeAnswers: true,
-        paused: true,
       }),
     )
   })
 
-  it('installs decks queued by a backup import, keeping unknown ones queued', async () => {
+  it('downloads decks queued by a backup import, keeping unknown ones queued', async () => {
     await repo.settings.set('pendingDeckInstalls', [
       { id: 'grep-gnu', deckVersion: 1, includeObscure: true },
       { id: 'gone-gnu', deckVersion: 1, includeObscure: false },
     ])
-    const wrapper = await mountView([grepDeck()])
+    await mountView([grepDeck()])
     expect(await repo.decks.get('grep-gnu')).toMatchObject({ includeObscure: true })
     expect(await repo.settings.get('pendingDeckInstalls')).toEqual([
       { id: 'gone-gnu', deckVersion: 1, includeObscure: false },
     ])
-    expect(wrapper.get('[role="status"]').text()).toBe('Installed 1 deck from your backup.')
   })
 
   it('shows an error when the deck list cannot load', async () => {
@@ -176,21 +195,21 @@ describe('DecksView', () => {
     expect(wrapper.get('[role="alert"]').text()).toMatch(/HTTP 500/)
   })
 
-  it('disables install and explains why while offline', async () => {
+  it('explains that downloads wait while offline', async () => {
     const setOnline = (value: boolean) => {
       Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => value })
       window.dispatchEvent(new Event(value ? 'online' : 'offline'))
     }
-    const wrapper = await mountView([grepDeck()])
+    const wrapper = await mountView([sedDeck('gnu'), sedDeck('bsd')])
     try {
       setOnline(false)
       await flushPromises()
-      expect(button(wrapper, 'grep', 'Install')!.attributes('disabled')).toBeDefined()
       expect(wrapper.text()).toContain("You're offline")
+      expect(wrapper.get('input[value="bsd"]').attributes('disabled')).toBeDefined()
 
       setOnline(true)
       await flushPromises()
-      expect(button(wrapper, 'grep', 'Install')!.attributes('disabled')).toBeUndefined()
+      expect(wrapper.get('input[value="bsd"]').attributes('disabled')).toBeUndefined()
       expect(wrapper.text()).not.toContain("You're offline")
     } finally {
       setOnline(true)

@@ -32,13 +32,40 @@ describe('onboarding', () => {
     expect(store.open).toBe(false)
   })
 
-  it('skips people who already have decks and remembers that', async () => {
+  it('skips people who have already reviewed and remembers that', async () => {
     const repository = repo()
-    await repository.decks.install(DeckSchema.parse(makeDeck([makeOption(['-i'])])))
+    const fsrs = {
+      phase: 'learning' as const,
+      due: 0,
+      stability: 1,
+      difficulty: 5,
+      elapsedDays: 0,
+      scheduledDays: 0,
+      learningSteps: 0,
+      reps: 1,
+      lapses: 0,
+    }
+    await repository.reviewLog.append({
+      cardId: 'grep:gnu:i:flag-to-meaning',
+      deckId: 'grep-gnu',
+      reviewedAt: 1,
+      rating: 3,
+      durationMs: 1000,
+      before: null,
+      after: fsrs,
+    })
     const store = useOnboardingStore()
     await store.startIfNew(repository)
     expect(store.open).toBe(false)
     expect(hasSeenOnboarding(localStorage)).toBe(true)
+  })
+
+  it('still welcomes a new learner whose decks downloaded already', async () => {
+    const repository = repo()
+    await repository.decks.install(DeckSchema.parse(makeDeck([makeOption(['-i'])])))
+    const store = useOnboardingStore()
+    await store.startIfNew(repository)
+    expect(store.open).toBe(true)
   })
 
   it('replays on request', () => {

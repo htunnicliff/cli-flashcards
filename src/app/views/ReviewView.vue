@@ -7,8 +7,9 @@ import { formatNextDue } from '@/core/review'
 import type { Rating } from '@/core/storage'
 
 import { UiButton, UiKbd } from '../components/ui'
-import { useDecksChanged } from '../decks/pending'
+import { useDeckSync } from '../decks/sync'
 import { fade, presets, spring } from '../motion/tokens'
+import { useOnline } from '../pwa/online'
 import ReviewCard from '../review/ReviewCard.vue'
 import TypedAnswer from '../review/TypedAnswer.vue'
 import {
@@ -44,8 +45,10 @@ const {
   flagPairs,
 } = session
 
-// Decks restored from a backup can finish installing while this screen is open.
-watch(useDecksChanged(), () => session.refresh())
+// Decks download in the background, so they can arrive while this screen is open.
+const deckSync = useDeckSync()
+watch(deckSync.changed, () => session.refresh())
+const online = useOnline()
 
 const helpOpen = ref(false)
 const revealButton = ref<{ $el: HTMLElement }>()
@@ -305,12 +308,24 @@ const swipeHint = computed(() => {
           A card you're learning comes back {{ nextDueText }}. It will show up here on its own.
         </p>
         <p v-else-if="nextDueText" class="hint">Your next review is {{ nextDueText }}.</p>
-        <p v-else class="hint">Nothing else is scheduled. Add a deck for more to learn.</p>
+        <p v-else class="hint">
+          Nothing else is scheduled. Turn on more decks in Decks for more to learn.
+        </p>
+      </template>
+      <template v-else-if="deckSync.state.running">
+        <h2>Getting your decks ready</h2>
+        <p class="hint">
+          Every deck downloads on its own, once. Your first cards appear here in a moment.
+        </p>
+      </template>
+      <template v-else-if="!online">
+        <h2>No decks yet</h2>
+        <p class="hint">Decks download the first time you're online, then work offline.</p>
       </template>
       <template v-else>
         <h2>No decks yet</h2>
-        <p class="hint">Pick a tool you use, and its most useful flags become your first cards.</p>
-        <RouterLink to="/decks" class="choose-deck">Choose a deck</RouterLink>
+        <p class="hint">The decks haven't downloaded yet. Decks shows what's happening.</p>
+        <RouterLink to="/decks" class="choose-deck">Open Decks</RouterLink>
       </template>
     </div>
 
