@@ -11,9 +11,7 @@ import { useOnboardingStore } from './onboarding'
 
 const STEPS = [
   { id: 'welcome', title: 'Welcome to --recall' },
-  { id: 'decks', title: 'Install a deck' },
   { id: 'review', title: 'Review your cards' },
-  { id: 'practice', title: 'Practice your way' },
   { id: 'offline', title: 'Works offline' },
 ] as const
 
@@ -119,18 +117,9 @@ function onCancel(event: Event) {
               Learn the flags of the command-line tools you use, one flashcard at a time. Each card
               comes back just before you'd forget it, so a few minutes a day is enough.
             </p>
-            <p class="hint casual">This quick tour takes under a minute.</p>
-          </template>
-
-          <template v-else-if="step.id === 'decks'">
             <p>
-              A deck covers one tool, such as <code class="mono">grep</code> or
-              <code class="mono">jq</code>. Install one from <strong>Decks</strong> to start
-              learning its most useful flags first.
-            </p>
-            <p>
-              Each installed deck has its own options: include obscure flags, type your answers, or
-              pause it for a while.
+              Each deck covers one tool, such as <code class="mono">grep</code> or
+              <code class="mono">jq</code>, and starts with its most useful flags.
             </p>
           </template>
 
@@ -157,18 +146,6 @@ function onCancel(event: Event) {
             </p>
           </template>
 
-          <template v-else-if="step.id === 'practice'">
-            <p>
-              Prefer to type? Turn on <strong>Type answers</strong> for a deck in Decks, and the app
-              checks what you type and suggests a grade.
-            </p>
-            <p>
-              <strong>Flag pair practice</strong> (in Settings) shows one form of a flag and asks
-              for the other, so you learn that <code class="mono">-r</code> and
-              <code class="mono">--recursive</code> go together.
-            </p>
-          </template>
-
           <template v-else>
             <p>
               Once a deck is installed, everything works without a connection. Add the app to your
@@ -177,6 +154,9 @@ function onCancel(event: Event) {
             <p>
               Your progress stays on this device, so export a backup from
               <strong>Settings</strong> now and then.
+            </p>
+            <p class="hint casual">
+              Rather type your answers? Turn on <strong>Type answers</strong> for a deck in Decks.
             </p>
           </template>
         </div>

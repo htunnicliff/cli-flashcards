@@ -302,9 +302,8 @@ const swipeHint = computed(() => {
       </template>
       <template v-else>
         <h2>No decks yet</h2>
-        <p class="hint">
-          <RouterLink to="/decks">Install a deck</RouterLink> to start reviewing its flags.
-        </p>
+        <p class="hint">Pick a tool you use, and its most useful flags become your first cards.</p>
+        <RouterLink to="/decks" class="choose-deck">Choose a deck</RouterLink>
       </template>
     </div>
 
@@ -552,6 +551,18 @@ p {
 .done a {
   color: var(--color-accent);
   font-weight: 600;
+}
+
+.done .choose-deck {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-button);
+  background: var(--color-accent);
+  color: var(--color-on-primary);
+  text-decoration: none;
 }
 
 .card-stage {

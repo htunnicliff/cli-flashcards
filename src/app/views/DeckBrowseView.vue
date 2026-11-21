@@ -99,7 +99,14 @@ const statuses = computed(() =>
     : new Map<string, OptionStatus>(),
 )
 
-const visible = computed(() => (deck.value?.options ?? []).filter((option) => !option.hidden))
+// Most used flags first, the order the deck teaches them in.
+const TIER_ORDER = { core: 0, common: 1, obscure: 2 } as const
+const tierLabel = { core: 'most used', common: 'common', obscure: 'rare' } as const
+const visible = computed(() =>
+  (deck.value?.options ?? [])
+    .filter((option) => !option.hidden)
+    .sort((a, b) => TIER_ORDER[a.tier] - TIER_ORDER[b.tier]),
+)
 const results = computed(() => searchOptions(visible.value, query.value))
 
 const statusLabel: Record<OptionStatus, string> = {
@@ -204,7 +211,7 @@ const statusLabel: Record<OptionStatus, string> = {
               </code>
               <span class="chips">
                 <UiChip v-if="option.subcommand" mono>{{ option.subcommand }}</UiChip>
-                <UiChip :data-tier="option.tier">{{ option.tier }}</UiChip>
+                <UiChip :data-tier="option.tier">{{ tierLabel[option.tier] }}</UiChip>
                 <UiChip v-if="installed" :data-status="statuses.get(option.id)">{{
                   statusLabel[statuses.get(option.id) ?? 'new']
                 }}</UiChip>

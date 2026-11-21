@@ -85,7 +85,7 @@ const motionOptions: { value: MotionPreference; label: string }[] = [
     <section class="setting" aria-labelledby="help-heading">
       <h2 id="help-heading" class="section-heading">Help</h2>
       <UiButton class="replay-tour" @click="onboarding.start()">Replay the welcome tour</UiButton>
-      <p class="hint casual">A one-minute walk through decks, reviewing and offline use.</p>
+      <p class="hint casual">A quick walk through decks, grading and offline use.</p>
     </section>
   </section>
 </template>
