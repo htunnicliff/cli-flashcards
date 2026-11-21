@@ -1,5 +1,5 @@
 import { readStore } from './support/storage'
-import { expect, test } from './support/test'
+import { expect, skipOnboarding, test } from './support/test'
 
 const cardId = 'rg:fixture:ignore-case:flag-to-meaning'
 const fsrs = {
@@ -62,6 +62,7 @@ test('a backup exported in one browser restores progress in another', async ({ b
   const file = await download.path()
 
   const fresh = await browser.newContext()
+  await skipOnboarding(fresh)
   try {
     const other = await fresh.newPage()
     await other.goto('/settings')

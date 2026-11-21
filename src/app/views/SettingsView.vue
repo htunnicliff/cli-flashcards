@@ -5,6 +5,8 @@ import BackupSettings from '../components/settings/BackupSettings.vue'
 import PracticeSettings from '../components/settings/PracticeSettings.vue'
 import SchedulingSettings from '../components/settings/SchedulingSettings.vue'
 import StorageSettings from '../components/settings/StorageSettings.vue'
+import { UiButton } from '../components/ui'
+import { useOnboardingStore } from '../onboarding/onboarding'
 import {
   useAppearanceStore,
   type FontSize,
@@ -13,6 +15,7 @@ import {
 } from '../stores/appearance'
 
 const { theme, fontSize, motion } = storeToRefs(useAppearanceStore())
+const onboarding = useOnboardingStore()
 
 const themeOptions: { value: ThemePreference; label: string }[] = [
   { value: 'light', label: 'Light' },
@@ -78,6 +81,12 @@ const motionOptions: { value: MotionPreference; label: string }[] = [
     <StorageSettings />
 
     <BackupSettings />
+
+    <section class="setting" aria-labelledby="help-heading">
+      <h2 id="help-heading" class="section-heading">Help</h2>
+      <UiButton class="replay-tour" @click="onboarding.start()">Replay the welcome tour</UiButton>
+      <p class="hint casual">A one-minute walk through decks, reviewing and offline use.</p>
+    </section>
   </section>
 </template>
 
@@ -100,6 +109,16 @@ h1 {
   margin: 0;
   padding: 0;
   border: 0;
+}
+
+.section-heading {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-md);
+  font-weight: 600;
+}
+
+.setting > .replay-tour {
+  align-self: flex-start;
 }
 
 legend {
