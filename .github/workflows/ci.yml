@@ -84,6 +84,44 @@ jobs:
       - name: Check decks
         run: pnpm decks:check
 
+      # The Flutter app's tests compare its Dart ports against these.
+      - name: Check Flutter parity fixtures are up to date
+        run: |
+          pnpm dart:golden
+          git diff --exit-code -- app/test/fixtures || {
+            echo "::error::Run 'pnpm dart:golden' and commit app/test/fixtures."
+            exit 1
+          }
+
+  flutter:
+    name: Flutter app
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.50.1
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Build web
+        run: flutter build web
+
   e2e:
     name: End-to-end tests
     runs-on: ubuntu-latest
