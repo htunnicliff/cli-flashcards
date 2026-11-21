@@ -33,11 +33,11 @@ describe('SchedulingSettings', () => {
     expect(input(wrapper, 'desiredRetention').element.value).toBe('0.9')
     expect(input(wrapper, 'newCardsPerDay').element.value).toBe('7')
     expect(wrapper.findAll('label').map((l) => l.text())).toEqual([
-      'Desired retention',
       'New cards per day',
+      'Desired retention',
       'Maximum reviews per day',
       'New day starts at',
-      'Leech after',
+      'Suspend hard cards after',
     ])
   })
 

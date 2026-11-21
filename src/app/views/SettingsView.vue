@@ -78,9 +78,9 @@ const motionOptions: { value: MotionPreference; label: string }[] = [
 
     <SchedulingSettings />
 
-    <StorageSettings />
-
     <BackupSettings />
+
+    <StorageSettings />
 
     <section class="setting" aria-labelledby="help-heading">
       <h2 id="help-heading" class="section-heading">Help</h2>

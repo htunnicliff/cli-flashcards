@@ -77,6 +77,6 @@ describe('StatsView', () => {
     expect(
       wrapper.findAll('tbody tr').map((r) => r.findAll('th, td').map((c) => c.text())),
       // The two flag pair cards count as new while flag pair practice is on (the default).
-    ).toEqual([['grep-gnu', '3', '0', '1', '0']])
+    ).toEqual([['grep (gnu)', '3', '0', '1', '0']])
   })
 })
