@@ -42,11 +42,10 @@ const button = (wrapper: VueWrapper, tool: string, text: string) =>
     .find((b) => b.text().startsWith(text))
 
 describe('DecksView', () => {
-  it('lists available decks with option counts per tier', async () => {
+  it('lists available decks with how many options they start with', async () => {
     const wrapper = await mountView([grepDeck()])
     const grep = card(wrapper, 'grep')
-    expect(grep.text()).toContain('2 options')
-    expect(grep.text()).toContain('1 core · 1 common · 0 obscure')
+    expect(grep.text()).toContain('2 options, starting with the 1 most used')
     expect(grep.attributes('data-installed')).toBe('false')
   })
 
@@ -56,7 +55,9 @@ describe('DecksView', () => {
     await vi.waitFor(async () => expect(await repo.decks.get('grep-gnu')).toBeDefined())
     await flushPromises()
     expect(card(wrapper, 'grep').attributes('data-installed')).toBe('true')
-    expect(wrapper.get('[role="status"]').text()).toBe('Installed grep (gnu).')
+    expect(wrapper.get('[role="status"]').text()).toBe('Installed grep.')
+    // The next step, a first review, is one tap away.
+    expect(wrapper.get('[data-testid="start-reviewing"]').attributes('href')).toBe('/')
   })
 
   it('preselects the BSD variant on macOS and GNU elsewhere', async () => {

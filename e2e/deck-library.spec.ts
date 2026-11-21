@@ -30,7 +30,7 @@ test('install a deck, then update it without losing progress', async ({ page }) 
   await expect(deck).toContainText('4 options')
   await deck.getByRole('button', { name: 'Install' }).click()
   await expect(deck).toHaveAttribute('data-installed', 'true')
-  await expect(page.getByRole('status').first()).toHaveText('Installed rg (fixture).')
+  await expect(page.getByRole('status').first()).toHaveText('Installed rg.')
 
   // Progress on one unchanged card, as a review would leave it.
   await page.evaluate((name) => {

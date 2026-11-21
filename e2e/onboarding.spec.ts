@@ -7,10 +7,10 @@ test('a first visit walks through the tour and lands on Decks', async ({ page })
   await page.goto('/')
   const tour = page.getByRole('dialog', { name: /Welcome to/ })
   await expect(tour).toBeVisible()
-  await expect(tour.getByText('Step 1 of 5')).toBeVisible()
+  await expect(tour.getByText('Step 1 of 3')).toBeVisible()
   await expectNoA11yViolations(page)
 
-  const headings = ['Install a deck', 'Review your cards', 'Practice your way', 'Works offline']
+  const headings = ['Review your cards', 'Works offline']
   for (const heading of headings) {
     await page.getByRole('button', { name: 'Next' }).click()
     await expect(page.getByRole('dialog', { name: heading })).toBeVisible()
@@ -20,7 +20,7 @@ test('a first visit walks through the tour and lands on Decks', async ({ page })
   await expectNoA11yViolations(page)
 
   await page.getByRole('button', { name: 'Back' }).click()
-  await expect(page.getByRole('dialog', { name: 'Practice your way' })).toBeVisible()
+  await expect(page.getByRole('dialog', { name: 'Review your cards' })).toBeVisible()
   await page.getByRole('button', { name: 'Next' }).click()
 
   await page.getByRole('button', { name: 'Choose a deck' }).click()
@@ -57,7 +57,7 @@ test('Settings replays the tour', async ({ page }) => {
 
   await page.getByRole('button', { name: 'Replay the welcome tour' }).click()
   await expect(page.getByRole('dialog', { name: /Welcome to/ })).toBeVisible()
-  for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Next' }).click()
+  for (let i = 0; i < 2; i++) await page.getByRole('button', { name: 'Next' }).click()
   await page.getByRole('button', { name: 'Done' }).click()
   await expect(page.getByRole('dialog')).toHaveCount(0)
   // A replay ends where it started.
@@ -69,7 +69,6 @@ test('shows keyboard shortcuts on desktop and swipes on touch screens', async ({
   isMobile,
 }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: 'Next' }).click()
   await page.getByRole('button', { name: 'Next' }).click()
   const tour = page.getByRole('dialog', { name: 'Review your cards' })
   await expect(tour.getByText(/shows the answer/)).toBeVisible({ visible: !isMobile })
