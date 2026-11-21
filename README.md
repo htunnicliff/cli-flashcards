@@ -15,18 +15,19 @@ pnpm install
 
 ## Scripts
 
-| Command              | What it does                                                   |
-| -------------------- | -------------------------------------------------------------- |
-| `pnpm dev`           | Start the Vite dev server with hot reload.                     |
-| `pnpm build`         | Type check, then build the production bundle into `dist/`.     |
-| `pnpm preview`       | Serve the built `dist/` locally.                               |
-| `pnpm typecheck`     | Run `vue-tsc` across the app, Node scripts and tests.          |
-| `pnpm lint`          | Run ESLint and check formatting with Prettier.                 |
-| `pnpm lint:fix`      | Fix what ESLint can and rewrite files with Prettier.           |
-| `pnpm format`        | Rewrite files with Prettier.                                   |
-| `pnpm test`          | Run all Vitest tests once.                                     |
-| `pnpm test:watch`    | Run Vitest in watch mode.                                      |
-| `pnpm test:coverage` | Run tests with a coverage report for `src/core/` and `tools/`. |
+| Command              | What it does                                                    |
+| -------------------- | --------------------------------------------------------------- |
+| `pnpm dev`           | Start the Vite dev server with hot reload.                      |
+| `pnpm build`         | Type check, then build the production bundle into `dist/`.      |
+| `pnpm preview`       | Serve the built `dist/` locally.                                |
+| `pnpm typecheck`     | Run `vue-tsc` across the app, Node scripts and tests.           |
+| `pnpm lint`          | Run ESLint and check formatting with Prettier.                  |
+| `pnpm lint:fix`      | Fix what ESLint can and rewrite files with Prettier.            |
+| `pnpm format`        | Rewrite files with Prettier.                                    |
+| `pnpm test`          | Run all Vitest tests once.                                      |
+| `pnpm test:watch`    | Run Vitest in watch mode.                                       |
+| `pnpm test:coverage` | Run tests with a coverage report for `src/core/` and `tools/`.  |
+| `pnpm schema:export` | Regenerate `schemas/deck.schema.json` from the Zod deck schema. |
 
 CI runs lint, typecheck, tests with coverage and a build on every pull request and every push to `main`.
 
