@@ -13,7 +13,12 @@ export default mergeConfig(
           test: {
             name: 'unit',
             environment: 'node',
-            include: ['src/core/**/*.test.ts', 'src/schema/**/*.test.ts', 'tools/**/*.test.ts'],
+            include: [
+              'src/core/**/*.test.ts',
+              'src/schema/**/*.test.ts',
+              'tools/**/*.test.ts',
+              'e2e/fixtures/**/*.test.ts',
+            ],
           },
         },
         {
@@ -23,6 +28,7 @@ export default mergeConfig(
             name: 'app',
             environment: 'happy-dom',
             include: ['src/app/**/*.test.ts'],
+            setupFiles: ['src/app/test-setup.ts'],
           },
         },
       ],

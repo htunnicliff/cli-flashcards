@@ -9,9 +9,14 @@ export type ThemePreference = (typeof themePreferences)[number]
 export const fontSizes = ['s', 'm', 'l'] as const
 export type FontSize = (typeof fontSizes)[number]
 
+/** "system" follows prefers-reduced-motion; the others override it in either direction. */
+export const motionPreferences = ['system', 'reduce', 'full'] as const
+export type MotionPreference = (typeof motionPreferences)[number]
+
 export interface Appearance {
   theme: ThemePreference
   fontSize: FontSize
+  motion: MotionPreference
 }
 
 /**
@@ -21,7 +26,7 @@ export interface Appearance {
  */
 export const APPEARANCE_STORAGE_KEY = 'recall:appearance'
 
-const defaults: Appearance = { theme: 'system', fontSize: 'm' }
+const defaults: Appearance = { theme: 'system', fontSize: 'm', motion: 'system' }
 
 export function loadAppearance(storage: Pick<Storage, 'getItem'> | undefined): Appearance {
   try {
@@ -29,7 +34,7 @@ export function loadAppearance(storage: Pick<Storage, 'getItem'> | undefined): A
     if (!raw) return { ...defaults }
     const parsed: unknown = JSON.parse(raw)
     if (typeof parsed !== 'object' || parsed === null) return { ...defaults }
-    const { theme, fontSize } = parsed as Record<string, unknown>
+    const { theme, fontSize, motion } = parsed as Record<string, unknown>
     return {
       theme: themePreferences.includes(theme as ThemePreference)
         ? (theme as ThemePreference)
@@ -37,6 +42,9 @@ export function loadAppearance(storage: Pick<Storage, 'getItem'> | undefined): A
       fontSize: fontSizes.includes(fontSize as FontSize)
         ? (fontSize as FontSize)
         : defaults.fontSize,
+      motion: motionPreferences.includes(motion as MotionPreference)
+        ? (motion as MotionPreference)
+        : defaults.motion,
     }
   } catch {
     return { ...defaults }
@@ -57,6 +65,9 @@ export function applyAppearance(value: Appearance, doc: Document = document) {
   if (value.theme === 'system') delete root.dataset.theme
   else root.dataset.theme = value.theme
   root.dataset.fontSize = value.fontSize
+  // Lets plain CSS transitions follow the in-app override too (see base.css).
+  if (value.motion === 'system') delete root.dataset.motion
+  else root.dataset.motion = value.motion
 
   // Two metas with media queries cover "system"; an override pins both to one colour.
   for (const meta of doc.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
@@ -69,16 +80,17 @@ export const useAppearanceStore = defineStore('appearance', () => {
   const initial = loadAppearance(typeof localStorage === 'undefined' ? undefined : localStorage)
   const theme = ref<ThemePreference>(initial.theme)
   const fontSize = ref<FontSize>(initial.fontSize)
+  const motion = ref<MotionPreference>(initial.motion)
 
   watch(
-    [theme, fontSize],
+    [theme, fontSize, motion],
     () => {
-      const value = { theme: theme.value, fontSize: fontSize.value }
+      const value = { theme: theme.value, fontSize: fontSize.value, motion: motion.value }
       applyAppearance(value)
       saveAppearance(value)
     },
     { immediate: true },
   )
 
-  return { theme, fontSize }
+  return { theme, fontSize, motion }
 })
