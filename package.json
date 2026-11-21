@@ -19,7 +19,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "schema:export": "jiti tools/export-schema.ts"
+    "schema:export": "jiti tools/export-schema.ts",
+    "deck:generate": "jiti tools/deck-generate.ts"
   },
   "dependencies": {
     "pinia": "^4.1.0",

@@ -28,6 +28,7 @@ pnpm install
 | `pnpm test:watch`    | Run Vitest in watch mode.                                       |
 | `pnpm test:coverage` | Run tests with a coverage report for `src/core/` and `tools/`.  |
 | `pnpm schema:export` | Regenerate `schemas/deck.schema.json` from the Zod deck schema. |
+| `pnpm deck:generate` | Generate a deck from a tool's manpage (see below).              |
 
 CI runs lint, typecheck, tests with coverage and a build on every pull request and every push to `main`.
 
@@ -43,6 +44,18 @@ decks/      Generated and curated deck data
 ```
 
 `src/schema/` and `src/core/` must not import Vue or browser APIs, so the Node tools in `tools/` can import them too. The `@/` alias points at `src/`.
+
+## Generating decks
+
+`pnpm deck:generate <tool>` finds the tool's manpage with `man -w`, parses its options and writes `decks/<tool>/<variant>.generated.json`.
+
+```sh
+pnpm deck:generate rg
+pnpm deck:generate git --pages git-log,git-commit   # options get IDs like log.oneline
+pnpm deck:generate sed --variant gnu --license GPL-3.0-or-later
+```
+
+The parser in `tools/deck/` reads roff source directly, both man(7) pages (GNU, help2man, asciidoc/docbook) and mdoc(7) pages (BSD, macOS), so it needs no extra tools. It is pure (manpage text in, deck out) and covered by snapshot tests over the real pages in `tools/deck/manpage/fixtures/`. Run `pnpm test -u` to update the snapshots after a parser change and review the diff.
 
 ## Tests
 

@@ -1,0 +1,2851 @@
+{
+  "deck": {
+    "schemaVersion": 1,
+    "id": "git-default",
+    "tool": "git",
+    "variant": "default",
+    "toolVersion": "fixture",
+    "deckVersion": 1,
+    "source": "manpage",
+    "license": "NOASSERTION",
+    "attribution": "Generated from the git-log(1) manual page.",
+    "sourcePages": [
+      {
+        "name": "git-log",
+        "section": "1",
+        "path": "git-log.1"
+      }
+    ],
+    "options": [
+      {
+        "id": "log.follow",
+        "flags": [
+          "--follow"
+        ],
+        "summary": "Continue listing the history of a file beyond renames (works only for a single file).",
+        "description": "Continue listing the history of a file beyond renames (works only for a single file).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-decorate",
+        "flags": [
+          "--decorate",
+          "--no-decorate"
+        ],
+        "argument": {
+          "name": "short|full|auto|no",
+          "optional": true
+        },
+        "summary": "Print out the ref names of any commits that are shown.",
+        "description": "Print out the ref names of any commits that are shown. If short is specified, the ref name prefixes refs/heads/, refs/tags/ and refs/remotes/ will not be printed. If full is specified, the full ref name (including prefix) will be printed. If auto is specified, then if the output is going to a terminal, the ref names are shown as if short were given, otherwise no ref names are shown. The option --decorate is short-hand for --decorate=short. Default to configuration value of log.decorate if configured, otherwise, auto.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.decorate-refs-exclude",
+        "flags": [
+          "--decorate-refs",
+          "--decorate-refs-exclude"
+        ],
+        "argument": {
+          "name": "pattern",
+          "optional": false
+        },
+        "summary": "For each candidate reference, do not use it for decoration if it matches any patterns given to --decorate-refs-exclude or if it doesn't match any of the patterns given to --decorate-refs.",
+        "description": "For each candidate reference, do not use it for decoration if it matches any patterns given to --decorate-refs-exclude or if it doesn't match any of the patterns given to --decorate-refs. The log.excludeDecoration config option allows excluding refs from the decorations, but an explicit --decorate-refs pattern will override a match in log.excludeDecoration.\n\nIf none of these options or config settings are given, then references are used as decoration if they match HEAD, refs/heads/, refs/remotes/, refs/stash/, or refs/tags/.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.clear-decorations",
+        "flags": [
+          "--clear-decorations"
+        ],
+        "summary": "When specified, this option clears all previous --decorate-refs or --decorate-refs-exclude options and relaxes the default decoration filter to include all references.",
+        "description": "When specified, this option clears all previous --decorate-refs or --decorate-refs-exclude options and relaxes the default decoration filter to include all references. This option is assumed if the config value log.initialDecorationSet is set to all.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.source",
+        "flags": [
+          "--source"
+        ],
+        "summary": "Print out the ref name given on the command line by which each commit was reached.",
+        "description": "Print out the ref name given on the command line by which each commit was reached.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-use-mailmap",
+        "flags": [
+          "--mailmap",
+          "--use-mailmap",
+          "--no-mailmap",
+          "--no-use-mailmap"
+        ],
+        "summary": "Use mailmap file to map author and committer names and email addresses to canonical real names and email addresses.",
+        "description": "Use mailmap file to map author and committer names and email addresses to canonical real names and email addresses. See git-shortlog(1).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.full-diff",
+        "flags": [
+          "--full-diff"
+        ],
+        "summary": "Without this flag, git log -p <path>... shows commits that touch the specified paths, and diffs about the same specified paths.",
+        "description": "Without this flag, git log -p <path>... shows commits that touch the specified paths, and diffs about the same specified paths. With this, the full diff is shown for commits that touch the specified paths; this means that \"<path>...\" limits only commits, and doesn't limit diff for those commits.\n\nNote that this affects all diff-based output types, e.g. those produced by --stat, etc.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.log-size",
+        "flags": [
+          "--log-size"
+        ],
+        "summary": "Include a line \"log size <number>\" in the output for each commit, where <number> is the length of that commit's message in bytes.",
+        "description": "Include a line \"log size <number>\" in the output for each commit, where <number> is the length of that commit's message in bytes. Intended to speed up tools that read log messages from git log output by allowing them to allocate space in advance.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.short-L",
+        "flags": [
+          "-L"
+        ],
+        "argument": {
+          "name": "<start>,<end>:<file>",
+          "optional": false
+        },
+        "summary": "Trace the evolution of the line range given by <start>,<end>, or by the function name regex <funcname>, within the <file>.",
+        "description": "Trace the evolution of the line range given by <start>,<end>, or by the function name regex <funcname>, within the <file>. You may not give any pathspec limiters. This is currently limited to a walk starting from a single revision, i.e., you may only give zero or one positive revision arguments, and <start> and <end> (or <funcname>) must exist in the starting revision. You can specify this option more than once. Implies --patch. Patch output can be suppressed using --no-patch, but other diff formats (namely --raw, --numstat, --shortstat, --dirstat, --summary, --name-only, --name-status, --check) are not currently implemented.\n\n<start> and <end> can take one of these forms:\n\nh'-04'• number\n\nIf <start> or <end> is a number, it specifies an absolute line number (lines count from 1).\n\nh'-04'• /regex/\n\nThis form will use the first line matching the given POSIX regex. If <start> is a regex, it will search from the end of the previous -L range, if any, otherwise from the start of file. If <start> is ^/regex/, it will search from the start of file. If <end> is a regex, it will search starting at the line given by <start>.\n\nh'-04'• +offset or -offset\n\nThis is only valid for <end> and will specify a number of lines before or after the line given by <start>.\n\nIf :<funcname> is given in place of <start> and <end>, it is a regular expression that denotes the range from the first funcname line that matches <funcname>, up to the next funcname line. :<funcname> searches from the end of the previous -L range, if any, otherwise from the start of file. ^:<funcname> searches from the start of file. The function names are determined in the same way as git diff works out patch hunk headers (see Defining a custom hunk-header in gitattributes(5)).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.max-count",
+        "flags": [
+          "-n",
+          "--max-count"
+        ],
+        "argument": {
+          "name": "number",
+          "optional": false
+        },
+        "summary": "Limit the number of commits to output.",
+        "description": "Limit the number of commits to output.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.skip",
+        "flags": [
+          "--skip"
+        ],
+        "argument": {
+          "name": "number",
+          "optional": false
+        },
+        "summary": "Skip number commits before starting to show the commit output.",
+        "description": "Skip number commits before starting to show the commit output.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.after",
+        "flags": [
+          "--since",
+          "--after"
+        ],
+        "argument": {
+          "name": "date",
+          "optional": false
+        },
+        "summary": "Show commits more recent than a specific date.",
+        "description": "Show commits more recent than a specific date.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.since-as-filter",
+        "flags": [
+          "--since-as-filter"
+        ],
+        "argument": {
+          "name": "date",
+          "optional": false
+        },
+        "summary": "Show all commits more recent than a specific date.",
+        "description": "Show all commits more recent than a specific date. This visits all commits in the range, rather than stopping at the first commit which is older than a specific date.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.before",
+        "flags": [
+          "--until",
+          "--before"
+        ],
+        "argument": {
+          "name": "date",
+          "optional": false
+        },
+        "summary": "Show commits older than a specific date.",
+        "description": "Show commits older than a specific date.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.committer",
+        "flags": [
+          "--author",
+          "--committer"
+        ],
+        "argument": {
+          "name": "pattern",
+          "optional": false
+        },
+        "summary": "Limit the commits output to ones with author/committer header lines that match the specified pattern (regular expression).",
+        "description": "Limit the commits output to ones with author/committer header lines that match the specified pattern (regular expression). With more than one --author=<pattern>, commits whose author matches any of the given patterns are chosen (similarly for multiple --committer=<pattern>).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.grep-reflog",
+        "flags": [
+          "--grep-reflog"
+        ],
+        "argument": {
+          "name": "pattern",
+          "optional": false
+        },
+        "summary": "Limit the commits output to ones with reflog entries that match the specified pattern (regular expression).",
+        "description": "Limit the commits output to ones with reflog entries that match the specified pattern (regular expression). With more than one --grep-reflog, commits whose reflog message matches any of the given patterns are chosen. It is an error to use this option unless --walk-reflogs is in use.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.grep",
+        "flags": [
+          "--grep"
+        ],
+        "argument": {
+          "name": "pattern",
+          "optional": false
+        },
+        "summary": "Limit the commits output to ones with a log message that matches the specified pattern (regular expression).",
+        "description": "Limit the commits output to ones with a log message that matches the specified pattern (regular expression). With more than one --grep=<pattern>, commits whose message matches any of the given patterns are chosen (but see --all-match).\n\nWhen --notes is in effect, the message from the notes is matched as if it were part of the log message.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.all-match",
+        "flags": [
+          "--all-match"
+        ],
+        "summary": "Limit the commits output to ones that match all given --grep, instead of ones that match at least one.",
+        "description": "Limit the commits output to ones that match all given --grep, instead of ones that match at least one.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.invert-grep",
+        "flags": [
+          "--invert-grep"
+        ],
+        "summary": "Limit the commits output to ones with a log message that do not match the pattern specified with --grep=<pattern>.",
+        "description": "Limit the commits output to ones with a log message that do not match the pattern specified with --grep=<pattern>.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.regexp-ignore-case",
+        "flags": [
+          "-i",
+          "--regexp-ignore-case"
+        ],
+        "summary": "Match the regular expression limiting patterns without regard to letter case.",
+        "description": "Match the regular expression limiting patterns without regard to letter case.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.basic-regexp",
+        "flags": [
+          "--basic-regexp"
+        ],
+        "summary": "Consider the limiting patterns to be basic regular expressions; this is the default.",
+        "description": "Consider the limiting patterns to be basic regular expressions; this is the default.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.extended-regexp",
+        "flags": [
+          "-E",
+          "--extended-regexp"
+        ],
+        "summary": "Consider the limiting patterns to be extended regular expressions instead of the default basic regular expressions.",
+        "description": "Consider the limiting patterns to be extended regular expressions instead of the default basic regular expressions.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.fixed-strings",
+        "flags": [
+          "-F",
+          "--fixed-strings"
+        ],
+        "summary": "Consider the limiting patterns to be fixed strings (don't interpret pattern as a regular expression).",
+        "description": "Consider the limiting patterns to be fixed strings (don't interpret pattern as a regular expression).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.perl-regexp",
+        "flags": [
+          "-P",
+          "--perl-regexp"
+        ],
+        "summary": "Consider the limiting patterns to be Perl-compatible regular expressions.",
+        "description": "Consider the limiting patterns to be Perl-compatible regular expressions.\n\nSupport for these types of regular expressions is an optional compile-time dependency. If Git wasn't compiled with support for them providing this option will cause it to die.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.remove-empty",
+        "flags": [
+          "--remove-empty"
+        ],
+        "summary": "Stop when a given path disappears from the tree.",
+        "description": "Stop when a given path disappears from the tree.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.merges",
+        "flags": [
+          "--merges"
+        ],
+        "summary": "Print only merge commits.",
+        "description": "Print only merge commits. This is exactly the same as --min-parents=2.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-merges",
+        "flags": [
+          "--no-merges"
+        ],
+        "summary": "Do not print commits with more than one parent.",
+        "description": "Do not print commits with more than one parent. This is exactly the same as --max-parents=1.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-max-parents",
+        "flags": [
+          "--min-parents",
+          "--max-parents",
+          "--no-min-parents",
+          "--no-max-parents"
+        ],
+        "argument": {
+          "name": "number",
+          "optional": false
+        },
+        "summary": "Show only commits which have at least (or at most) that many parent commits.",
+        "description": "Show only commits which have at least (or at most) that many parent commits. In particular, --max-parents=1 is the same as --no-merges, --min-parents=2 is the same as --merges. --max-parents=0 gives all root commits and --min-parents=3 all octopus merges.\n\n--no-min-parents and --no-max-parents reset these limits (to no limit) again. Equivalent forms are --min-parents=0 (any commit has 0 or more parents) and --max-parents=-1 (negative numbers denote no upper limit).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.first-parent",
+        "flags": [
+          "--first-parent"
+        ],
+        "summary": "When finding commits to include, follow only the first parent commit upon seeing a merge commit.",
+        "description": "When finding commits to include, follow only the first parent commit upon seeing a merge commit. This option can give a better overview when viewing the evolution of a particular topic branch, because merges into a topic branch tend to be only about adjusting to updated upstream from time to time, and this option allows you to ignore the individual commits brought in to your history by such a merge.\n\nThis option also changes default diff format for merge commits to first-parent, see --diff-merges=first-parent for details.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.exclude-first-parent-only",
+        "flags": [
+          "--exclude-first-parent-only"
+        ],
+        "summary": "When finding commits to exclude (with a ^), follow only the first parent commit upon seeing a merge commit.",
+        "description": "When finding commits to exclude (with a ^), follow only the first parent commit upon seeing a merge commit. This can be used to find the set of changes in a topic branch from the point where it diverged from the remote branch, given that arbitrary merges can be valid topic branch changes.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.not",
+        "flags": [
+          "--not"
+        ],
+        "summary": "Reverses the meaning of the ^ prefix (or lack thereof) for all following revision specifiers, up to the next --not.",
+        "description": "Reverses the meaning of the ^ prefix (or lack thereof) for all following revision specifiers, up to the next --not. When used on the command line before --stdin, the revisions passed through stdin will not be affected by it. Conversely, when passed via standard input, the revisions passed on the command line will not be affected by it.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.all",
+        "flags": [
+          "--all"
+        ],
+        "summary": "Pretend as if all the refs in refs/, along with HEAD, are listed on the command line as <commit>.",
+        "description": "Pretend as if all the refs in refs/, along with HEAD, are listed on the command line as <commit>.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.branches",
+        "flags": [
+          "--branches"
+        ],
+        "argument": {
+          "name": "pattern",
+          "optional": true
+        },
+        "summary": "Pretend as if all the refs in refs/heads are listed on the command line as <commit>.",
+        "description": "Pretend as if all the refs in refs/heads are listed on the command line as <commit>. If <pattern> is given, limit branches to ones matching given shell glob. If pattern lacks ?, *, or [, /* at the end is implied.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.tags",
+        "flags": [
+          "--tags"
+        ],
+        "argument": {
+          "name": "pattern",
+          "optional": true
+        },
+        "summary": "Pretend as if all the refs in refs/tags are listed on the command line as <commit>.",
+        "description": "Pretend as if all the refs in refs/tags are listed on the command line as <commit>. If <pattern> is given, limit tags to ones matching given shell glob. If pattern lacks ?, *, or [, /* at the end is implied.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.remotes",
+        "flags": [
+          "--remotes"
+        ],
+        "argument": {
+          "name": "pattern",
+          "optional": true
+        },
+        "summary": "Pretend as if all the refs in refs/remotes are listed on the command line as <commit>.",
+        "description": "Pretend as if all the refs in refs/remotes are listed on the command line as <commit>. If <pattern> is given, limit remote-tracking branches to ones matching given shell glob. If pattern lacks ?, *, or [, /* at the end is implied.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.glob",
+        "flags": [
+          "--glob"
+        ],
+        "argument": {
+          "name": "glob-pattern",
+          "optional": false
+        },
+        "summary": "Pretend as if all the refs matching shell glob <glob-pattern> are listed on the command line as <commit>.",
+        "description": "Pretend as if all the refs matching shell glob <glob-pattern> are listed on the command line as <commit>. Leading refs/, is automatically prepended if missing. If pattern lacks ?, *, or [, /* at the end is implied.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.exclude",
+        "flags": [
+          "--exclude"
+        ],
+        "argument": {
+          "name": "glob-pattern",
+          "optional": false
+        },
+        "summary": "Do not include refs matching <glob-pattern> that the next --all, --branches, --tags, --remotes, or --glob would otherwise consider.",
+        "description": "Do not include refs matching <glob-pattern> that the next --all, --branches, --tags, --remotes, or --glob would otherwise consider. Repetitions of this option accumulate exclusion patterns up to the next --all, --branches, --tags, --remotes, or --glob option (other options or arguments do not clear accumulated patterns).\n\nThe patterns given should not begin with refs/heads, refs/tags, or refs/remotes when applied to --branches, --tags, or --remotes, respectively, and they must begin with refs/ when applied to --glob or --all. If a trailing /* is intended, it must be given explicitly.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.exclude-hidden",
+        "flags": [
+          "--exclude-hidden"
+        ],
+        "argument": {
+          "name": "fetch|receive|uploadpack",
+          "optional": true
+        },
+        "summary": "Do not include refs that would be hidden by git-fetch, git-receive-pack or git-upload-pack by consulting the appropriate fetch.hideRefs, receive.hideRefs or uploadpack.hideRefs configuration along with transfer.hideRefs (see git-config(1)).",
+        "description": "Do not include refs that would be hidden by git-fetch, git-receive-pack or git-upload-pack by consulting the appropriate fetch.hideRefs, receive.hideRefs or uploadpack.hideRefs configuration along with transfer.hideRefs (see git-config(1)). This option affects the next pseudo-ref option --all or --glob and is cleared after processing them.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.reflog",
+        "flags": [
+          "--reflog"
+        ],
+        "summary": "Pretend as if all objects mentioned by reflogs are listed on the command line as <commit>.",
+        "description": "Pretend as if all objects mentioned by reflogs are listed on the command line as <commit>.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.alternate-refs",
+        "flags": [
+          "--alternate-refs"
+        ],
+        "summary": "Pretend as if all objects mentioned as ref tips of alternate repositories were listed on the command line.",
+        "description": "Pretend as if all objects mentioned as ref tips of alternate repositories were listed on the command line. An alternate repository is any repository whose object directory is specified in objects/info/alternates. The set of included objects may be modified by core.alternateRefsCommand, etc. See git-config(1).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.single-worktree",
+        "flags": [
+          "--single-worktree"
+        ],
+        "summary": "By default, all working trees will be examined by the following options when there are more than one (see git-worktree(1)): --all, --reflog and --indexed-objects.",
+        "description": "By default, all working trees will be examined by the following options when there are more than one (see git-worktree(1)): --all, --reflog and --indexed-objects. This option forces them to examine the current working tree only.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.ignore-missing",
+        "flags": [
+          "--ignore-missing"
+        ],
+        "summary": "Upon seeing an invalid object name in the input, pretend as if the bad input was not given.",
+        "description": "Upon seeing an invalid object name in the input, pretend as if the bad input was not given.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.bisect",
+        "flags": [
+          "--bisect"
+        ],
+        "summary": "Pretend as if the bad bisection ref refs/bisect/bad was listed and as if it was followed by --not and the good bisection refs refs/bisect/good-* on the command line.",
+        "description": "Pretend as if the bad bisection ref refs/bisect/bad was listed and as if it was followed by --not and the good bisection refs refs/bisect/good-* on the command line.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.stdin",
+        "flags": [
+          "--stdin"
+        ],
+        "summary": "In addition to getting arguments from the command line, read them from standard input as well.",
+        "description": "In addition to getting arguments from the command line, read them from standard input as well. This accepts commits and pseudo-options like --all and --glob=. When a -- separator is seen, the following input is treated as paths and used to limit the result. Flags like --not which are read via standard input are only respected for arguments passed in the same way and will not influence any subsequent command line arguments.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.cherry-mark",
+        "flags": [
+          "--cherry-mark"
+        ],
+        "summary": "Like --cherry-pick (see below) but mark equivalent commits with = rather than omitting them, and inequivalent ones with +.",
+        "description": "Like --cherry-pick (see below) but mark equivalent commits with = rather than omitting them, and inequivalent ones with +.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.cherry-pick",
+        "flags": [
+          "--cherry-pick"
+        ],
+        "summary": "Omit any commit that introduces the same change as another commit on the \"other side\" when the set of commits are limited with symmetric difference.",
+        "description": "Omit any commit that introduces the same change as another commit on the \"other side\" when the set of commits are limited with symmetric difference.\n\nFor example, if you have two branches, A and B, a usual way to list all commits on only one side of them is with --left-right (see the example below in the description of the --left-right option). However, it shows the commits that were cherry-picked from the other branch (for example, \"3rd on b\" may be cherry-picked from branch A). With this option, such pairs of commits are excluded from the output.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.right-only",
+        "flags": [
+          "--left-only",
+          "--right-only"
+        ],
+        "summary": "List only commits on the respective side of a symmetric difference, i.e. only those which would be marked < resp. > by --left-right.",
+        "description": "List only commits on the respective side of a symmetric difference, i.e. only those which would be marked < resp. > by --left-right.\n\nFor example, --cherry-pick --right-only A...B omits those commits from B which are in A or are patch-equivalent to a commit in A. In other words, this lists the + commits from git cherry A B. More precisely, --cherry-pick --right-only --no-merges gives the exact list.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.cherry",
+        "flags": [
+          "--cherry"
+        ],
+        "summary": "A synonym for --right-only --cherry-mark --no-merges; useful to limit the output to the commits on our side and mark those that have been applied to the other side of a forked history with git log --cherry upstream...mybranch, similar to git cherry upstream mybranch.",
+        "description": "A synonym for --right-only --cherry-mark --no-merges; useful to limit the output to the commits on our side and mark those that have been applied to the other side of a forked history with git log --cherry upstream...mybranch, similar to git cherry upstream mybranch.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.walk-reflogs",
+        "flags": [
+          "-g",
+          "--walk-reflogs"
+        ],
+        "summary": "Instead of walking the commit ancestry chain, walk reflog entries from the most recent one to older ones.",
+        "description": "Instead of walking the commit ancestry chain, walk reflog entries from the most recent one to older ones. When this option is used you cannot specify commits to exclude (that is, ^commit, commit1..commit2, and commit1...commit2 notations cannot be used).\n\nWith --pretty format other than oneline and reference (for obvious reasons), this causes the output to have two extra lines of information taken from the reflog. The reflog designator in the output may be shown as ref@{Nth} (where Nth is the reverse-chronological index in the reflog) or as ref@{timestamp} (with the timestamp for that entry), depending on a few rules:\n\nh'-04' 1. If the starting point is specified as ref@{Nth}, show the index format.\n\nh'-04' 2. If the starting point was specified as ref@{now}, show the timestamp format.\n\nh'-04' 3. If neither was used, but --date was given on the command line, show the timestamp in the format requested by --date.\n\nh'-04' 4. Otherwise, show the index format.\n\nUnder --pretty=oneline, the commit message is prefixed with this information on the same line. This option cannot be combined with --reverse. See also git-reflog(1).\n\nUnder --pretty=reference, this information will not be shown at all.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.merge",
+        "flags": [
+          "--merge"
+        ],
+        "summary": "After a failed merge, show refs that touch files having a conflict and don't exist on all heads to merge.",
+        "description": "After a failed merge, show refs that touch files having a conflict and don't exist on all heads to merge.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.boundary",
+        "flags": [
+          "--boundary"
+        ],
+        "summary": "Output excluded boundary commits.",
+        "description": "Output excluded boundary commits. Boundary commits are prefixed with -.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.simplify-by-decoration",
+        "flags": [
+          "--simplify-by-decoration"
+        ],
+        "summary": "Commits that are referred by some branch or tag are selected.",
+        "description": "Commits that are referred by some branch or tag are selected.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.show-pulls",
+        "flags": [
+          "--show-pulls"
+        ],
+        "summary": "In addition to the commits shown in the default history, show each merge commit that is not TREESAME to its first parent but is TREESAME to a later parent.",
+        "description": "In addition to the commits shown in the default history, show each merge commit that is not TREESAME to its first parent but is TREESAME to a later parent.\n\nWhen a merge commit is included by --show-pulls, the merge is treated as if it \"pulled\" the change from another branch. When using --show-pulls on this example (and no other options) the resulting graph is:\n\n        I---X---R---N\n\nHere, the merge commits R and N are included because they pulled the commits X and R into the base branch, respectively. These merges are the reason the commits A and B do not appear in the default history.\n\nWhen --show-pulls is paired with --simplify-merges, the graph includes all of the necessary information:\n\n          .-A---M--.   N\n         /     /    \\ /\n        I     B      R\n         \\   /      /\n          \\ /      /\n           `---X--'\n\nNotice that since M is reachable from R, the edge from N to M was simplified away. However, N still appears in the history as an important commit because it \"pulled\" the change R into the main branch.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.full-history",
+        "flags": [
+          "--full-history"
+        ],
+        "summary": "Same as the default mode, but does not prune some history.",
+        "description": "Same as the default mode, but does not prune some history.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.dense",
+        "flags": [
+          "--dense"
+        ],
+        "summary": "Only the selected commits are shown, plus some to have a meaningful history.",
+        "description": "Only the selected commits are shown, plus some to have a meaningful history.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.sparse",
+        "flags": [
+          "--sparse"
+        ],
+        "summary": "All commits that are walked are included.",
+        "description": "All commits that are walked are included.\n\nNote that without --full-history, this still simplifies merges: if one of the parents is TREESAME, we follow only that one, so the other sides of the merge are never walked.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.simplify-merges",
+        "flags": [
+          "--simplify-merges"
+        ],
+        "summary": "First, build a history graph in the same way that --full-history with parent rewriting does (see above).",
+        "description": "First, build a history graph in the same way that --full-history with parent rewriting does (see above).\n\nThen simplify each commit C to its replacement C' in the final history according to the following rules:\n\nh'-04'• Set C' to C.\n\nh'-04'• Replace each parent P of C' with its simplification P'. In the process, drop parents that are ancestors of other parents or that are root commits TREESAME to an empty tree, and remove duplicates, but take care to never drop all parents that we are TREESAME to.\n\nh'-04'• If after this parent rewriting, C' is a root or merge commit (has zero or >1 parents), a boundary commit, or !TREESAME, it remains. Otherwise, it is replaced with its only parent.\n\nThe effect of this is best shown by way of comparing to --full-history with parent rewriting. The example turns into:\n\n          .-A---M---N---O\n         /     /       /\n        I     B       D\n         \\   /       /\n          `---------'\n\nNote the major differences in N, P, and Q over --full-history:\n\nh'-04'• N's parent list had I removed, because it is an ancestor of the other parent M. Still, N remained because it is !TREESAME.\n\nh'-04'• P's parent list similarly had I removed. P was then removed completely, because it had one parent and is TREESAME.\n\nh'-04'• Q's parent list had Y simplified to X. X was then removed, because it was a TREESAME root. Q was then removed completely, because it had one parent and is TREESAME.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.ancestry-path",
+        "flags": [
+          "--ancestry-path"
+        ],
+        "argument": {
+          "name": "commit",
+          "optional": true
+        },
+        "summary": "Limit the displayed commits to those which are an ancestor of <commit>, or which are a descendant of <commit>, or are <commit> itself.",
+        "description": "Limit the displayed commits to those which are an ancestor of <commit>, or which are a descendant of <commit>, or are <commit> itself.\n\nAs an example use case, consider the following commit history:\n\n            D---E-------F\n           /     \\       \\\n          B---C---G---H---I---J\n         /                     \\\n        A-------K---------------L--M\n\nA regular D..M computes the set of commits that are ancestors of M, but excludes the ones that are ancestors of D. This is useful to see what happened to the history leading to M since D, in the sense that \"what does M have that did not exist in D\". The result in this example would be all the commits, except A and B (and D itself, of course).\n\nWhen we want to find out what commits in M are contaminated with the bug introduced by D and need fixing, however, we might want to view only the subset of D..M that are actually descendants of D, i.e. excluding C and K. This is exactly what the --ancestry-path option does. Applied to the D..M range, it results in:\n\n                E-------F\n                 \\       \\\n                  G---H---I---J\n                               \\\n                                L--M\n\nWe can also use --ancestry-path=D instead of --ancestry-path which means the same thing when applied to the D..M range but is just more explicit.\n\nIf we instead are interested in a given topic within this range, and all commits affected by that topic, we may only want to view the subset of D..M which contain that topic in their ancestry path. So, using --ancestry-path=H D..M for example would result in:\n\n                E\n                 \\\n                  G---H---I---J\n                               \\\n                                L--M\n\nWhereas --ancestry-path=K D..M would result in\n\n                K---------------L--M",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.date-order",
+        "flags": [
+          "--date-order"
+        ],
+        "summary": "Show no parents before all of its children are shown, but otherwise show commits in the commit timestamp order.",
+        "description": "Show no parents before all of its children are shown, but otherwise show commits in the commit timestamp order.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.author-date-order",
+        "flags": [
+          "--author-date-order"
+        ],
+        "summary": "Show no parents before all of its children are shown, but otherwise show commits in the author timestamp order.",
+        "description": "Show no parents before all of its children are shown, but otherwise show commits in the author timestamp order.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.topo-order",
+        "flags": [
+          "--topo-order"
+        ],
+        "summary": "Show no parents before all of its children are shown, and avoid showing commits on multiple lines of history intermixed.",
+        "description": "Show no parents before all of its children are shown, and avoid showing commits on multiple lines of history intermixed.\n\nFor example, in a commit history like this:\n\n    ---1----2----4----7\n        \\              \\\n         3----5----6----8---\n\nwhere the numbers denote the order of commit timestamps, git rev-list and friends with --date-order show the commits in the timestamp order: 8 7 6 5 4 3 2 1.\n\nWith --topo-order, they would show 8 6 5 3 7 4 2 1 (or 8 7 4 2 6 5 3 1); some older commits are shown before newer ones in order to avoid showing the commits from two parallel development track mixed together.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.reverse",
+        "flags": [
+          "--reverse"
+        ],
+        "summary": "Output the commits chosen to be shown (see Commit Limiting section above) in reverse order.",
+        "description": "Output the commits chosen to be shown (see Commit Limiting section above) in reverse order. Cannot be combined with --walk-reflogs.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-walk",
+        "flags": [
+          "--no-walk"
+        ],
+        "argument": {
+          "name": "(sorted|unsorted)",
+          "optional": true
+        },
+        "summary": "Only show the given commits, but do not traverse their ancestors.",
+        "description": "Only show the given commits, but do not traverse their ancestors. This has no effect if a range is specified. If the argument unsorted is given, the commits are shown in the order they were given on the command line. Otherwise (if sorted or no argument was given), the commits are shown in reverse chronological order by commit time. Cannot be combined with --graph.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.do-walk",
+        "flags": [
+          "--do-walk"
+        ],
+        "summary": "Overrides a previous --no-walk.",
+        "description": "Overrides a previous --no-walk.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.format",
+        "flags": [
+          "--pretty",
+          "--format"
+        ],
+        "argument": {
+          "name": "format",
+          "optional": true
+        },
+        "summary": "Pretty-print the contents of the commit logs in a given format, where <format> can be one of oneline, short, medium, full, fuller, reference, email, raw, format:<string> and tformat:<string>.",
+        "description": "Pretty-print the contents of the commit logs in a given format, where <format> can be one of oneline, short, medium, full, fuller, reference, email, raw, format:<string> and tformat:<string>. When <format> is none of the above, and has %placeholder in it, it acts as if --pretty=tformat:<format> were given.\n\nSee the \"PRETTY FORMATS\" section for some additional details for each format. When =<format> part is omitted, it defaults to medium.\n\nNote: you can specify the default pretty format in the repository configuration (see git-config(1)).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.abbrev-commit",
+        "flags": [
+          "--abbrev-commit"
+        ],
+        "summary": "Instead of showing the full 40-byte hexadecimal commit object name, show a prefix that names the object uniquely.",
+        "description": "Instead of showing the full 40-byte hexadecimal commit object name, show a prefix that names the object uniquely. \"--abbrev=<n>\" (which also modifies diff output, if it is displayed) option can be used to specify the minimum length of the prefix.\n\nThis should make \"--pretty=oneline\" a whole lot more readable for people using 80-column terminals.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-abbrev-commit",
+        "flags": [
+          "--no-abbrev-commit"
+        ],
+        "summary": "Show the full 40-byte hexadecimal commit object name.",
+        "description": "Show the full 40-byte hexadecimal commit object name. This negates --abbrev-commit, either explicit or implied by other options such as \"--oneline\". It also overrides the log.abbrevCommit variable.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.oneline",
+        "flags": [
+          "--oneline"
+        ],
+        "summary": "This is a shorthand for \"--pretty=oneline --abbrev-commit\" used together.",
+        "description": "This is a shorthand for \"--pretty=oneline --abbrev-commit\" used together.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.encoding",
+        "flags": [
+          "--encoding"
+        ],
+        "argument": {
+          "name": "encoding",
+          "optional": false
+        },
+        "summary": "Commit objects record the character encoding used for the log message in their encoding header; this option can be used to tell the command to re-code the commit log message in the encoding preferred by the user.",
+        "description": "Commit objects record the character encoding used for the log message in their encoding header; this option can be used to tell the command to re-code the commit log message in the encoding preferred by the user. For non plumbing commands this defaults to UTF-8. Note that if an object claims to be encoded in X and we are outputting in X, we will output the object verbatim; this means that invalid sequences in the original commit may be copied to the output. Likewise, if iconv(3) fails to convert the commit, we will quietly output the original object verbatim.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-expand-tabs",
+        "flags": [
+          "--expand-tabs",
+          "--no-expand-tabs"
+        ],
+        "argument": {
+          "name": "n",
+          "optional": false
+        },
+        "summary": "Perform a tab expansion (replace each tab with enough spaces to fill to the next display column that is a multiple of <n>) in the log message before showing it in the output. --expand-tabs is a short-hand for --expand-tabs=8, and --no-expand-tabs is a short-hand for --expand-tabs=0, which disables…",
+        "description": "Perform a tab expansion (replace each tab with enough spaces to fill to the next display column that is a multiple of <n>) in the log message before showing it in the output. --expand-tabs is a short-hand for --expand-tabs=8, and --no-expand-tabs is a short-hand for --expand-tabs=0, which disables tab expansion.\n\nBy default, tabs are expanded in pretty formats that indent the log message by 4 spaces (i.e. medium, which is the default, full, and fuller).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.notes",
+        "flags": [
+          "--notes"
+        ],
+        "argument": {
+          "name": "ref",
+          "optional": true
+        },
+        "summary": "Show the notes (see git-notes(1)) that annotate the commit, when showing the commit log message.",
+        "description": "Show the notes (see git-notes(1)) that annotate the commit, when showing the commit log message. This is the default for git log, git show and git whatchanged commands when there is no --pretty, --format, or --oneline option given on the command line.\n\nBy default, the notes shown are from the notes refs listed in the core.notesRef and notes.displayRef variables (or corresponding environment overrides). See git-config(1) for more details.\n\nWith an optional <ref> argument, use the ref to find the notes to display. The ref can specify the full refname when it begins with refs/notes/; when it begins with notes/, refs/ and otherwise refs/notes/ is prefixed to form the full name of the ref.\n\nMultiple --notes options can be combined to control which notes are being displayed. Examples: \"--notes=foo\" will show only notes from \"refs/notes/foo\"; \"--notes=foo --notes\" will show both notes from \"refs/notes/foo\" and from the default notes ref(s).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-notes",
+        "flags": [
+          "--no-notes"
+        ],
+        "summary": "Do not show notes.",
+        "description": "Do not show notes. This negates the above --notes option, by resetting the list of notes refs from which notes are shown. Options are parsed in the order given on the command line, so e.g. \"--notes --notes=foo --no-notes --notes=bar\" will only show notes from \"refs/notes/bar\".",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.show-notes-by-default",
+        "flags": [
+          "--show-notes-by-default"
+        ],
+        "summary": "Show the default notes unless options for displaying specific notes are given.",
+        "description": "Show the default notes unless options for displaying specific notes are given.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-standard-notes",
+        "flags": [
+          "--show-notes",
+          "--standard-notes",
+          "--no-standard-notes"
+        ],
+        "argument": {
+          "name": "ref",
+          "optional": true
+        },
+        "summary": "These options are deprecated.",
+        "description": "These options are deprecated. Use the above --notes/--no-notes options instead.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.show-signature",
+        "flags": [
+          "--show-signature"
+        ],
+        "summary": "Check the validity of a signed commit object by passing the signature to gpg --verify and show the output.",
+        "description": "Check the validity of a signed commit object by passing the signature to gpg --verify and show the output.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.relative-date",
+        "flags": [
+          "--relative-date"
+        ],
+        "summary": "Synonym for --date=relative.",
+        "description": "Synonym for --date=relative.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.date",
+        "flags": [
+          "--date"
+        ],
+        "argument": {
+          "name": "format",
+          "optional": false
+        },
+        "summary": "Only takes effect for dates shown in human-readable format, such as when using --pretty. log.date config variable sets a default value for the log command's --date option.",
+        "description": "Only takes effect for dates shown in human-readable format, such as when using --pretty. log.date config variable sets a default value for the log command's --date option. By default, dates are shown in the original time zone (either committer's or author's). If -local is appended to the format (e.g., iso-local), the user's local time zone is used instead.\n\n--date=relative shows dates relative to the current time, e.g. \"2 hours ago\". The -local option has no effect for --date=relative.\n\n--date=local is an alias for --date=default-local.\n\n--date=iso (or --date=iso8601) shows timestamps in a ISO 8601-like format. The differences to the strict ISO 8601 format are:\n\nh'-04'• a space instead of the T date/time delimiter\n\nh'-04'• a space between time and time zone\n\nh'-04'• no colon between hours and minutes of the time zone\n\n--date=iso-strict (or --date=iso8601-strict) shows timestamps in strict ISO 8601 format.\n\n--date=rfc (or --date=rfc2822) shows timestamps in RFC 2822 format, often found in email messages.\n\n--date=short shows only the date, but not the time, in YYYY-MM-DD format.\n\n--date=raw shows the date as seconds since the epoch (1970-01-01 00:00:00 UTC), followed by a space, and then the timezone as an offset from UTC (a + or - with four digits; the first two are hours, and the second two are minutes). I.e., as if the timestamp were formatted with strftime(\"%s %z\")). Note that the -local option does not affect the seconds-since-epoch value (which is always measured in UTC), but does switch the accompanying timezone value.\n\n--date=human shows the timezone if the timezone does not match the current time-zone, and doesn't print the whole date if that matches (ie skip printing year for dates that are \"this year\", but also skip the whole date itself if it's in the last few days and we can just say what weekday it was). For older dates the hour and minute is also omitted.\n\n--date=unix shows the date as a Unix epoch timestamp (seconds since 1970). As with --raw, this is always in UTC and therefore -local has no effect.\n\n--date=format:... feeds the format ... to your system strftime, except for %s, %z, and %Z, which are handled internally. Use --date=format:%c to show the date in your system locale's preferred format. See the strftime manual for a complete list of format placeholders. When using -local, the correct syntax is --date=format-local:....\n\n--date=default is the default format, and is based on ctime(3) output. It shows a single line with three-letter day of the week, three-letter month, day-of-month, hour-minute-seconds in \"HH:MM:SS\" format, followed by 4-digit year, plus timezone information, unless the local time zone is used, e.g. Thu Jan 1 00:00:00 1970 +0000.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.parents",
+        "flags": [
+          "--parents"
+        ],
+        "summary": "Print also the parents of the commit (in the form \"commit parent...\").",
+        "description": "Print also the parents of the commit (in the form \"commit parent...\"). Also enables parent rewriting, see History Simplification above.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.children",
+        "flags": [
+          "--children"
+        ],
+        "summary": "Print also the children of the commit (in the form \"commit child...\").",
+        "description": "Print also the children of the commit (in the form \"commit child...\"). Also enables parent rewriting, see History Simplification above.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.left-right",
+        "flags": [
+          "--left-right"
+        ],
+        "summary": "Mark which side of a symmetric difference a commit is reachable from.",
+        "description": "Mark which side of a symmetric difference a commit is reachable from. Commits from the left side are prefixed with < and those from the right with >. If combined with --boundary, those commits are prefixed with -.\n\nFor example, if you have this topology:\n\n             y---b---b  branch B\n            / \\ /\n           /   .\n          /   / \\\n         o---x---a---a  branch A\n\nyou would get an output like this:\n\n        $ git rev-list --left-right --boundary --pretty=oneline A...B\n\n        >bbbbbbb... 3rd on b\n        >bbbbbbb... 2nd on b\n        <aaaaaaa... 3rd on a\n        <aaaaaaa... 2nd on a\n        -yyyyyyy... 1st on b\n        -xxxxxxx... 1st on a",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.graph",
+        "flags": [
+          "--graph"
+        ],
+        "summary": "Draw a text-based graphical representation of the commit history on the left hand side of the output.",
+        "description": "Draw a text-based graphical representation of the commit history on the left hand side of the output. This may cause extra lines to be printed in between commits, in order for the graph history to be drawn properly. Cannot be combined with --no-walk.\n\nThis enables parent rewriting, see History Simplification above.\n\nThis implies the --topo-order option by default, but the --date-order option may also be specified.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.show-linear-break",
+        "flags": [
+          "--show-linear-break"
+        ],
+        "argument": {
+          "name": "barrier",
+          "optional": true
+        },
+        "summary": "When --graph is not used, all history branches are flattened which can make it hard to see that the two consecutive commits do not belong to a linear branch.",
+        "description": "When --graph is not used, all history branches are flattened which can make it hard to see that the two consecutive commits do not belong to a linear branch. This option puts a barrier in between them in that case. If <barrier> is specified, it is the string that will be shown instead of the default one.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.patch",
+        "flags": [
+          "-p",
+          "-u",
+          "--patch"
+        ],
+        "summary": "Generate patch (see the section called \"GENERATING PATCH TEXT WITH -P\").",
+        "description": "Generate patch (see the section called \"GENERATING PATCH TEXT WITH -P\").",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-patch",
+        "flags": [
+          "-s",
+          "--no-patch"
+        ],
+        "summary": "Suppress all output from the diff machinery.",
+        "description": "Suppress all output from the diff machinery. Useful for commands like git show that show the patch by default to squelch their output, or to cancel the effect of options like --patch, --stat earlier on the command line in an alias.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.short-m",
+        "flags": [
+          "-m"
+        ],
+        "summary": "Show diffs for merge commits in the default format.",
+        "description": "Show diffs for merge commits in the default format. This is similar to --diff-merges=on, except -m will produce no output unless -p is given as well.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.short-c",
+        "flags": [
+          "-c"
+        ],
+        "summary": "Produce combined diff output for merge commits.",
+        "description": "Produce combined diff output for merge commits. Shortcut for --diff-merges=combined -p.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.cc",
+        "flags": [
+          "--cc"
+        ],
+        "summary": "Produce dense combined diff output for merge commits.",
+        "description": "Produce dense combined diff output for merge commits. Shortcut for --diff-merges=dense-combined -p.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.dd",
+        "flags": [
+          "--dd"
+        ],
+        "summary": "Produce diff with respect to first parent for both merge and regular commits.",
+        "description": "Produce diff with respect to first parent for both merge and regular commits. Shortcut for --diff-merges=first-parent -p.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.remerge-diff",
+        "flags": [
+          "--remerge-diff"
+        ],
+        "summary": "Produce remerge-diff output for merge commits.",
+        "description": "Produce remerge-diff output for merge commits. Shortcut for --diff-merges=remerge -p.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-diff-merges",
+        "flags": [
+          "--no-diff-merges"
+        ],
+        "summary": "Synonym for --diff-merges=off.",
+        "description": "Synonym for --diff-merges=off.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.diff-merges",
+        "flags": [
+          "--diff-merges"
+        ],
+        "argument": {
+          "name": "format",
+          "optional": false
+        },
+        "summary": "Specify diff format to be used for merge commits.",
+        "description": "Specify diff format to be used for merge commits. Default is off unless --first-parent is in use, in which case first-parent is the default.\n\nThe following formats are supported:\n\noff, none Disable output of diffs for merge commits. Useful to override implied value.\n\non, m Make diff output for merge commits to be shown in the default format. The default format can be changed using log.diffMerges configuration variable, whose default value is separate.\n\nfirst-parent, 1 Show full diff with respect to first parent. This is the same format as --patch produces for non-merge commits.\n\nseparate Show full diff with respect to each of parents. Separate log entry and diff is generated for each parent.\n\ncombined, c Show differences from each of the parents to the merge result simultaneously instead of showing pairwise diff between a parent and the result one at a time. Furthermore, it lists only files which were modified from all parents.\n\ndense-combined, cc Further compress output produced by --diff-merges=combined by omitting uninteresting hunks whose contents in the parents have only two variants and the merge result picks one of them without modification.\n\nremerge, r Remerge two-parent merge commits to create a temporary tree object—potentially containing files with conflict markers and such. A diff is then shown between that temporary tree and the actual merge commit.\n\nThe output emitted when this option is used is subject to change, and so is its interaction with other options (unless explicitly documented).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.combined-all-paths",
+        "flags": [
+          "--combined-all-paths"
+        ],
+        "summary": "This flag causes combined diffs (used for merge commits) to list the name of the file from all parents.",
+        "description": "This flag causes combined diffs (used for merge commits) to list the name of the file from all parents. It thus only has effect when --diff-merges=[dense-]combined is in use, and is likely only useful if filename changes are detected (i.e. when either rename or copy detection have been requested).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.unified",
+        "flags": [
+          "-U",
+          "--unified"
+        ],
+        "argument": {
+          "name": "n",
+          "optional": false
+        },
+        "summary": "Generate diffs with <n> lines of context instead of the usual three.",
+        "description": "Generate diffs with <n> lines of context instead of the usual three. Implies --patch.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.output",
+        "flags": [
+          "--output"
+        ],
+        "argument": {
+          "name": "file",
+          "optional": false
+        },
+        "summary": "Output to a specific file instead of stdout.",
+        "description": "Output to a specific file instead of stdout.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.output-indicator-context",
+        "flags": [
+          "--output-indicator-new",
+          "--output-indicator-old",
+          "--output-indicator-context"
+        ],
+        "argument": {
+          "name": "char",
+          "optional": false
+        },
+        "summary": "Specify the character used to indicate new, old or context lines in the generated patch.",
+        "description": "Specify the character used to indicate new, old or context lines in the generated patch. Normally they are +, - and ' ' respectively.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.raw",
+        "flags": [
+          "--raw"
+        ],
+        "summary": "For each commit, show a summary of changes using the raw diff format.",
+        "description": "For each commit, show a summary of changes using the raw diff format. See the \"RAW OUTPUT FORMAT\" section of git-diff(1). This is different from showing the log itself in raw format, which you can achieve with --format=raw.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.patch-with-raw",
+        "flags": [
+          "--patch-with-raw"
+        ],
+        "summary": "Synonym for -p --raw.",
+        "description": "Synonym for -p --raw.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.short-t",
+        "flags": [
+          "-t"
+        ],
+        "summary": "Show the tree objects in the diff output.",
+        "description": "Show the tree objects in the diff output.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.indent-heuristic",
+        "flags": [
+          "--indent-heuristic"
+        ],
+        "summary": "Enable the heuristic that shifts diff hunk boundaries to make patches easier to read.",
+        "description": "Enable the heuristic that shifts diff hunk boundaries to make patches easier to read. This is the default.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-indent-heuristic",
+        "flags": [
+          "--no-indent-heuristic"
+        ],
+        "summary": "Disable the indent heuristic.",
+        "description": "Disable the indent heuristic.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.minimal",
+        "flags": [
+          "--minimal"
+        ],
+        "summary": "Spend extra time to make sure the smallest possible diff is produced.",
+        "description": "Spend extra time to make sure the smallest possible diff is produced.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.patience",
+        "flags": [
+          "--patience"
+        ],
+        "summary": "Generate a diff using the \"patience diff\" algorithm.",
+        "description": "Generate a diff using the \"patience diff\" algorithm.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.histogram",
+        "flags": [
+          "--histogram"
+        ],
+        "summary": "Generate a diff using the \"histogram diff\" algorithm.",
+        "description": "Generate a diff using the \"histogram diff\" algorithm.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.anchored",
+        "flags": [
+          "--anchored"
+        ],
+        "argument": {
+          "name": "text",
+          "optional": false
+        },
+        "summary": "Generate a diff using the \"anchored diff\" algorithm.",
+        "description": "Generate a diff using the \"anchored diff\" algorithm.\n\nThis option may be specified more than once.\n\nIf a line exists in both the source and destination, exists only once, and starts with this text, this algorithm attempts to prevent it from appearing as a deletion or addition in the output. It uses the \"patience diff\" algorithm internally.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.diff-algorithm",
+        "flags": [
+          "--diff-algorithm"
+        ],
+        "argument": {
+          "name": "{patience|minimal|histogram|myers}",
+          "optional": false
+        },
+        "summary": "Choose a diff algorithm.",
+        "description": "Choose a diff algorithm. The variants are as follows:\n\ndefault, myers The basic greedy diff algorithm. Currently, this is the default.\n\nminimal Spend extra time to make sure the smallest possible diff is produced.\n\npatience Use \"patience diff\" algorithm when generating patches.\n\nhistogram This algorithm extends the patience algorithm to \"support low-occurrence common elements\".\n\nFor instance, if you configured the diff.algorithm variable to a non-default value and want to use the default one, then you have to use --diff-algorithm=default option.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.stat",
+        "flags": [
+          "--stat"
+        ],
+        "argument": {
+          "name": "<width>,<name-width>,<count>",
+          "optional": true
+        },
+        "summary": "Generate a diffstat.",
+        "description": "Generate a diffstat. By default, as much space as necessary will be used for the filename part, and the rest for the graph part. Maximum width defaults to terminal width, or 80 columns if not connected to a terminal, and can be overridden by <width>. The width of the filename part can be limited by giving another width <name-width> after a comma or by setting diff.statNameWidth=<width>. The width of the graph part can be limited by using --stat-graph-width=<width> or by setting diff.statGraphWidth=<width>. Using --stat or --stat-graph-width affects all commands generating a stat graph, while setting diff.statNameWidth or diff.statGraphWidth does not affect git format-patch. By giving a third parameter <count>, you can limit the output to the first <count> lines, followed by ... if there are more.\n\nThese parameters can also be set individually with --stat-width=<width>, --stat-name-width=<name-width> and --stat-count=<count>.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.compact-summary",
+        "flags": [
+          "--compact-summary"
+        ],
+        "summary": "Output a condensed summary of extended header information such as file creations or deletions (\"new\" or \"gone\", optionally \"+l\" if it's a symlink) and mode changes (\"+x\" or \"-x\" for adding or removing executable bit respectively) in diffstat.",
+        "description": "Output a condensed summary of extended header information such as file creations or deletions (\"new\" or \"gone\", optionally \"+l\" if it's a symlink) and mode changes (\"+x\" or \"-x\" for adding or removing executable bit respectively) in diffstat. The information is put between the filename part and the graph part. Implies --stat.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.numstat",
+        "flags": [
+          "--numstat"
+        ],
+        "summary": "Similar to --stat, but shows number of added and deleted lines in decimal notation and pathname without abbreviation, to make it more machine friendly.",
+        "description": "Similar to --stat, but shows number of added and deleted lines in decimal notation and pathname without abbreviation, to make it more machine friendly. For binary files, outputs two - instead of saying 0 0.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.shortstat",
+        "flags": [
+          "--shortstat"
+        ],
+        "summary": "Output only the last line of the --stat format containing total number of modified files, as well as number of added and deleted lines.",
+        "description": "Output only the last line of the --stat format containing total number of modified files, as well as number of added and deleted lines.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.dirstat",
+        "flags": [
+          "-X",
+          "--dirstat"
+        ],
+        "argument": {
+          "name": "param1,param2,...",
+          "optional": true
+        },
+        "summary": "Output the distribution of relative amount of changes for each sub-directory.",
+        "description": "Output the distribution of relative amount of changes for each sub-directory. The behavior of --dirstat can be customized by passing it a comma separated list of parameters. The defaults are controlled by the diff.dirstat configuration variable (see git-config(1)). The following parameters are available:\n\nchanges Compute the dirstat numbers by counting the lines that have been removed from the source, or added to the destination. This ignores the amount of pure code movements within a file. In other words, rearranging lines in a file is not counted as much as other changes. This is the default behavior when no parameter is given.\n\nlines Compute the dirstat numbers by doing the regular line-based diff analysis, and summing the removed/added line counts. (For binary files, count 64-byte chunks instead, since binary files have no natural concept of lines). This is a more expensive --dirstat behavior than the changes behavior, but it does count rearranged lines within a file as much as other changes. The resulting output is consistent with what you get from the other --*stat options.\n\nfiles Compute the dirstat numbers by counting the number of files changed. Each changed file counts equally in the dirstat analysis. This is the computationally cheapest --dirstat behavior, since it does not have to look at the file contents at all.\n\ncumulative Count changes in a child directory for the parent directory as well. Note that when using cumulative, the sum of the percentages reported may exceed 100%. The default (non-cumulative) behavior can be specified with the noncumulative parameter.\n\n<limit> An integer parameter specifies a cut-off percent (3% by default). Directories contributing less than this percentage of the changes are not shown in the output.\n\nExample: The following will count changed files, while ignoring directories with less than 10% of the total amount of changed files, and accumulating child directory counts in the parent directories: --dirstat=files,10,cumulative.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.cumulative",
+        "flags": [
+          "--cumulative"
+        ],
+        "summary": "Synonym for --dirstat=cumulative",
+        "description": "Synonym for --dirstat=cumulative",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.dirstat-by-file",
+        "flags": [
+          "--dirstat-by-file"
+        ],
+        "argument": {
+          "name": "<param1,param2>...",
+          "optional": true
+        },
+        "summary": "Synonym for --dirstat=files,param1,param2...",
+        "description": "Synonym for --dirstat=files,param1,param2...",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.summary",
+        "flags": [
+          "--summary"
+        ],
+        "summary": "Output a condensed summary of extended header information such as creations, renames and mode changes.",
+        "description": "Output a condensed summary of extended header information such as creations, renames and mode changes.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.patch-with-stat",
+        "flags": [
+          "--patch-with-stat"
+        ],
+        "summary": "Synonym for -p --stat.",
+        "description": "Synonym for -p --stat.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.short-z",
+        "flags": [
+          "-z"
+        ],
+        "summary": "Separate the commits with NULs instead of newlines.",
+        "description": "Separate the commits with NULs instead of newlines.\n\nAlso, when --raw or --numstat has been given, do not munge pathnames and use NULs as output field terminators.\n\nWithout this option, pathnames with \"unusual\" characters are quoted as explained for the configuration variable core.quotePath (see git-config(1)).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.name-only",
+        "flags": [
+          "--name-only"
+        ],
+        "summary": "Show only names of changed files.",
+        "description": "Show only names of changed files. The file names are often encoded in UTF-8. For more information see the discussion about encoding in the git-log(1) manual page.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.name-status",
+        "flags": [
+          "--name-status"
+        ],
+        "summary": "Show only names and status of changed files.",
+        "description": "Show only names and status of changed files. See the description of the --diff-filter option on what the status letters mean. Just like --name-only the file names are often encoded in UTF-8.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.submodule",
+        "flags": [
+          "--submodule"
+        ],
+        "argument": {
+          "name": "format",
+          "optional": true
+        },
+        "summary": "Specify how differences in submodules are shown.",
+        "description": "Specify how differences in submodules are shown. When specifying --submodule=short the short format is used. This format just shows the names of the commits at the beginning and end of the range. When --submodule or --submodule=log is specified, the log format is used. This format lists the commits in the range like git-submodule(1) summary does. When --submodule=diff is specified, the diff format is used. This format shows an inline diff of the changes in the submodule contents between the commit range. Defaults to diff.submodule or the short format if the config option is unset.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.color",
+        "flags": [
+          "--color"
+        ],
+        "argument": {
+          "name": "when",
+          "optional": true
+        },
+        "summary": "Show colored diff. --color (i.e. without =<when>) is the same as --color=always. <when> can be one of always, never, or auto.",
+        "description": "Show colored diff. --color (i.e. without =<when>) is the same as --color=always. <when> can be one of always, never, or auto.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-color",
+        "flags": [
+          "--no-color"
+        ],
+        "summary": "Turn off colored diff.",
+        "description": "Turn off colored diff. It is the same as --color=never.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.color-moved",
+        "flags": [
+          "--color-moved"
+        ],
+        "argument": {
+          "name": "mode",
+          "optional": true
+        },
+        "summary": "Moved lines of code are colored differently.",
+        "description": "Moved lines of code are colored differently. The <mode> defaults to no if the option is not given and to zebra if the option with no mode is given. The mode must be one of:\n\nno Moved lines are not highlighted.\n\ndefault Is a synonym for zebra. This may change to a more sensible mode in the future.\n\nplain Any line that is added in one location and was removed in another location will be colored with color.diff.newMoved. Similarly color.diff.oldMoved will be used for removed lines that are added somewhere else in the diff. This mode picks up any moved line, but it is not very useful in a review to determine if a block of code was moved without permutation.\n\nblocks Blocks of moved text of at least 20 alphanumeric characters are detected greedily. The detected blocks are painted using either the color.diff.{old,new}Moved color. Adjacent blocks cannot be told apart.\n\nzebra Blocks of moved text are detected as in blocks mode. The blocks are painted using either the color.diff.{old,new}Moved color or color.diff.{old,new}MovedAlternative. The change between the two colors indicates that a new block was detected.\n\ndimmed-zebra Similar to zebra, but additional dimming of uninteresting parts of moved code is performed. The bordering lines of two adjacent blocks are considered interesting, the rest is uninteresting. dimmed_zebra is a deprecated synonym.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-color-moved",
+        "flags": [
+          "--no-color-moved"
+        ],
+        "summary": "Turn off move detection.",
+        "description": "Turn off move detection. This can be used to override configuration settings. It is the same as --color-moved=no.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.color-moved-ws",
+        "flags": [
+          "--color-moved-ws"
+        ],
+        "argument": {
+          "name": "modes",
+          "optional": false
+        },
+        "summary": "This configures how whitespace is ignored when performing the move detection for --color-moved.",
+        "description": "This configures how whitespace is ignored when performing the move detection for --color-moved. These modes can be given as a comma separated list:\n\nno Do not ignore whitespace when performing move detection.\n\nignore-space-at-eol Ignore changes in whitespace at EOL.\n\nignore-space-change Ignore changes in amount of whitespace. This ignores whitespace at line end, and considers all other sequences of one or more whitespace characters to be equivalent.\n\nignore-all-space Ignore whitespace when comparing lines. This ignores differences even if one line has whitespace where the other line has none.\n\nallow-indentation-change Initially ignore any whitespace in the move detection, then group the moved code blocks only into a block if the change in whitespace is the same per line. This is incompatible with the other modes.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-color-moved-ws",
+        "flags": [
+          "--no-color-moved-ws"
+        ],
+        "summary": "Do not ignore whitespace when performing move detection.",
+        "description": "Do not ignore whitespace when performing move detection. This can be used to override configuration settings. It is the same as --color-moved-ws=no.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.word-diff",
+        "flags": [
+          "--word-diff"
+        ],
+        "argument": {
+          "name": "mode",
+          "optional": true
+        },
+        "summary": "Show a word diff, using the <mode> to delimit changed words.",
+        "description": "Show a word diff, using the <mode> to delimit changed words. By default, words are delimited by whitespace; see --word-diff-regex below. The <mode> defaults to plain, and must be one of:\n\ncolor Highlight changed words using only colors. Implies --color.\n\nplain Show words as [-removed-] and {+added+}. Makes no attempts to escape the delimiters if they appear in the input, so the output may be ambiguous.\n\nporcelain Use a special line-based format intended for script consumption. Added/removed/unchanged runs are printed in the usual unified diff format, starting with a +/-/` ` character at the beginning of the line and extending to the end of the line. Newlines in the input are represented by a tilde ~ on a line of its own.\n\nnone Disable word diff again.\n\nNote that despite the name of the first mode, color is used to highlight the changed parts in all modes if enabled.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.word-diff-regex",
+        "flags": [
+          "--word-diff-regex"
+        ],
+        "argument": {
+          "name": "regex",
+          "optional": false
+        },
+        "summary": "Use <regex> to decide what a word is, instead of considering runs of non-whitespace to be a word.",
+        "description": "Use <regex> to decide what a word is, instead of considering runs of non-whitespace to be a word. Also implies --word-diff unless it was already enabled.\n\nEvery non-overlapping match of the <regex> is considered a word. Anything between these matches is considered whitespace and ignored(!) for the purposes of finding differences. You may want to append |[^[:space:]] to your regular expression to make sure that it matches all non-whitespace characters. A match that contains a newline is silently truncated(!) at the newline.\n\nFor example, --word-diff-regex=. will treat each character as a word and, correspondingly, show differences character by character.\n\nThe regex can also be set via a diff driver or configuration option, see gitattributes(5) or git-config(1). Giving it explicitly overrides any diff driver or configuration setting. Diff drivers override configuration settings.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.color-words",
+        "flags": [
+          "--color-words"
+        ],
+        "argument": {
+          "name": "regex",
+          "optional": true
+        },
+        "summary": "Equivalent to --word-diff=color plus (if a regex was specified) --word-diff-regex=<regex>.",
+        "description": "Equivalent to --word-diff=color plus (if a regex was specified) --word-diff-regex=<regex>.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-renames",
+        "flags": [
+          "--no-renames"
+        ],
+        "summary": "Turn off rename detection, even when the configuration file gives the default to do so.",
+        "description": "Turn off rename detection, even when the configuration file gives the default to do so.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-rename-empty",
+        "flags": [
+          "--rename-empty",
+          "--no-rename-empty"
+        ],
+        "summary": "Whether to use empty blobs as rename source.",
+        "description": "Whether to use empty blobs as rename source.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.check",
+        "flags": [
+          "--check"
+        ],
+        "summary": "Warn if changes introduce conflict markers or whitespace errors.",
+        "description": "Warn if changes introduce conflict markers or whitespace errors. What are considered whitespace errors is controlled by core.whitespace configuration. By default, trailing whitespaces (including lines that consist solely of whitespaces) and a space character that is immediately followed by a tab character inside the initial indent of the line are considered whitespace errors. Exits with non-zero status if problems are found. Not compatible with --exit-code.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.ws-error-highlight",
+        "flags": [
+          "--ws-error-highlight"
+        ],
+        "argument": {
+          "name": "kind",
+          "optional": false
+        },
+        "summary": "Highlight whitespace errors in the context, old or new lines of the diff.",
+        "description": "Highlight whitespace errors in the context, old or new lines of the diff. Multiple values are separated by comma, none resets previous values, default reset the list to new and all is a shorthand for old,new,context. When this option is not given, and the configuration variable diff.wsErrorHighlight is not set, only whitespace errors in new lines are highlighted. The whitespace errors are colored with color.diff.whitespace.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.full-index",
+        "flags": [
+          "--full-index"
+        ],
+        "summary": "Instead of the first handful of characters, show the full pre- and post-image blob object names on the \"index\" line when generating patch format output.",
+        "description": "Instead of the first handful of characters, show the full pre- and post-image blob object names on the \"index\" line when generating patch format output.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.binary",
+        "flags": [
+          "--binary"
+        ],
+        "summary": "In addition to --full-index, output a binary diff that can be applied with git-apply.",
+        "description": "In addition to --full-index, output a binary diff that can be applied with git-apply. Implies --patch.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.abbrev",
+        "flags": [
+          "--abbrev"
+        ],
+        "argument": {
+          "name": "n",
+          "optional": true
+        },
+        "summary": "Instead of showing the full 40-byte hexadecimal object name in diff-raw format output and diff-tree header lines, show the shortest prefix that is at least <n> hexdigits long that uniquely refers the object.",
+        "description": "Instead of showing the full 40-byte hexadecimal object name in diff-raw format output and diff-tree header lines, show the shortest prefix that is at least <n> hexdigits long that uniquely refers the object. In diff-patch output format, --full-index takes higher precedence, i.e. if --full-index is specified, full blob names will be shown regardless of --abbrev. Non default number of digits can be specified with --abbrev=<n>.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.break-rewrites",
+        "flags": [
+          "-B",
+          "--break-rewrites"
+        ],
+        "argument": {
+          "name": "<n>/<m>",
+          "optional": true
+        },
+        "summary": "Break complete rewrite changes into pairs of delete and create.",
+        "description": "Break complete rewrite changes into pairs of delete and create. This serves two purposes:\n\nIt affects the way a change that amounts to a total rewrite of a file not as a series of deletion and insertion mixed together with a very few lines that happen to match textually as the context, but as a single deletion of everything old followed by a single insertion of everything new, and the number m controls this aspect of the -B option (defaults to 60%). -B/70% specifies that less than 30% of the original should remain in the result for Git to consider it a total rewrite (i.e. otherwise the resulting patch will be a series of deletion and insertion mixed together with context lines).\n\nWhen used with -M, a totally-rewritten file is also considered as the source of a rename (usually -M only considers a file that disappeared as the source of a rename), and the number n controls this aspect of the -B option (defaults to 50%). -B20% specifies that a change with addition and deletion compared to 20% or more of the file's size are eligible for being picked up as a possible source of a rename to another file.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.find-renames",
+        "flags": [
+          "-M",
+          "--find-renames"
+        ],
+        "argument": {
+          "name": "n",
+          "optional": true
+        },
+        "summary": "If generating diffs, detect and report renames for each commit.",
+        "description": "If generating diffs, detect and report renames for each commit. For following files across renames while traversing history, see --follow. If n is specified, it is a threshold on the similarity index (i.e. amount of addition/deletions compared to the file's size). For example, -M90% means Git should consider a delete/add pair to be a rename if more than 90% of the file hasn't changed. Without a % sign, the number is to be read as a fraction, with a decimal point before it. I.e., -M5 becomes 0.5, and is thus the same as -M50%. Similarly, -M05 is the same as -M5%. To limit detection to exact renames, use -M100%. The default similarity index is 50%.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.find-copies",
+        "flags": [
+          "-C",
+          "--find-copies"
+        ],
+        "argument": {
+          "name": "n",
+          "optional": true
+        },
+        "summary": "Detect copies as well as renames.",
+        "description": "Detect copies as well as renames. See also --find-copies-harder. If n is specified, it has the same meaning as for -M<n>.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.find-copies-harder",
+        "flags": [
+          "--find-copies-harder"
+        ],
+        "summary": "For performance reasons, by default, -C option finds copies only if the original file of the copy was modified in the same changeset.",
+        "description": "For performance reasons, by default, -C option finds copies only if the original file of the copy was modified in the same changeset. This flag makes the command inspect unmodified files as candidates for the source of copy. This is a very expensive operation for large projects, so use it with caution. Giving more than one -C option has the same effect.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.irreversible-delete",
+        "flags": [
+          "-D",
+          "--irreversible-delete"
+        ],
+        "summary": "Omit the preimage for deletes, i.e. print only the header but not the diff between the preimage and /dev/null.",
+        "description": "Omit the preimage for deletes, i.e. print only the header but not the diff between the preimage and /dev/null. The resulting patch is not meant to be applied with patch or git apply; this is solely for people who want to just concentrate on reviewing the text after the change. In addition, the output obviously lacks enough information to apply such a patch in reverse, even manually, hence the name of the option.\n\nWhen used together with -B, omit also the preimage in the deletion part of a delete/create pair.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.short-l",
+        "flags": [
+          "-l"
+        ],
+        "argument": {
+          "name": "num",
+          "optional": false
+        },
+        "summary": "The -M and -C options involve some preliminary steps that can detect subsets of renames/copies cheaply, followed by an exhaustive fallback portion that compares all remaining unpaired destinations to all relevant sources.",
+        "description": "The -M and -C options involve some preliminary steps that can detect subsets of renames/copies cheaply, followed by an exhaustive fallback portion that compares all remaining unpaired destinations to all relevant sources. (For renames, only remaining unpaired sources are relevant; for copies, all original sources are relevant.) For N sources and destinations, this exhaustive check is O(N^2). This option prevents the exhaustive portion of rename/copy detection from running if the number of source/destination files involved exceeds the specified number. Defaults to diff.renameLimit. Note that a value of 0 is treated as unlimited.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.diff-filter",
+        "flags": [
+          "--diff-filter"
+        ],
+        "argument": {
+          "name": "(A|C|D|M|R|T|U|X|B)...*",
+          "optional": true
+        },
+        "summary": "Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R), have their type (i.e. regular file, symlink, submodule, ...) changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B).",
+        "description": "Select only files that are Added (A), Copied (C), Deleted (D), Modified (M), Renamed (R), have their type (i.e. regular file, symlink, submodule, ...) changed (T), are Unmerged (U), are Unknown (X), or have had their pairing Broken (B). Any combination of the filter characters (including none) can be used. When * (All-or-none) is added to the combination, all paths are selected if there is any file that matches other criteria in the comparison; if there is no file that matches other criteria, nothing is selected.\n\nAlso, these upper-case letters can be downcased to exclude. E.g. --diff-filter=ad excludes added and deleted paths.\n\nNote that not all diffs can feature all types. For instance, copied and renamed entries cannot appear if detection for those types is disabled.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.short-S",
+        "flags": [
+          "-S"
+        ],
+        "argument": {
+          "name": "string",
+          "optional": false
+        },
+        "summary": "Look for differences that change the number of occurrences of the specified string (i.e. addition/deletion) in a file.",
+        "description": "Look for differences that change the number of occurrences of the specified string (i.e. addition/deletion) in a file. Intended for the scripter's use.\n\nIt is useful when you're looking for an exact block of code (like a struct), and want to know the history of that block since it first came into being: use the feature iteratively to feed the interesting block in the preimage back into -S, and keep going until you get the very first version of the block.\n\nBinary files are searched as well.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.short-G",
+        "flags": [
+          "-G"
+        ],
+        "argument": {
+          "name": "regex",
+          "optional": false
+        },
+        "summary": "Look for differences whose patch text contains added/removed lines that match <regex>.",
+        "description": "Look for differences whose patch text contains added/removed lines that match <regex>.\n\nTo illustrate the difference between -S<regex> --pickaxe-regex and -G<regex>, consider a commit with the following diff in the same file:\n\n+    return frotz(nitfol, two->ptr, 1, 0);\n...\n-    hit = frotz(nitfol, mf2.ptr, 1, 0);\n\nWhile git log -G\"frotz\\(nitfol\" will show this commit, git log -S\"frotz\\(nitfol\" --pickaxe-regex will not (because the number of occurrences of that string did not change).\n\nUnless --text is supplied patches of binary files without a textconv filter will be ignored.\n\nSee the pickaxe entry in gitdiffcore(7) for more information.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.find-object",
+        "flags": [
+          "--find-object"
+        ],
+        "argument": {
+          "name": "object-id",
+          "optional": false
+        },
+        "summary": "Look for differences that change the number of occurrences of the specified object.",
+        "description": "Look for differences that change the number of occurrences of the specified object. Similar to -S, just the argument is different in that it doesn't search for a specific string but for a specific object id.\n\nThe object can be a blob or a submodule commit. It implies the -t option in git-log to also find trees.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.pickaxe-all",
+        "flags": [
+          "--pickaxe-all"
+        ],
+        "summary": "When -S or -G finds a change, show all the changes in that changeset, not just the files that contain the change in <string>.",
+        "description": "When -S or -G finds a change, show all the changes in that changeset, not just the files that contain the change in <string>.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.pickaxe-regex",
+        "flags": [
+          "--pickaxe-regex"
+        ],
+        "summary": "Treat the <string> given to -S as an extended POSIX regular expression to match.",
+        "description": "Treat the <string> given to -S as an extended POSIX regular expression to match.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.short-O",
+        "flags": [
+          "-O"
+        ],
+        "argument": {
+          "name": "orderfile",
+          "optional": false
+        },
+        "summary": "Control the order in which files appear in the output.",
+        "description": "Control the order in which files appear in the output. This overrides the diff.orderFile configuration variable (see git-config(1)). To cancel diff.orderFile, use -O/dev/null.\n\nThe output order is determined by the order of glob patterns in <orderfile>. All files with pathnames that match the first pattern are output first, all files with pathnames that match the second pattern (but not the first) are output next, and so on. All files with pathnames that do not match any pattern are output last, as if there was an implicit match-all pattern at the end of the file. If multiple pathnames have the same rank (they match the same pattern but no earlier patterns), their output order relative to each other is the normal order.\n\n<orderfile> is parsed as follows:\n\nh'-04'• Blank lines are ignored, so they can be used as separators for readability.\n\nh'-04'• Lines starting with a hash (\"#\") are ignored, so they can be used for comments. Add a backslash (\"\\\") to the beginning of the pattern if it starts with a hash.\n\nh'-04'• Each other line contains a single pattern.\n\nPatterns have the same syntax and semantics as patterns used for fnmatch(3) without the FNM_PATHNAME flag, except a pathname also matches a pattern if removing any number of the final pathname components matches the pattern. For example, the pattern \"foo*bar\" matches \"fooasdfbar\" and \"foo/bar/baz/asdf\" but not \"foobarx\".",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.rotate-to",
+        "flags": [
+          "--skip-to",
+          "--rotate-to"
+        ],
+        "argument": {
+          "name": "file",
+          "optional": false
+        },
+        "summary": "Discard the files before the named <file> from the output (i.e. skip to), or move them to the end of the output (i.e. rotate to).",
+        "description": "Discard the files before the named <file> from the output (i.e. skip to), or move them to the end of the output (i.e. rotate to). These options were invented primarily for the use of the git difftool command, and may not be very useful otherwise.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.short-R",
+        "flags": [
+          "-R"
+        ],
+        "summary": "Swap two inputs; that is, show differences from index or on-disk file to tree contents.",
+        "description": "Swap two inputs; that is, show differences from index or on-disk file to tree contents.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-relative",
+        "flags": [
+          "--relative",
+          "--no-relative"
+        ],
+        "argument": {
+          "name": "path",
+          "optional": true
+        },
+        "summary": "When run from a subdirectory of the project, it can be told to exclude changes outside the directory and show pathnames relative to it with this option.",
+        "description": "When run from a subdirectory of the project, it can be told to exclude changes outside the directory and show pathnames relative to it with this option. When you are not in a subdirectory (e.g. in a bare repository), you can name which subdirectory to make the output relative to by giving a <path> as an argument. --no-relative can be used to countermand both diff.relative config option and previous --relative.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.text",
+        "flags": [
+          "-a",
+          "--text"
+        ],
+        "summary": "Treat all files as text.",
+        "description": "Treat all files as text.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.ignore-cr-at-eol",
+        "flags": [
+          "--ignore-cr-at-eol"
+        ],
+        "summary": "Ignore carriage-return at the end of line when doing a comparison.",
+        "description": "Ignore carriage-return at the end of line when doing a comparison.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.ignore-space-at-eol",
+        "flags": [
+          "--ignore-space-at-eol"
+        ],
+        "summary": "Ignore changes in whitespace at EOL.",
+        "description": "Ignore changes in whitespace at EOL.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.ignore-space-change",
+        "flags": [
+          "-b",
+          "--ignore-space-change"
+        ],
+        "summary": "Ignore changes in amount of whitespace.",
+        "description": "Ignore changes in amount of whitespace. This ignores whitespace at line end, and considers all other sequences of one or more whitespace characters to be equivalent.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.ignore-all-space",
+        "flags": [
+          "-w",
+          "--ignore-all-space"
+        ],
+        "summary": "Ignore whitespace when comparing lines.",
+        "description": "Ignore whitespace when comparing lines. This ignores differences even if one line has whitespace where the other line has none.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.ignore-blank-lines",
+        "flags": [
+          "--ignore-blank-lines"
+        ],
+        "summary": "Ignore changes whose lines are all blank.",
+        "description": "Ignore changes whose lines are all blank.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.ignore-matching-lines",
+        "flags": [
+          "-I",
+          "--ignore-matching-lines"
+        ],
+        "argument": {
+          "name": "regex",
+          "optional": false
+        },
+        "summary": "Ignore changes whose all lines match <regex>.",
+        "description": "Ignore changes whose all lines match <regex>. This option may be specified more than once.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.inter-hunk-context",
+        "flags": [
+          "--inter-hunk-context"
+        ],
+        "argument": {
+          "name": "lines",
+          "optional": false
+        },
+        "summary": "Show the context between diff hunks, up to the specified number of lines, thereby fusing hunks that are close to each other.",
+        "description": "Show the context between diff hunks, up to the specified number of lines, thereby fusing hunks that are close to each other. Defaults to diff.interHunkContext or 0 if the config option is unset.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.function-context",
+        "flags": [
+          "-W",
+          "--function-context"
+        ],
+        "summary": "Show whole function as context lines for each change.",
+        "description": "Show whole function as context lines for each change. The function names are determined in the same way as git diff works out patch hunk headers (see Defining a custom hunk-header in gitattributes(5)).",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.ext-diff",
+        "flags": [
+          "--ext-diff"
+        ],
+        "summary": "Allow an external diff helper to be executed.",
+        "description": "Allow an external diff helper to be executed. If you set an external diff driver with gitattributes(5), you need to use this option with git-log(1) and friends.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-ext-diff",
+        "flags": [
+          "--no-ext-diff"
+        ],
+        "summary": "Disallow external diff drivers.",
+        "description": "Disallow external diff drivers.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-textconv",
+        "flags": [
+          "--textconv",
+          "--no-textconv"
+        ],
+        "summary": "Allow (or disallow) external text conversion filters to be run when comparing binary files.",
+        "description": "Allow (or disallow) external text conversion filters to be run when comparing binary files. See gitattributes(5) for details. Because textconv filters are typically a one-way conversion, the resulting diff is suitable for human consumption, but cannot be applied. For this reason, textconv filters are enabled by default only for git-diff(1) and git-log(1), but not for git-format-patch(1) or diff plumbing commands.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.ignore-submodules",
+        "flags": [
+          "--ignore-submodules"
+        ],
+        "argument": {
+          "name": "when",
+          "optional": true
+        },
+        "summary": "Ignore changes to submodules in the diff generation. <when> can be either \"none\", \"untracked\", \"dirty\" or \"all\", which is the default.",
+        "description": "Ignore changes to submodules in the diff generation. <when> can be either \"none\", \"untracked\", \"dirty\" or \"all\", which is the default. Using \"none\" will consider the submodule modified when it either contains untracked or modified files or its HEAD differs from the commit recorded in the superproject and can be used to override any settings of the ignore option in git-config(1) or gitmodules(5). When \"untracked\" is used submodules are not considered dirty when they only contain untracked content (but they are still scanned for modified content). Using \"dirty\" ignores all changes to the work tree of submodules, only changes to the commits stored in the superproject are shown (this was the behavior until 1.7.0). Using \"all\" hides all changes to submodules.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.src-prefix",
+        "flags": [
+          "--src-prefix"
+        ],
+        "argument": {
+          "name": "prefix",
+          "optional": false
+        },
+        "summary": "Show the given source prefix instead of \"a/\".",
+        "description": "Show the given source prefix instead of \"a/\".",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.dst-prefix",
+        "flags": [
+          "--dst-prefix"
+        ],
+        "argument": {
+          "name": "prefix",
+          "optional": false
+        },
+        "summary": "Show the given destination prefix instead of \"b/\".",
+        "description": "Show the given destination prefix instead of \"b/\".",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.no-prefix",
+        "flags": [
+          "--no-prefix"
+        ],
+        "summary": "Do not show any source or destination prefix.",
+        "description": "Do not show any source or destination prefix.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.default-prefix",
+        "flags": [
+          "--default-prefix"
+        ],
+        "summary": "Use the default source and destination prefixes (\"a/\" and \"b/\").",
+        "description": "Use the default source and destination prefixes (\"a/\" and \"b/\"). This is usually the default already, but may be used to override config such as diff.noprefix.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.line-prefix",
+        "flags": [
+          "--line-prefix"
+        ],
+        "argument": {
+          "name": "prefix",
+          "optional": false
+        },
+        "summary": "Prepend an additional prefix to every line of output.",
+        "description": "Prepend an additional prefix to every line of output.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      },
+      {
+        "id": "log.ita-invisible-in-index",
+        "flags": [
+          "--ita-invisible-in-index"
+        ],
+        "summary": "By default entries added by \"git add -N\" appear as an existing empty file in \"git diff\" and a new file in \"git diff --cached\".",
+        "description": "By default entries added by \"git add -N\" appear as an existing empty file in \"git diff\" and a new file in \"git diff --cached\". This option makes the entry appear as a new file in \"git diff\" and non-existent in \"git diff --cached\". This option could be reverted with --ita-visible-in-index. Both options are experimental and could be removed in future.",
+        "tier": "common",
+        "examples": [],
+        "tags": [
+          "log"
+        ],
+        "hidden": false,
+        "subcommand": "log"
+      }
+    ]
+  },
+  "warnings": [
+    "git-log: OPTIONS: \"--full-history without parent rewriting\": no flags recognised, skipped",
+    "git-log: OPTIONS: \"--full-history with parent rewriting\": no flags recognised, skipped"
+  ]
+}

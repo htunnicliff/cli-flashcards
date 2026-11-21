@@ -74,6 +74,21 @@ describe('DeckSchema', () => {
     expect(result.error?.issues[0]?.message).toMatch(/"-i" also belongs to options\[0\]/)
   })
 
+  it('allows the same flag in different subcommands', () => {
+    const deck = makeDeck([
+      makeOption(['-n', '--max-count'], { id: 'log.max-count', subcommand: 'log' }),
+      makeOption(['-n', '--no-verify'], { id: 'commit.no-verify', subcommand: 'commit' }),
+    ])
+    expect(DeckSchema.safeParse(deck).success).toBe(true)
+  })
+
+  it('records source pages', () => {
+    const deck = DeckSchema.parse(
+      makeDeck([], { sourcePages: [{ name: 'grep', section: '1', path: 'grep.1' }] }),
+    )
+    expect(deck.sourcePages).toEqual([{ name: 'grep', section: '1', path: 'grep.1' }])
+  })
+
   it('rejects slugs with capitals or spaces', () => {
     expect(DeckSchema.safeParse(makeDeck([], { tool: 'Grep' })).success).toBe(false)
     expect(DeckSchema.safeParse(makeDeck([], { variant: 'g nu' })).success).toBe(false)
