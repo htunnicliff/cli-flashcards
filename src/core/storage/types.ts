@@ -94,6 +94,19 @@ export interface Settings {
   maxReviewsPerDay: number
   /** Local hour at which a new study day starts; 4 means 4 AM. */
   dayRolloverHour: number
+  /** When a backup was last exported (epoch ms). */
+  lastBackupAt: number | null
+  /**
+   * Decks an imported backup used that this device hadn't installed. The deck
+   * library installs them when it can reach the deck files, then clears them.
+   */
+  pendingDeckInstalls: PendingDeckInstall[]
+}
+
+export interface PendingDeckInstall {
+  id: string
+  deckVersion: number
+  includeObscure: boolean
 }
 
 export type SettingKey = keyof Settings
@@ -104,6 +117,8 @@ export const SETTING_DEFAULTS: Settings = {
   newCardsPerDay: 20,
   maxReviewsPerDay: 200,
   dayRolloverHour: 4,
+  lastBackupAt: null,
+  pendingDeckInstalls: [],
 }
 
 export interface SettingRow<K extends SettingKey = SettingKey> {

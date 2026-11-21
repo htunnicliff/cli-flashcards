@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=../../schemas/overrides.schema.json
+#
+# Curation for the ripgrep deck. Applied on top of default.generated.json by
+# `pnpm deck:build`; regenerating the deck keeps these edits.
+
+options:
+  # Deprecated flags: keep them in the deck for reference, but make no cards.
+  auto-hybrid-regex:
+    hidden: true
+    summary: Deprecated; use --engine instead.
+  no-pcre2-unicode:
+    hidden: true
+    summary: Deprecated; use --no-unicode instead.
+  sort-files:
+    hidden: true
+    summary: Deprecated; use --sort=path instead.

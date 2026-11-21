@@ -2,6 +2,7 @@ import { readdir, readFile, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { DeckSchema } from '../src/schema/deck'
+import { DeckManifestSchema } from '../src/schema/manifest'
 
 async function exists(path: string) {
   return stat(path).then(
@@ -19,8 +20,9 @@ async function readJson(path: string): Promise<{ value?: unknown; error?: string
 }
 
 /**
- * Validates every deck file in `dir` against the deck schema, and checks that each
- * `path` listed in `index.json` (when there is one) points at a deck file that exists.
+ * Validates every deck file in `dir` against the deck schema, validates `index.json`
+ * (when there is one) against the manifest schema, and checks that each `file` it
+ * lists exists.
  * Returns one message per problem; an empty list means the decks are fine.
  */
 export async function checkDecks(dir: string): Promise<string[]> {
@@ -45,14 +47,15 @@ export async function checkDecks(dir: string): Promise<string[]> {
     if (error) {
       problems.push(`index.json: invalid JSON (${error})`)
     } else {
-      const decks = (value as { decks?: unknown }).decks
-      if (!Array.isArray(decks)) {
-        problems.push('index.json: expected a "decks" array')
+      const manifest = DeckManifestSchema.safeParse(value)
+      if (!manifest.success) {
+        for (const issue of manifest.error.issues) {
+          problems.push(`index.json: ${issue.path.join('.') || '(root)'}: ${issue.message}`)
+        }
       } else {
-        for (const [i, entry] of decks.entries()) {
-          const path = (entry as { path?: unknown }).path
-          if (typeof path === 'string' && !(await exists(join(dir, path)))) {
-            problems.push(`index.json: decks.${i}.path: ${path} does not exist`)
+        for (const [i, entry] of manifest.data.decks.entries()) {
+          if (!(await exists(join(dir, entry.file)))) {
+            problems.push(`index.json: decks.${i}.file: ${entry.file} does not exist`)
           }
         }
       }

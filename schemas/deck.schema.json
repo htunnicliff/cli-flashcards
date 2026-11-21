@@ -46,6 +46,29 @@
       "type": "string",
       "minLength": 1
     },
+    "sourcePages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "section": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
     "options": {
       "type": "array",
       "items": {
@@ -129,6 +152,10 @@
           "hidden": {
             "default": false,
             "type": "boolean"
+          },
+          "subcommand": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._-]*$"
           }
         },
         "required": [
