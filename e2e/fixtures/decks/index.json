@@ -1,0 +1,12 @@
+{
+  "decks": [
+    {
+      "id": "ripgrep-fixture",
+      "tool": "rg",
+      "variant": "fixture",
+      "deckVersion": 1,
+      "path": "ripgrep-fixture.json",
+      "counts": { "core": 2, "common": 1, "obscure": 1 }
+    }
+  ]
+}

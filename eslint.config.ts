@@ -10,14 +10,20 @@ export default defineConfigWithVueTs(
     files: ['**/*.{ts,mts,tsx,vue}'],
   },
 
-  globalIgnores(['**/dist/**', '**/coverage/**']),
+  globalIgnores([
+    '**/dist/**',
+    '**/dist-e2e/**',
+    '**/coverage/**',
+    'playwright-report/**',
+    'test-results/**',
+  ]),
 
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
 
   {
     name: 'app/node-scripts',
-    files: ['tools/**/*.ts', '*.config.ts'],
+    files: ['tools/**/*.ts', 'e2e/**/*.ts', '*.config.ts'],
     languageOptions: { globals: globals.node },
   },
 

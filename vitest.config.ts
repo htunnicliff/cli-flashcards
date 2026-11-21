@@ -13,7 +13,12 @@ export default mergeConfig(
           test: {
             name: 'unit',
             environment: 'node',
-            include: ['src/core/**/*.test.ts', 'src/schema/**/*.test.ts', 'tools/**/*.test.ts'],
+            include: [
+              'src/core/**/*.test.ts',
+              'src/schema/**/*.test.ts',
+              'tools/**/*.test.ts',
+              'e2e/fixtures/**/*.test.ts',
+            ],
           },
         },
         {

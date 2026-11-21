@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "ripgrep-fixture",
+  "tool": "rg",
+  "variant": "fixture",
+  "toolVersion": "14.1.0",
+  "deckVersion": 1,
+  "source": "manual",
+  "license": "MIT",
+  "attribution": "Hand-written E2E fixture modelled on ripgrep's documentation.",
+  "options": [
+    {
+      "id": "short-i",
+      "flags": ["-i", "--ignore-case"],
+      "summary": "Search case insensitively.",
+      "tier": "core",
+      "examples": [{ "command": "rg -i todo", "description": "Find TODO, todo or Todo" }]
+    },
+    {
+      "id": "short-w",
+      "flags": ["-w", "--word-regexp"],
+      "summary": "Only show matches surrounded by word boundaries.",
+      "tier": "core"
+    },
+    {
+      "id": "short-l",
+      "flags": ["-l", "--files-with-matches"],
+      "summary": "Print only the paths with at least one match.",
+      "tier": "common"
+    },
+    {
+      "id": "long-color",
+      "flags": ["--color"],
+      "argument": { "name": "WHEN" },
+      "summary": "Control when to use colors in the output.",
+      "tier": "obscure"
+    }
+  ]
+}
