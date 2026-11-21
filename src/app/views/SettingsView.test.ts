@@ -1,9 +1,23 @@
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { h } from 'vue'
 
+import { createRepository } from '@/core/storage'
+import { fakeIndexedDB, uniqueDatabaseName } from '@/core/storage/test-utils'
+
+import { repositoryKey } from '../repository'
 import { useAppearanceStore } from '../stores/appearance'
-import SettingsView from './SettingsView.vue'
+import SettingsViewComponent from './SettingsView.vue'
+
+const SettingsView = {
+  render: () => h(SettingsViewComponent),
+}
+
+function mountSettings() {
+  const repository = createRepository({ name: uniqueDatabaseName(), dependencies: fakeIndexedDB })
+  return mount(SettingsView, { global: { provide: { [repositoryKey]: repository } } })
+}
 
 describe('SettingsView', () => {
   beforeEach(() => {
@@ -12,8 +26,8 @@ describe('SettingsView', () => {
   })
 
   it('offers theme, text size and reduce motion choices', () => {
-    const wrapper = mount(SettingsView)
-    const labels = wrapper.findAll('label').map((l) => l.text())
+    const wrapper = mountSettings()
+    const labels = wrapper.findAll('.segment').map((l) => l.text())
     expect(labels).toEqual(['Light', 'Dark', 'System', 'S', 'M', 'L', 'System', 'On', 'Off'])
     expect(wrapper.get<HTMLInputElement>('input[value="system"]').element.checked).toBe(true)
     expect(wrapper.get<HTMLInputElement>('input[value="m"]').element.checked).toBe(true)
@@ -23,7 +37,7 @@ describe('SettingsView', () => {
   })
 
   it('updates the appearance settings', async () => {
-    const wrapper = mount(SettingsView)
+    const wrapper = mountSettings()
     await wrapper.get('input[value="dark"]').setValue(true)
     await wrapper.get('input[value="l"]').setValue(true)
     await wrapper.get('input[value="reduce"]').setValue(true)

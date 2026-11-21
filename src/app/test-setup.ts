@@ -1,3 +1,7 @@
+// happy-dom has no IndexedDB. Components that fall back to the shared
+// repository get an in-memory one instead of failing.
+import 'fake-indexeddb/auto'
+
 // Component tests run with prefers-reduced-motion: reduce, like the E2E tests, so
 // animations can't make results timing-dependent. Tests that check motion itself
 // override this through the appearance store's `motion` setting.

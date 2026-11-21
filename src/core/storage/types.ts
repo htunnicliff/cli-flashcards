@@ -86,12 +86,24 @@ export interface PersistenceRecord {
 export interface Settings {
   /** Set once `navigator.storage.persist()` has been asked. */
   persistence: PersistenceRecord | null
+  /** Probability of recall FSRS aims for when it picks an interval. */
+  desiredRetention: number
+  /** New cards introduced per day, across all decks. */
+  newCardsPerDay: number
+  /** Review (not learning) cards shown per day, across all decks. */
+  maxReviewsPerDay: number
+  /** Local hour at which a new study day starts; 4 means 4 AM. */
+  dayRolloverHour: number
 }
 
 export type SettingKey = keyof Settings
 
 export const SETTING_DEFAULTS: Settings = {
   persistence: null,
+  desiredRetention: 0.9,
+  newCardsPerDay: 20,
+  maxReviewsPerDay: 200,
+  dayRolloverHour: 4,
 }
 
 export interface SettingRow<K extends SettingKey = SettingKey> {

@@ -4,6 +4,7 @@ import { DeckSchema } from '@/schema'
 import { makeDeck, makeOption } from '@/schema/fixtures'
 
 import { activeCardStates, createRepository, type Repository } from './repository'
+import { SETTING_DEFAULTS } from './types'
 import {
   fakeIndexedDB,
   makeCardState,
@@ -191,6 +192,7 @@ describe('settings', () => {
     await repo.settings.set('persistence', { requestedAt: 1, granted: true })
     expect(await repo.settings.get('persistence')).toEqual({ requestedAt: 1, granted: true })
     expect(await repo.settings.getAll()).toEqual({
+      ...SETTING_DEFAULTS,
       persistence: { requestedAt: 1, granted: true },
     })
   })
