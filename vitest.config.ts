@@ -28,6 +28,7 @@ export default mergeConfig(
             name: 'app',
             environment: 'happy-dom',
             include: ['src/app/**/*.test.ts'],
+            setupFiles: ['src/app/test-setup.ts'],
           },
         },
       ],

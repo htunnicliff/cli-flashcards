@@ -18,6 +18,7 @@ describe('appearance', () => {
     localStorage.clear()
     delete document.documentElement.dataset.theme
     delete document.documentElement.dataset.fontSize
+    delete document.documentElement.dataset.motion
     document.head.innerHTML = `
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6F5F2">
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121315">`
@@ -45,12 +46,28 @@ describe('appearance', () => {
     expect(JSON.parse(localStorage.getItem(APPEARANCE_STORAGE_KEY)!)).toEqual({
       theme: 'dark',
       fontSize: 'l',
+      motion: 'system',
     })
 
     store.theme = 'system'
     await nextTick()
     expect(document.documentElement.dataset.theme).toBeUndefined()
     expect(themeColors()).toEqual(['#F6F5F2', '#121315'])
+  })
+
+  it('overrides the reduced motion setting in either direction', async () => {
+    const store = useAppearanceStore()
+    expect(store.motion).toBe('system')
+    expect(document.documentElement.dataset.motion).toBeUndefined()
+
+    store.motion = 'reduce'
+    await nextTick()
+    expect(document.documentElement.dataset.motion).toBe('reduce')
+
+    store.motion = 'full'
+    await nextTick()
+    expect(document.documentElement.dataset.motion).toBe('full')
+    expect(JSON.parse(localStorage.getItem(APPEARANCE_STORAGE_KEY)!).motion).toBe('full')
   })
 
   it('restores saved settings', () => {
@@ -65,7 +82,11 @@ describe('appearance', () => {
     ['wrong values', JSON.stringify({ theme: 'sepia', fontSize: 'xl' })],
     ['null', 'null'],
   ])('falls back to defaults for %s', (_, raw) => {
-    expect(loadAppearance({ getItem: () => raw })).toEqual({ theme: 'system', fontSize: 'm' })
+    expect(loadAppearance({ getItem: () => raw })).toEqual({
+      theme: 'system',
+      fontSize: 'm',
+      motion: 'system',
+    })
   })
 
   describe('pre-paint script in index.html', () => {

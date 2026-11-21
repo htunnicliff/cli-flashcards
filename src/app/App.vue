@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 
+import MotionRoot from './motion/MotionRoot.vue'
 import { useAppearanceStore } from './stores/appearance'
 
 // Instantiated here so the saved theme and text size stay applied on every page.
@@ -15,19 +16,21 @@ const links = [
 </script>
 
 <template>
-  <header class="app-header">
-    <RouterLink to="/" class="wordmark mono" aria-label="--recall, home"
-      ><span class="wordmark-dashes" aria-hidden="true">--</span>recall</RouterLink
-    >
-    <nav aria-label="Main" class="app-nav">
-      <RouterLink v-for="link in links" :key="link.to" :to="link.to" class="nav-link">{{
-        link.label
-      }}</RouterLink>
-    </nav>
-  </header>
-  <main class="app-main">
-    <RouterView />
-  </main>
+  <MotionRoot>
+    <header class="app-header">
+      <RouterLink to="/" class="wordmark mono" aria-label="--recall, home"
+        ><span class="wordmark-dashes" aria-hidden="true">--</span>recall</RouterLink
+      >
+      <nav aria-label="Main" class="app-nav">
+        <RouterLink v-for="link in links" :key="link.to" :to="link.to" class="nav-link">{{
+          link.label
+        }}</RouterLink>
+      </nav>
+    </header>
+    <main class="app-main">
+      <RouterView />
+    </main>
+  </MotionRoot>
 </template>
 
 <style scoped>
