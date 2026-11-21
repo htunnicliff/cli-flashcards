@@ -30,13 +30,13 @@ test('the app loads and navigates offline once it has been visited', async ({
 
 test('the header says when the browser is offline', async ({ page, context }) => {
   await page.goto('/')
-  await expect(page.getByText('Offline')).toBeHidden()
+  await expect(page.getByText('Offline', { exact: true })).toBeHidden()
 
   await context.setOffline(true)
-  await expect(page.getByText('Offline')).toBeVisible()
+  await expect(page.getByText('Offline', { exact: true })).toBeVisible()
 
   await context.setOffline(false)
-  await expect(page.getByText('Offline')).toBeHidden()
+  await expect(page.getByText('Offline', { exact: true })).toBeHidden()
 })
 
 test('the deck list falls back to the cache offline', async ({ page, context, baseURL }) => {
