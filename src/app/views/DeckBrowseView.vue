@@ -25,9 +25,11 @@ const states = shallowRef<CardState[]>([])
 const query = ref('')
 const error = ref<string>()
 const loading = ref(true)
+const flagPairs = ref(false)
 
 onMounted(async () => {
   try {
+    flagPairs.value = await repository.settings.get('flagPairs')
     const stored = await repository.decks.get(props.id)
     if (stored) {
       deck.value = stored.deck
@@ -61,6 +63,8 @@ const CARD_TYPE_LABELS: Record<CardType, string> = {
   'flag-to-meaning': 'Flag → meaning',
   'meaning-to-flag': 'Meaning → flag',
   cloze: 'Fill in the blank',
+  'short-to-long': 'Short → long',
+  'long-to-short': 'Long → short',
 }
 
 interface SetAsideCard {
@@ -90,7 +94,9 @@ async function unsuspend(cardIds: string[]) {
 }
 
 const statuses = computed(() =>
-  deck.value ? optionStatuses(deck.value, states.value) : new Map<string, OptionStatus>(),
+  deck.value
+    ? optionStatuses(deck.value, states.value, { flagPairs: flagPairs.value })
+    : new Map<string, OptionStatus>(),
 )
 
 const visible = computed(() => (deck.value?.options ?? []).filter((option) => !option.hidden))

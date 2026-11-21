@@ -20,13 +20,15 @@ const deck = DeckSchema.parse(
     makeOption(['--line-buffered'], { summary: 'Flush output on every line' }),
   ]),
 )
-const cards = deriveCards(deck)
+const cards = deriveCards(deck, { flagPairs: true })
 const find = (id: string) => cards.find((card) => card.id === `grep:gnu:${id}`)!
 const optionOf = (card: Card) => deck.options.find((o) => o.id === card.optionId)
 
-function render(id: string, revealed = false) {
+function render(id: string, revealed = false, flagPairs = false) {
   const card = find(id)
-  return mount(ReviewCard, { props: { card, option: optionOf(card), tool: 'grep', revealed } })
+  return mount(ReviewCard, {
+    props: { card, option: optionOf(card), tool: 'grep', revealed, flagPairs },
+  })
 }
 
 const texts = (node: { findAll(selector: string): { text(): string }[] }, selector: string) =>
@@ -39,6 +41,31 @@ describe('ReviewCard', () => {
     expect(texts(wrapper, '.front .flag-alias')).toEqual(['--ignore-case'])
     expect(wrapper.text()).not.toContain('Match case-insensitively')
     expect(wrapper.find('[data-testid="back"]').exists()).toBe(false)
+  })
+
+  it('leaves the long form off a flag → meaning front during flag pair practice', () => {
+    const wrapper = render('ignore-case:flag-to-meaning', false, true)
+    expect(texts(wrapper, '.front .flag-primary')).toEqual(['-i'])
+    expect(wrapper.find('.front .flag-alias').exists()).toBe(false)
+    expect(
+      texts(render('ignore-case:flag-to-meaning', true, true), '[data-testid="back-flags"] span'),
+    ).toEqual(['-i', '--ignore-case'])
+  })
+
+  it.each([
+    ['short-to-long', "What's the long form?", '-i', '--ignore-case'],
+    ['long-to-short', "What's the short form?", '--ignore-case', '-i'],
+  ])('shows a %s front with one form only', (type, prompt, shown, hidden) => {
+    const wrapper = render(`ignore-case:${type}`)
+    expect(wrapper.get('.prompt').text()).toBe(prompt)
+    expect(texts(wrapper, '.front .flags span')).toEqual([shown])
+    expect(wrapper.find('[data-testid="back"]').exists()).toBe(false)
+    expect(wrapper.text().replace(shown, '')).not.toContain(hidden)
+    expect(wrapper.text()).not.toContain('Match case-insensitively')
+
+    const back = render(`ignore-case:${type}`, true)
+    expect(texts(back, '[data-testid="back-flags"] span')).toEqual(['-i', '--ignore-case'])
+    expect(back.text()).toContain('Match case-insensitively')
   })
 
   it('shows a meaning → flag front with the summary only', () => {

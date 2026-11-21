@@ -15,6 +15,7 @@ import {
   RATINGS,
   useReviewSession,
   type LeaveHint,
+  frontFlag,
   type ReviewSessionOptions,
 } from '../review/useReviewSession'
 
@@ -40,6 +41,7 @@ const {
   typing,
   answer,
   suggestedRating,
+  flagPairs,
 } = session
 
 // Decks restored from a backup can finish installing while this screen is open.
@@ -340,6 +342,7 @@ const swipeHint = computed(() => {
                 :option="option"
                 :tool="deck?.tool ?? ''"
                 :revealed="revealed"
+                :flag-pairs="flagPairs"
               />
             </div>
           </m.div>
@@ -396,7 +399,7 @@ const swipeHint = computed(() => {
             aria-keyshortcuts="Shift+S"
             @click="session.setAside('suspend', 'option')"
           >
-            Suspend all {{ current.card.flag }} cards <UiKbd>S</UiKbd>
+            Suspend all {{ frontFlag(current.card) }} cards <UiKbd>S</UiKbd>
           </button>
         </div>
       </div>

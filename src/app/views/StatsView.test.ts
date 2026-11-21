@@ -76,6 +76,7 @@ describe('StatsView', () => {
     expect(wrapper.text()).toContain('1 card due in the next 30 days')
     expect(
       wrapper.findAll('tbody tr').map((r) => r.findAll('th, td').map((c) => c.text())),
-    ).toEqual([['grep-gnu', '1', '0', '1', '0']])
+      // The two flag pair cards count as new while flag pair practice is on (the default).
+    ).toEqual([['grep-gnu', '3', '0', '1', '0']])
   })
 })

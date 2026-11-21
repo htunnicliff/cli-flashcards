@@ -1,6 +1,15 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
-import { type Card, answerFlags, cardId, deriveCards, primaryFlag } from './cards'
+import {
+  type Card,
+  type FlagPairCard,
+  answerFlags,
+  cardId,
+  deriveCards,
+  flagPair,
+  isFlagPairCard,
+  primaryFlag,
+} from './cards'
 import { type Deck, DeckSchema, type OptionInput } from './deck'
 import { deriveOptionId } from './flags'
 import { deckArbitrary, makeDeck, makeOption } from './fixtures'
@@ -144,5 +153,45 @@ describe('ID stability (properties)', () => {
         }
       }),
     )
+  })
+})
+
+describe('flag pair cards', () => {
+  const pairs = (deck: Deck) => deriveCards(deck, { flagPairs: true }).filter(isFlagPairCard)
+
+  it('are only derived when asked for', () => {
+    const deck = parse(makeOption(['-i', '--ignore-case']))
+    expect(deriveCards(deck).some(isFlagPairCard)).toBe(false)
+    expect(ids(pairs(deck))).toEqual([
+      'grep:gnu:ignore-case:short-to-long',
+      'grep:gnu:ignore-case:long-to-short',
+    ])
+  })
+
+  it('show one form and expect the other', () => {
+    const [toLong, toShort] = pairs(parse(makeOption(['-i', '-y', '--ignore-case'])))
+    expect(toLong).toMatchObject<Partial<FlagPairCard>>({
+      shown: '-i',
+      targets: ['--ignore-case'],
+    })
+    expect(toShort).toMatchObject<Partial<FlagPairCard>>({
+      shown: '--ignore-case',
+      targets: ['-i', '-y'],
+    })
+  })
+
+  it('lead each form with the primary flag when it has that form', () => {
+    const option = makeOption(['-y', '--colour', '--color'], { primary: '--color' })
+    expect(flagPair(option)).toEqual({ short: ['-y'], long: ['--color', '--colour'] })
+    expect(pairs(parse(option)).map((card) => card.shown)).toEqual(['-y', '--color'])
+  })
+
+  it('need both a short and a long form', () => {
+    const deck = parse(makeOption(['-0']), makeOption(['--oneline']), makeOption(['-name']))
+    expect(pairs(deck)).toEqual([])
+  })
+
+  it('treat a single-dash long flag such as find -newer as the long form', () => {
+    expect(flagPair({ flags: ['-n', '-newer'] })).toEqual({ short: ['-n'], long: ['-newer'] })
   })
 })

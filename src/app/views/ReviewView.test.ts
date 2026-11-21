@@ -227,6 +227,82 @@ describe('ReviewView', () => {
     input.remove()
   })
 
+  describe('flag pair practice', () => {
+    /** Leaves -i's long → short card first: every other -i card is learned already. */
+    async function setUpPair(typeAnswers: boolean) {
+      await repo.decks.install(
+        DeckSchema.parse(
+          makeDeck([makeOption(['-i', '--ignore-case'], { summary: 'Ignore case' })]),
+        ),
+      )
+      await repo.decks.setTypeAnswers('grep-gnu', typeAnswers)
+      const later = Date.now() + 30 * 86_400_000
+      for (const type of ['flag-to-meaning', 'meaning-to-flag', 'short-to-long']) {
+        await repo.cardStates.put(
+          makeCardState(`grep:gnu:ignore-case:${type}`, { fsrs: makeFsrsState({ due: later }) }),
+        )
+      }
+      const w = await mountView()
+      expect(cardId(w)).toBe('grep:gnu:ignore-case:long-to-short')
+      return w
+    }
+
+    it('asks for the short form without showing it, even in the set-aside buttons', async () => {
+      const w = await setUpPair(false)
+      expect(w.get('[data-testid="front-flag"]').text()).toBe('--ignore-case')
+      expect(w.get('.set-aside').text()).toContain('Suspend all --ignore-case cards')
+      expect(w.text().replaceAll('--ignore-case', '')).not.toMatch(/-i\b/)
+      press(' ')
+      await flushPromises()
+      expect(w.get('[data-testid="back-flags"]').text()).toContain('-i')
+    })
+
+    it('marks the flag the card shows as wrong when typed back', async () => {
+      const w = await setUpPair(true)
+      await w.get('#typed-answer').setValue('--ignore-case')
+      await w.get('form.typed').trigger('submit')
+      await flushPromises()
+      expect(w.get('#typed-result').text()).toContain('expected -i')
+    })
+
+    it('accepts the other form when typed', async () => {
+      const w = await setUpPair(true)
+      await w.get('#typed-answer').setValue('-i')
+      await w.get('form.typed').trigger('submit')
+      await flushPromises()
+      expect(w.get('#typed-result').text()).toMatch(/^Correct$/)
+    })
+
+    it('hides the long form on card fronts while on, and shows it again when off', async () => {
+      await repo.decks.install(DeckSchema.parse(makeDeck([makeOption(['-c', '--count'])])))
+      let w = await mountView()
+      expect(cardId(w)).toBe('grep:gnu:count:flag-to-meaning')
+      expect(w.find('.front .flag-alias').exists()).toBe(false)
+      w.unmount()
+
+      await repo.settings.set('flagPairs', false)
+      w = await mountView()
+      expect(w.get('.front .flag-alias').text()).toBe('--count')
+    })
+
+    it('stops asking for flag pairs once turned off', async () => {
+      await repo.settings.set('flagPairs', false)
+      await repo.decks.install(
+        DeckSchema.parse(
+          makeDeck([makeOption(['-i', '--ignore-case'], { summary: 'Ignore case' })]),
+        ),
+      )
+      const later = Date.now() + 30 * 86_400_000
+      for (const type of ['flag-to-meaning', 'meaning-to-flag']) {
+        await repo.cardStates.put(
+          makeCardState(`grep:gnu:ignore-case:${type}`, { fsrs: makeFsrsState({ due: later }) }),
+        )
+      }
+      const w = await mountView()
+      expect(w.find('[data-testid="done"]').exists()).toBe(true)
+    })
+  })
+
   describe('typed answers', () => {
     /** Leaves the -i meaning → flag card first in the queue, with typing on. */
     async function setUpTyping() {
@@ -325,7 +401,9 @@ describe('ReviewView', () => {
         expect((await repo.cardStates.listByDeck('grep-gnu')).map((s) => s.cardId).sort()).toEqual([
           'grep:gnu:ignore-case:cloze',
           'grep:gnu:ignore-case:flag-to-meaning',
+          'grep:gnu:ignore-case:long-to-short',
           'grep:gnu:ignore-case:meaning-to-flag',
+          'grep:gnu:ignore-case:short-to-long',
         ]),
       )
       expect(w.get('[data-testid="notice"]').text()).toContain('every card for -i')

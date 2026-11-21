@@ -108,6 +108,11 @@ export interface Settings {
   /** When a backup was last exported (epoch ms). */
   lastBackupAt: number | null
   /**
+   * Flag pair practice: adds short → long and long → short cards, and keeps
+   * other card fronts from showing both forms of a flag at once.
+   */
+  flagPairs: boolean
+  /**
    * Decks an imported backup used that this device hadn't installed. The deck
    * library installs them when it can reach the deck files, then clears them.
    */
@@ -130,6 +135,7 @@ export const SETTING_DEFAULTS: Settings = {
   dayRolloverHour: 4,
   leechThreshold: 6,
   lastBackupAt: null,
+  flagPairs: true,
   pendingDeckInstalls: [],
 }
 

@@ -1,4 +1,4 @@
-import { deriveCards } from '../../schema'
+import { deriveCards, type DeriveOptions } from '../../schema'
 import { studyDayStart } from '../scheduler/day'
 import type { CardState, ReviewLogEntry, StoredDeck } from '../storage'
 
@@ -62,6 +62,7 @@ export interface DeckCardCounts extends CardCounts {
 export function cardCountsByDeck(
   decks: readonly StoredDeck[],
   states: readonly CardState[],
+  derive: DeriveOptions = {},
 ): DeckCardCounts[] {
   const byId = new Map(states.map((s) => [s.cardId, s]))
   return decks.map((stored) => {
@@ -72,7 +73,7 @@ export function cardCountsByDeck(
       review: 0,
       suspended: 0,
     }
-    for (const card of deriveCards(stored.deck)) {
+    for (const card of deriveCards(stored.deck, derive)) {
       const state = byId.get(card.id)
       if (state?.suspended) counts.suspended++
       else if (!state || state.fsrs.phase === 'new') counts.new++
@@ -133,8 +134,9 @@ export function dueForecast(
   now: number,
   rolloverHour: number,
   days = 30,
+  derive: DeriveOptions = {},
 ): DayCount[] {
-  const live = new Set(decks.flatMap((d) => deriveCards(d.deck).map((c) => c.id)))
+  const live = new Set(decks.flatMap((d) => deriveCards(d.deck, derive).map((c) => c.id)))
   const starts = Array.from({ length: days + 1 }, (_, i) => shiftStudyDay(now, i, rolloverHour))
   const counts = new Array<number>(days).fill(0)
   for (const state of states) {
@@ -181,15 +183,18 @@ export function computeStats(input: {
   log: readonly ReviewLogEntry[]
   now: number
   rolloverHour: number
+  /** Whether flag pair practice is on, so its cards count. */
+  flagPairs?: boolean
 }): Stats {
   const { decks, states, log, now, rolloverHour } = input
+  const derive = { flagPairs: input.flagPairs }
   const byDay = reviewsByDay(log, rolloverHour)
   return {
     reviewsToday: byDay.get(studyDayStart(now, rolloverHour)) ?? 0,
     streak: currentStreak(byDay, now, rolloverHour),
-    cards: cardCountsByDeck(decks, states),
+    cards: cardCountsByDeck(decks, states, derive),
     retention: trueRetention(log, now, rolloverHour),
-    forecast: dueForecast(decks, states, now, rolloverHour),
+    forecast: dueForecast(decks, states, now, rolloverHour, 30, derive),
     history: reviewHistory(byDay, now, rolloverHour),
   }
 }

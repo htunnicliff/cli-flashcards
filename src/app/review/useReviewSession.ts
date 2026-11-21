@@ -15,7 +15,7 @@ import {
   type Rating,
   type StorageManagerLike,
 } from '@/core/storage'
-import { deriveCards, type Deck, type Option } from '@/schema'
+import { deriveCards, isFlagPairCard, type Card, type Deck, type Option } from '@/schema'
 
 import { useRepository } from '../repository'
 
@@ -77,6 +77,8 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
   const loading = ref(true)
   const revealed = ref(false)
   const desiredRetention = ref(0.9)
+  /** Flag pair practice: card fronts show one form of a flag, never both. */
+  const flagPairs = ref(false)
   const gradedThisSession = ref(0)
   /** The rating of the last grade, so the leaving card can drift the right way. */
   const lastRating = ref<Rating>()
@@ -149,12 +151,14 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
 
   /** Reloads the queue, keeping the card on screen in front if it is still due. */
   async function refresh() {
-    const [queue, stored, retention, upcoming] = await Promise.all([
+    const [queue, stored, retention, upcoming, pairs] = await Promise.all([
       scheduler.getQueue(now()),
       repository.decks.list(),
       repository.settings.get('desiredRetention'),
       scheduler.nextDue(now()),
+      repository.settings.get('flagPairs'),
     ])
+    flagPairs.value = pairs
     decks.value = new Map(stored.map((s) => [s.id, s.deck]))
     typedDecks.value = new Set(stored.filter((s) => s.typeAnswers).map((s) => s.id))
     desiredRetention.value = retention
@@ -192,9 +196,10 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     const target = option.value
     if (!item || !target || revealed.value) return
     const options = deck.value?.options ?? [target]
+    const only = isFlagPairCard(item.card) ? item.card.targets : undefined
     answer.value = {
       typed,
-      ...checkAnswer(typed, { option: target, options, style: deck.value?.parsingStyle }),
+      ...checkAnswer(typed, { option: target, options, style: deck.value?.parsingStyle, only }),
     }
     revealed.value = true
   }
@@ -280,7 +285,7 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     const at = now()
     const cardIds =
       scope === 'option'
-        ? deriveCards(decks.value.get(item.card.deckId)!)
+        ? deriveCards(decks.value.get(item.card.deckId)!, { flagPairs: true })
             .filter((card) => card.optionId === item.card.optionId)
             .map((card) => card.id)
         : [item.card.id]
@@ -295,7 +300,7 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
       how === 'bury'
         ? 'Buried until tomorrow.'
         : scope === 'option'
-          ? `Suspended every card for ${item.card.flag}.`
+          ? `Suspended every card for ${frontFlag(item.card)}.`
           : 'Card suspended.'
     showNotice({ message, undoable: true })
     void enqueue(async () => {
@@ -342,6 +347,7 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
     nextLearningDue,
     lastRating,
     leaveHint,
+    flagPairs,
     notice,
     gradedThisSession,
     error,
@@ -362,3 +368,11 @@ export function useReviewSession(options: ReviewSessionOptions = {}) {
 }
 
 export type ReviewSession = ReturnType<typeof useReviewSession>
+
+/**
+ * The flag to name a card by on screen. A flag pair card goes by the form its
+ * front shows, so a label such as "Suspend all -r cards" never gives the answer away.
+ */
+export function frontFlag(card: Card): string {
+  return isFlagPairCard(card) ? card.shown : card.flag
+}
