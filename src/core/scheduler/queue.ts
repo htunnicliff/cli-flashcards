@@ -62,7 +62,7 @@ function countsAs(entry: ReviewLogEntry): 'new' | 'review' | 'learning' {
  * - Sibling burying: once any card of an option has been graded today, or one
  *   is already in the queue, that option's other cards wait until tomorrow.
  *   A card graded today still returns for its own learning steps.
- * - Suspended cards and cards buried past `now` are skipped.
+ * - Suspended cards, cards buried past `now` and paused decks are skipped.
  */
 export function buildQueue({ decks, states, todaysLog, settings, now }: QueueInput): Queue {
   const dayEnd = nextStudyDayStart(now, settings.dayRolloverHour)
@@ -89,6 +89,7 @@ export function buildQueue({ decks, states, todaysLog, settings, now }: QueueInp
   let nextLearningDue: number | undefined
 
   decks.forEach((stored, deckIndex) => {
+    if (stored.paused) return
     const tierByOption = new Map(stored.deck.options.map((o) => [o.id, o.tier]))
     deriveCards(stored.deck).forEach((card, order) => {
       const tier = tierByOption.get(card.optionId) ?? 'common'

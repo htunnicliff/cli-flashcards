@@ -12,6 +12,12 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('../views/DecksView.vue'),
   },
   {
+    path: '/decks/:id',
+    name: 'deck',
+    component: () => import('../views/DeckBrowseView.vue'),
+    props: true,
+  },
+  {
     path: '/stats',
     name: 'stats',
     component: () => import('../views/StatsView.vue'),

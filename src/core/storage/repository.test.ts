@@ -48,18 +48,21 @@ describe('decks', () => {
   it('keeps install time and preferences when a new version is installed', async () => {
     await repo.decks.install(grepV1, 100)
     await repo.decks.setIncludeObscure('grep-gnu', true)
+    await repo.decks.setPaused('grep-gnu', true)
     const updated = await repo.decks.install(grepV2, 200)
     expect(updated).toMatchObject({
       deckVersion: 2,
       installedAt: 100,
       updatedAt: 200,
       includeObscure: true,
+      paused: true,
     })
     expect(updated.deck.options).toHaveLength(1)
   })
 
   it('refuses preferences for a deck that is not installed', async () => {
     await expect(repo.decks.setIncludeObscure('nope', true)).rejects.toThrow(/not installed/)
+    await expect(repo.decks.setPaused('nope', true)).rejects.toThrow(/not installed/)
   })
 
   it('keeps progress when a deck is updated or removed', async () => {

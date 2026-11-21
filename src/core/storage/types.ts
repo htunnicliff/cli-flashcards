@@ -37,6 +37,8 @@ export interface StoredDeck {
   updatedAt: number
   /** Obscure-tier options are left out of new cards unless this is on. */
   includeObscure: boolean
+  /** Paused decks show no cards until resumed. Absent on decks stored before #12. */
+  paused?: boolean
   deck: Deck
 }
 
