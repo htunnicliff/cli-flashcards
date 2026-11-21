@@ -4,6 +4,8 @@ import { RouterLink, RouterView } from 'vue-router'
 
 import { installPendingDecks } from './decks/pending'
 import MotionRoot from './motion/MotionRoot.vue'
+import { useOnboardingStore } from './onboarding/onboarding'
+import OnboardingTour from './onboarding/OnboardingTour.vue'
 import OfflineIndicator from './pwa/OfflineIndicator.vue'
 import { useOnline } from './pwa/online'
 import UpdatePrompt from './pwa/UpdatePrompt.vue'
@@ -21,6 +23,10 @@ function retryPendingDecks() {
   if (online.value) installPendingDecks(repository).catch(() => {})
 }
 onMounted(retryPendingDecks)
+
+// First visit: a short tour of decks, reviewing and offline use (replayable from Settings).
+const onboarding = useOnboardingStore()
+onMounted(() => onboarding.startIfNew(repository))
 watch(online, retryPendingDecks)
 
 const links = [
@@ -50,6 +56,7 @@ const links = [
       <RouterView />
     </main>
     <UpdatePrompt />
+    <OnboardingTour />
   </MotionRoot>
 </template>
 
