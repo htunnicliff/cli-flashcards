@@ -172,4 +172,25 @@ describe('DecksView', () => {
     await vi.waitFor(() => expect(wrapper.find('[role="alert"]').exists()).toBe(true))
     expect(wrapper.get('[role="alert"]').text()).toMatch(/HTTP 500/)
   })
+
+  it('disables install and explains why while offline', async () => {
+    const setOnline = (value: boolean) => {
+      Object.defineProperty(navigator, 'onLine', { configurable: true, get: () => value })
+      window.dispatchEvent(new Event(value ? 'online' : 'offline'))
+    }
+    const wrapper = await mountView([grepDeck()])
+    try {
+      setOnline(false)
+      await flushPromises()
+      expect(button(wrapper, 'grep', 'Install')!.attributes('disabled')).toBeDefined()
+      expect(wrapper.text()).toContain("You're offline")
+
+      setOnline(true)
+      await flushPromises()
+      expect(button(wrapper, 'grep', 'Install')!.attributes('disabled')).toBeUndefined()
+      expect(wrapper.text()).not.toContain("You're offline")
+    } finally {
+      setOnline(true)
+    }
+  })
 })

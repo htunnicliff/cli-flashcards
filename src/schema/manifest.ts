@@ -4,7 +4,7 @@ import { SourceSchema, TIERS, TierSchema, type Deck } from './deck'
 /** Bump when the manifest format changes incompatibly. */
 export const MANIFEST_VERSION = 1
 
-/** One built deck, as listed in `public/decks/index.json`. */
+/** One built deck, as listed in `public/data/decks/index.json`. */
 export const DeckManifestEntrySchema = z.object({
   id: z.string().min(1),
   tool: z.string().min(1),
