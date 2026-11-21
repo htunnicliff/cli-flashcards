@@ -1,0 +1,462 @@
+/*
+ * PROTOTYPE: three Liquid Glass-style looks to choose from. Not for merging as is.
+ *
+ * Try one with ?look=clear | ?look=aurora | ?look=frost (?look=off goes back). The choice
+ * sticks in localStorage (see glass-prototype.ts). Each look sets the same glass variables
+ * and the structural rules at the bottom of this file turn them into surfaces.
+ *
+ * Accessibility: Reduce transparency and Increase contrast both swap the glass for solid
+ * surfaces, and nothing here animates beyond the existing short transitions, which the
+ * reduced-motion rules in base.css already cut.
+ */
+
+/* ---------- Clear: closest to Apple's Liquid Glass. Neutral, bright, capsule controls. --- */
+
+:root[data-look='clear'] {
+  --radius-card: 28px;
+  --radius-button: 999px;
+  --radius-small: 12px;
+
+  --color-bg: #eef0f5;
+  --color-surface: #ffffff;
+  --color-sunken: rgb(118 128 150 / 0.12);
+  --color-border: rgb(30 40 70 / 0.1);
+  --color-text: #15171c;
+  --color-muted: #4b515c;
+  --color-accent: #1d54d4;
+  --color-kbd: rgb(118 128 150 / 0.16);
+
+  --backdrop:
+    radial-gradient(60% 50% at 12% 8%, rgb(120 170 255 / 0.45), transparent 70%),
+    radial-gradient(50% 45% at 92% 18%, rgb(255 170 140 / 0.38), transparent 70%),
+    radial-gradient(60% 55% at 70% 95%, rgb(130 220 190 / 0.35), transparent 70%);
+  --glass-bg: rgb(255 255 255 / 0.56);
+  --glass-bg-chrome: rgb(255 255 255 / 0.62);
+  --glass-solid: #ffffff;
+  --glass-rim: rgb(255 255 255 / 0.85);
+  --glass-edge: rgb(20 30 60 / 0.08);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.95), inset 0 -1px 1px rgb(255 255 255 / 0.4);
+  --glass-shadow: 0 1px 2px rgb(20 30 60 / 0.06), 0 16px 40px rgb(20 30 60 / 0.12);
+  --glass-filter: blur(28px) saturate(180%);
+  --glass-sheen: linear-gradient(
+    160deg,
+    rgb(255 255 255 / 0.55) 0%,
+    rgb(255 255 255 / 0) 38%,
+    rgb(255 255 255 / 0) 70%,
+    rgb(255 255 255 / 0.22) 100%
+  );
+  --glass-primary: linear-gradient(180deg, #2f66e6, #1d54d4 55%, #1a4cc2);
+}
+
+:root[data-look='clear'][data-theme='dark'] {
+  --color-bg: #0a0c11;
+  --color-surface: #1c1f27;
+  --color-sunken: rgb(150 165 200 / 0.12);
+  --color-border: rgb(255 255 255 / 0.1);
+  --color-text: #f3f4f7;
+  --color-muted: #aab0bc;
+  --color-accent: #8eb0ff;
+  --color-on-primary: #0b1430;
+  --color-kbd: rgb(150 165 200 / 0.16);
+
+  --backdrop:
+    radial-gradient(60% 50% at 12% 8%, rgb(50 90 200 / 0.42), transparent 70%),
+    radial-gradient(50% 45% at 92% 20%, rgb(140 70 160 / 0.32), transparent 70%),
+    radial-gradient(60% 55% at 70% 95%, rgb(20 120 120 / 0.32), transparent 70%);
+  --glass-bg: rgb(36 40 52 / 0.5);
+  --glass-bg-chrome: rgb(30 34 44 / 0.58);
+  --glass-solid: #1c1f27;
+  --glass-rim: rgb(255 255 255 / 0.16);
+  --glass-edge: rgb(0 0 0 / 0.4);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.2), inset 0 -1px 1px rgb(255 255 255 / 0.05);
+  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 18px 48px rgb(0 0 0 / 0.45);
+  --glass-sheen: linear-gradient(
+    160deg,
+    rgb(255 255 255 / 0.1) 0%,
+    rgb(255 255 255 / 0) 40%,
+    rgb(255 255 255 / 0) 75%,
+    rgb(255 255 255 / 0.05) 100%
+  );
+  --glass-primary: linear-gradient(180deg, #a3c0ff, #8eb0ff 55%, #84a6f5);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-look='clear']:not([data-theme='light']) {
+    --color-bg: #0a0c11;
+    --color-surface: #1c1f27;
+    --color-sunken: rgb(150 165 200 / 0.12);
+    --color-border: rgb(255 255 255 / 0.1);
+    --color-text: #f3f4f7;
+    --color-muted: #aab0bc;
+    --color-accent: #8eb0ff;
+    --color-on-primary: #0b1430;
+    --color-kbd: rgb(150 165 200 / 0.16);
+
+    --backdrop:
+      radial-gradient(60% 50% at 12% 8%, rgb(50 90 200 / 0.42), transparent 70%),
+      radial-gradient(50% 45% at 92% 20%, rgb(140 70 160 / 0.32), transparent 70%),
+      radial-gradient(60% 55% at 70% 95%, rgb(20 120 120 / 0.32), transparent 70%);
+    --glass-bg: rgb(36 40 52 / 0.5);
+    --glass-bg-chrome: rgb(30 34 44 / 0.58);
+    --glass-solid: #1c1f27;
+    --glass-rim: rgb(255 255 255 / 0.16);
+    --glass-edge: rgb(0 0 0 / 0.4);
+    --glass-highlight:
+      inset 0 1px 0 rgb(255 255 255 / 0.2), inset 0 -1px 1px rgb(255 255 255 / 0.05);
+    --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 18px 48px rgb(0 0 0 / 0.45);
+    --glass-sheen: linear-gradient(
+      160deg,
+      rgb(255 255 255 / 0.1) 0%,
+      rgb(255 255 255 / 0) 40%,
+      rgb(255 255 255 / 0) 75%,
+      rgb(255 255 255 / 0.05) 100%
+    );
+    --glass-primary: linear-gradient(180deg, #a3c0ff, #8eb0ff 55%, #84a6f5);
+  }
+}
+
+/* ---------- Aurora: vivid colour behind tinted glass. The most "wow", the busiest. ------- */
+
+:root[data-look='aurora'] {
+  --radius-card: 26px;
+  --radius-button: 999px;
+  --radius-small: 12px;
+
+  --color-bg: #efe9fb;
+  --color-surface: #ffffff;
+  --color-sunken: rgb(90 60 170 / 0.1);
+  --color-border: rgb(70 40 140 / 0.12);
+  --color-text: #17132a;
+  --color-muted: #423c5c;
+  --color-accent: #5232cc;
+  --color-arg: #92400a;
+  --color-kbd: rgb(90 60 170 / 0.13);
+
+  --backdrop:
+    radial-gradient(55% 45% at 5% 0%, rgb(255 120 190 / 0.55), transparent 70%),
+    radial-gradient(55% 50% at 100% 10%, rgb(110 140 255 / 0.6), transparent 70%),
+    radial-gradient(70% 55% at 50% 100%, rgb(80 220 210 / 0.5), transparent 70%),
+    radial-gradient(40% 35% at 40% 45%, rgb(190 150 255 / 0.35), transparent 70%);
+  --glass-bg: rgb(255 255 255 / 0.5);
+  --glass-bg-chrome: rgb(255 255 255 / 0.55);
+  --glass-solid: #ffffff;
+  --glass-rim: rgb(255 255 255 / 0.8);
+  --glass-edge: rgb(60 30 130 / 0.1);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.95), inset 0 0 0 1px rgb(255 255 255 / 0.25);
+  --glass-shadow: 0 2px 6px rgb(60 30 130 / 0.08), 0 20px 50px rgb(60 30 130 / 0.18);
+  --glass-filter: blur(32px) saturate(200%);
+  --glass-sheen: linear-gradient(
+    135deg,
+    rgb(255 255 255 / 0.6) 0%,
+    rgb(255 255 255 / 0) 35%,
+    rgb(255 210 240 / 0) 65%,
+    rgb(200 220 255 / 0.3) 100%
+  );
+  --glass-primary: linear-gradient(135deg, #6a3ee0, #4d36cf 50%, #2f4fd0);
+}
+
+:root[data-look='aurora'][data-theme='dark'] {
+  --color-bg: #08071a;
+  --color-surface: #1b1838;
+  --color-sunken: rgb(170 150 255 / 0.12);
+  --color-border: rgb(200 180 255 / 0.14);
+  --color-text: #f4f1ff;
+  --color-muted: #b6aed6;
+  --color-accent: #b6a2ff;
+  --color-arg: #ffb276;
+  --color-on-primary: #160c3a;
+  --color-kbd: rgb(170 150 255 / 0.16);
+
+  --backdrop:
+    radial-gradient(55% 45% at 5% 0%, rgb(170 40 150 / 0.45), transparent 70%),
+    radial-gradient(55% 50% at 100% 12%, rgb(60 70 220 / 0.5), transparent 70%),
+    radial-gradient(70% 55% at 50% 100%, rgb(10 150 140 / 0.42), transparent 70%),
+    radial-gradient(40% 35% at 40% 45%, rgb(110 60 220 / 0.3), transparent 70%);
+  --glass-bg: rgb(30 24 66 / 0.48);
+  --glass-bg-chrome: rgb(24 20 56 / 0.55);
+  --glass-solid: #1b1838;
+  --glass-rim: rgb(220 200 255 / 0.2);
+  --glass-edge: rgb(0 0 0 / 0.4);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.22), inset 0 0 0 1px rgb(255 255 255 / 0.04);
+  --glass-shadow: 0 2px 6px rgb(0 0 0 / 0.3), 0 22px 56px rgb(10 0 40 / 0.6);
+  --glass-sheen: linear-gradient(
+    135deg,
+    rgb(255 255 255 / 0.12) 0%,
+    rgb(255 255 255 / 0) 35%,
+    rgb(255 255 255 / 0) 65%,
+    rgb(160 200 255 / 0.08) 100%
+  );
+  --glass-primary: linear-gradient(135deg, #c8b6ff, #b6a2ff 50%, #9fb6ff);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-look='aurora']:not([data-theme='light']) {
+    --color-bg: #08071a;
+    --color-surface: #1b1838;
+    --color-sunken: rgb(170 150 255 / 0.12);
+    --color-border: rgb(200 180 255 / 0.14);
+    --color-text: #f4f1ff;
+    --color-muted: #b6aed6;
+    --color-accent: #b6a2ff;
+    --color-arg: #ffb276;
+    --color-on-primary: #160c3a;
+    --color-kbd: rgb(170 150 255 / 0.16);
+
+    --backdrop:
+      radial-gradient(55% 45% at 5% 0%, rgb(170 40 150 / 0.45), transparent 70%),
+      radial-gradient(55% 50% at 100% 12%, rgb(60 70 220 / 0.5), transparent 70%),
+      radial-gradient(70% 55% at 50% 100%, rgb(10 150 140 / 0.42), transparent 70%),
+      radial-gradient(40% 35% at 40% 45%, rgb(110 60 220 / 0.3), transparent 70%);
+    --glass-bg: rgb(30 24 66 / 0.48);
+    --glass-bg-chrome: rgb(24 20 56 / 0.55);
+    --glass-solid: #1b1838;
+    --glass-rim: rgb(220 200 255 / 0.2);
+    --glass-edge: rgb(0 0 0 / 0.4);
+    --glass-highlight:
+      inset 0 1px 0 rgb(255 255 255 / 0.22), inset 0 0 0 1px rgb(255 255 255 / 0.04);
+    --glass-shadow: 0 2px 6px rgb(0 0 0 / 0.3), 0 22px 56px rgb(10 0 40 / 0.6);
+    --glass-sheen: linear-gradient(
+      135deg,
+      rgb(255 255 255 / 0.12) 0%,
+      rgb(255 255 255 / 0) 35%,
+      rgb(255 255 255 / 0) 65%,
+      rgb(160 200 255 / 0.08) 100%
+    );
+    --glass-primary: linear-gradient(135deg, #c8b6ff, #b6a2ff 50%, #9fb6ff);
+  }
+}
+
+/* ---------- Frost: today's warm palette, glass on the chrome, cards mostly solid. ------- */
+
+:root[data-look='frost'] {
+  --radius-card: 24px;
+  --radius-button: 16px;
+
+  --backdrop:
+    radial-gradient(70% 45% at 0% 0%, rgb(255 215 170 / 0.4), transparent 70%),
+    radial-gradient(60% 45% at 100% 100%, rgb(170 195 255 / 0.35), transparent 70%);
+  --glass-bg: rgb(255 255 255 / 0.82);
+  --glass-bg-chrome: rgb(250 249 246 / 0.66);
+  --glass-solid: #ffffff;
+  --glass-rim: rgb(255 255 255 / 0.9);
+  --glass-edge: rgb(29 28 26 / 0.08);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 1);
+  --glass-shadow: 0 1px 2px rgb(29 28 26 / 0.05), 0 10px 30px rgb(29 28 26 / 0.08);
+  --glass-filter: blur(20px) saturate(140%);
+  --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0) 30%);
+  --glass-primary: linear-gradient(180deg, #3560d4, #2b54c9);
+}
+
+:root[data-look='frost'][data-theme='dark'] {
+  --backdrop:
+    radial-gradient(70% 45% at 0% 0%, rgb(120 80 40 / 0.28), transparent 70%),
+    radial-gradient(60% 45% at 100% 100%, rgb(50 70 140 / 0.3), transparent 70%);
+  --glass-bg: rgb(30 31 35 / 0.82);
+  --glass-bg-chrome: rgb(22 23 26 / 0.66);
+  --glass-solid: #1a1b1e;
+  --glass-rim: rgb(255 255 255 / 0.09);
+  --glass-edge: rgb(0 0 0 / 0.4);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.1);
+  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px rgb(0 0 0 / 0.35);
+  --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0) 30%);
+  --glass-primary: linear-gradient(180deg, #a2bcff, #94b2ff);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-look='frost']:not([data-theme='light']) {
+    --backdrop:
+      radial-gradient(70% 45% at 0% 0%, rgb(120 80 40 / 0.28), transparent 70%),
+      radial-gradient(60% 45% at 100% 100%, rgb(50 70 140 / 0.3), transparent 70%);
+    --glass-bg: rgb(30 31 35 / 0.82);
+    --glass-bg-chrome: rgb(22 23 26 / 0.66);
+    --glass-solid: #1a1b1e;
+    --glass-rim: rgb(255 255 255 / 0.09);
+    --glass-edge: rgb(0 0 0 / 0.4);
+    --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.1);
+    --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px rgb(0 0 0 / 0.35);
+    --glass-sheen: linear-gradient(180deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0) 30%);
+    --glass-primary: linear-gradient(180deg, #a2bcff, #94b2ff);
+  }
+}
+
+/* ---------- Structure shared by all three looks --------------------------------------- */
+
+/* The colour field the glass refracts. Fixed, so it shifts under content as you scroll. */
+:root[data-look] body {
+  background: var(--color-bg);
+}
+
+:root[data-look] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--backdrop);
+  pointer-events: none;
+}
+
+/* Every raised surface: translucent fill, blur, a bright rim and a soft sheen on top. */
+:root[data-look] .card,
+:root[data-look] .review-card,
+:root[data-look] .deck,
+:root[data-look] .help,
+:root[data-look] .snackbar,
+:root[data-look] .swipe-hint {
+  border: var(--border-width) solid var(--glass-rim);
+  background: var(--glass-sheen), var(--glass-bg);
+  box-shadow:
+    var(--glass-highlight),
+    0 0 0 var(--border-width) var(--glass-edge),
+    var(--glass-shadow);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+/* Header: a glass bar that content scrolls under. */
+:root[data-look] .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border-bottom: var(--border-width) solid var(--glass-edge);
+  background: var(--glass-bg-chrome);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+/* Navigation: a capsule of tabs, with the current one as a lens of brighter glass. */
+:root[data-look] .app-nav {
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--color-sunken);
+}
+
+:root[data-look] .nav-link {
+  border-radius: var(--radius-pill);
+}
+
+:root[data-look] .nav-link.router-link-exact-active {
+  background: var(--glass-sheen), var(--glass-solid);
+  box-shadow:
+    var(--glass-highlight),
+    0 0 0 var(--border-width) var(--glass-edge),
+    0 2px 8px rgb(0 0 0 / 0.1);
+}
+
+/* Phone: the tab bar floats above the content as its own pane of glass. */
+@media (max-width: 600px) {
+  :root[data-look] .app-header {
+    border-bottom-color: transparent;
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    position: static;
+  }
+
+  :root[data-look] .app-nav {
+    inset: auto var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+    padding: 5px;
+    border: var(--border-width) solid var(--glass-rim);
+    border-radius: var(--radius-pill);
+    background: var(--glass-sheen), var(--glass-bg-chrome);
+    box-shadow:
+      var(--glass-highlight),
+      0 0 0 var(--border-width) var(--glass-edge),
+      var(--glass-shadow);
+    -webkit-backdrop-filter: var(--glass-filter);
+    backdrop-filter: var(--glass-filter);
+  }
+
+  :root[data-look] .nav-link {
+    min-height: 44px;
+  }
+
+  :root[data-look] .app-main {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Buttons: neutral ones are small panes of glass; the primary one is tinted glass. */
+:root[data-look] .button {
+  border-color: var(--glass-rim);
+  background: var(--glass-sheen), var(--glass-bg);
+  box-shadow:
+    var(--glass-highlight),
+    0 0 0 var(--border-width) var(--glass-edge),
+    0 2px 8px rgb(0 0 0 / 0.06);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+:root[data-look] .button--primary {
+  border-color: rgb(255 255 255 / 0.25);
+  background: var(--glass-primary);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    inset 0 -1px 0 rgb(0 0 0 / 0.12),
+    0 6px 18px color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+:root[data-look] .button--again {
+  border-color: var(--color-again-border);
+  background: var(--glass-sheen), var(--color-again-tint);
+}
+
+/* Segmented controls follow the tab capsule. */
+:root[data-look] .segmented {
+  border-radius: var(--radius-pill);
+}
+
+:root[data-look] .segment span {
+  border-radius: var(--radius-pill);
+}
+
+:root[data-look] .segment input:checked + span {
+  background: var(--glass-solid);
+  box-shadow:
+    var(--glass-highlight),
+    0 0 0 var(--border-width) var(--glass-edge),
+    0 1px 4px rgb(0 0 0 / 0.1);
+}
+
+:root[data-look] .command-line--block {
+  border: var(--border-width) solid var(--color-border);
+}
+
+/* Frost keeps glass to the chrome and the tab bar; cards stay calm and readable. */
+:root[data-look='frost'] .review-card,
+:root[data-look='frost'] .deck {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+/* ---------- Accessibility fallbacks ------------------------------------------------- */
+
+/*
+ * Reduce transparency or Increase contrast: the same shapes, solid fills, no blur, no
+ * colour field. Browsers without backdrop-filter get solid fills too.
+ */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  :root[data-look] {
+    --glass-bg: var(--glass-solid);
+    --glass-bg-chrome: var(--glass-solid);
+    --glass-sheen: linear-gradient(transparent, transparent);
+    --glass-filter: none;
+    --backdrop: none;
+  }
+
+  :root[data-look] .card,
+  :root[data-look] .review-card,
+  :root[data-look] .deck,
+  :root[data-look] .help,
+  :root[data-look] .snackbar,
+  :root[data-look] .button:not(.button--primary, .button--again) {
+    border-color: var(--color-border);
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root[data-look] {
+    --glass-bg: var(--glass-solid);
+    --glass-bg-chrome: var(--glass-solid);
+  }
+}
