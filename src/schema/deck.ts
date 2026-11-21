@@ -61,6 +61,11 @@ export const OptionSchema = z
     tags: z.array(z.string().min(1)).default([]),
     /** Hidden options stay in the deck but produce no cards. */
     hidden: z.boolean().default(false),
+    /**
+     * For tools with subcommands (`git log`, `git commit`), the subcommand the
+     * option belongs to. Flags only need to be unique within a subcommand.
+     */
+    subcommand: Slug.optional(),
   })
   .superRefine((option, ctx) => {
     if (!isShortFirst(option.flags)) {
@@ -84,6 +89,16 @@ export const OptionSchema = z
 export type Option = z.infer<typeof OptionSchema>
 export type OptionInput = z.input<typeof OptionSchema>
 
+export const SourcePageSchema = z.object({
+  /** Manpage name, e.g. `rg` or `git-log`. */
+  name: z.string().min(1),
+  /** Manual section, e.g. `1`. */
+  section: z.string().min(1).optional(),
+  /** File the page was read from, as given to the generator. */
+  path: z.string().min(1).optional(),
+})
+export type SourcePage = z.infer<typeof SourcePageSchema>
+
 export const DeckSchema = z
   .object({
     /** Lets deck files point at `schemas/deck.schema.json` for editor support. */
@@ -101,6 +116,8 @@ export const DeckSchema = z
     /** License of the source text, ideally an SPDX identifier. */
     license: z.string().min(1),
     attribution: z.string().min(1),
+    /** The manpages (or `--help` output) the deck was generated from. */
+    sourcePages: z.array(SourcePageSchema).optional(),
     options: z.array(OptionSchema),
   })
   .superRefine((deck, ctx) => {
@@ -118,7 +135,8 @@ export const DeckSchema = z
         ids.set(option.id, index)
       }
       for (const flag of option.flags) {
-        const sameFlag = flags.get(flag)
+        const key = `${option.subcommand ?? ''} ${flag}`
+        const sameFlag = flags.get(key)
         if (sameFlag !== undefined && sameFlag !== index) {
           ctx.addIssue({
             code: 'custom',
@@ -126,7 +144,7 @@ export const DeckSchema = z
             message: `Flag "${flag}" also belongs to options[${sameFlag}]`,
           })
         } else {
-          flags.set(flag, index)
+          flags.set(key, index)
         }
       }
     })

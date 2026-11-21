@@ -1,0 +1,230 @@
+{
+  "deck": {
+    "schemaVersion": 1,
+    "id": "sed-gnu",
+    "tool": "sed",
+    "variant": "gnu",
+    "toolVersion": "fixture",
+    "deckVersion": 1,
+    "source": "manpage",
+    "license": "NOASSERTION",
+    "attribution": "Generated from the sed(1) manual page.",
+    "sourcePages": [
+      {
+        "name": "sed",
+        "section": "1",
+        "path": "sed.gnu.1"
+      }
+    ],
+    "options": [
+      {
+        "id": "silent",
+        "flags": [
+          "-n",
+          "--quiet",
+          "--silent"
+        ],
+        "summary": "Suppress automatic printing of pattern space",
+        "description": "suppress automatic printing of pattern space",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "debug",
+        "flags": [
+          "--debug"
+        ],
+        "summary": "Annotate program execution",
+        "description": "annotate program execution",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "expression",
+        "flags": [
+          "-e",
+          "--expression"
+        ],
+        "argument": {
+          "name": "script",
+          "optional": false
+        },
+        "summary": "Add the script to the commands to be executed",
+        "description": "add the script to the commands to be executed",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "file",
+        "flags": [
+          "-f",
+          "--file"
+        ],
+        "argument": {
+          "name": "script-file",
+          "optional": false
+        },
+        "summary": "Add the contents of script-file to the commands to be executed",
+        "description": "add the contents of script-file to the commands to be executed",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "follow-symlinks",
+        "flags": [
+          "--follow-symlinks"
+        ],
+        "summary": "Follow symlinks when processing in place",
+        "description": "follow symlinks when processing in place",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "in-place",
+        "flags": [
+          "-i",
+          "--in-place"
+        ],
+        "argument": {
+          "name": "SUFFIX",
+          "optional": true
+        },
+        "summary": "Edit files in place (makes backup if SUFFIX supplied)",
+        "description": "edit files in place (makes backup if SUFFIX supplied)",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "line-length",
+        "flags": [
+          "-l",
+          "--line-length"
+        ],
+        "argument": {
+          "name": "N",
+          "optional": false
+        },
+        "summary": "Specify the desired line-wrap length for the `l' command",
+        "description": "specify the desired line-wrap length for the `l' command",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "posix",
+        "flags": [
+          "--posix"
+        ],
+        "summary": "Disable all GNU extensions.",
+        "description": "disable all GNU extensions.",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "regexp-extended",
+        "flags": [
+          "-E",
+          "-r",
+          "--regexp-extended"
+        ],
+        "summary": "Use extended regular expressions in the script (for portability use POSIX -E).",
+        "description": "use extended regular expressions in the script (for portability use POSIX -E).",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "separate",
+        "flags": [
+          "-s",
+          "--separate"
+        ],
+        "summary": "Consider files as separate rather than as a single, continuous long stream.",
+        "description": "consider files as separate rather than as a single, continuous long stream.",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "sandbox",
+        "flags": [
+          "--sandbox"
+        ],
+        "summary": "Operate in sandbox mode (disable e/r/w commands).",
+        "description": "operate in sandbox mode (disable e/r/w commands).",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "unbuffered",
+        "flags": [
+          "-u",
+          "--unbuffered"
+        ],
+        "summary": "Load minimal amounts of data from the input files and flush the output buffers more often",
+        "description": "load minimal amounts of data from the input files and flush the output buffers more often",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "null-data",
+        "flags": [
+          "-z",
+          "--null-data"
+        ],
+        "summary": "Separate lines by NUL characters",
+        "description": "separate lines by NUL characters",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "help",
+        "flags": [
+          "--help"
+        ],
+        "summary": "Display this help and exit",
+        "description": "display this help and exit",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      },
+      {
+        "id": "version",
+        "flags": [
+          "--version"
+        ],
+        "summary": "Output version information and exit",
+        "description": "output version information and exit",
+        "tier": "common",
+        "examples": [],
+        "tags": [],
+        "hidden": false
+      }
+    ]
+  },
+  "warnings": []
+}
