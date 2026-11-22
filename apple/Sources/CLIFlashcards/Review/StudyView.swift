@@ -30,6 +30,9 @@ struct StudyView: View {
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .toolbar { toolbar }
+        #if os(iOS)
+        .toolbar(.hidden, for: .tabBar)
+        #endif
         .background(groupedBackground.ignoresSafeArea())
     }
 
@@ -88,7 +91,7 @@ struct StudyView: View {
 
     func controlBar(_ item: QueueItem) -> some View {
         controls(item)
-            .frame(maxWidth: contentWidth)
+            .frame(maxWidth: studyWidth)
             .padding(.horizontal, Space.s4)
             .padding(.vertical, Space.s3)
             .frame(maxWidth: .infinity)
@@ -117,7 +120,7 @@ struct StudyView: View {
                     Text(error).font(.footnote).foregroundStyle(.red)
                 }
             }
-            .frame(maxWidth: contentWidth)
+            .frame(maxWidth: studyWidth)
             .padding(Space.s4)
             .frame(maxWidth: .infinity)
         }
@@ -300,9 +303,20 @@ struct DoneView: View {
                     ?? "Nothing else is scheduled. Turn on more decks in Decks for more to learn.",
                 systemImage: "checkmark.circle"
             )
+            .task(id: session.nextLearningDue) {
+                // Bring a learning step back as soon as it comes due.
+                guard let due = session.nextLearningDue else { return }
+                let wait = max(0, due - session.model.now)
+                try? await Task.sleep(nanoseconds: UInt64(wait) * 1_000_000)
+                if !Task.isCancelled { session.refresh() }
+            }
         }
     }
 }
+
+/// The study column: narrower than a page, so the card and buttons don't
+/// stretch across a wide Mac or iPad window.
+let studyWidth: CGFloat = 600
 
 /// The bar behind the pinned controls: the system bar material where there is
 /// one, otherwise the grouped background.

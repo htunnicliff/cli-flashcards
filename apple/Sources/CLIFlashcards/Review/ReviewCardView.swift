@@ -48,27 +48,30 @@ struct ReviewCardView: View {
             flags([card.shown ?? card.flag], front: true)
         case .meaningToFlag:
             toolLine
-            Text(card.summary).font(.title3.weight(.semibold))
+            inlineMarkdown(card.summary).font(.title3.weight(.semibold))
         case .cloze:
             CommandLineView(highlight(card.cloze ?? ""), large: true)
             if let description = card.exampleDescription {
-                Text(description).font(.subheadline).foregroundStyle(.secondary)
+                inlineMarkdown(description).font(.subheadline).foregroundStyle(.secondary)
             }
         }
     }
 
     @ViewBuilder var back: some View {
         flags(card.answers)
-        Text(card.summary).font(.body)
+        // The front of a meaning card already shows the summary.
+        if card.type != .meaningToFlag {
+            inlineMarkdown(card.summary).font(.body)
+        }
         if let example = example {
             CommandLineView(highlight(example.command))
             if let description = example.description, card.type != .cloze {
-                Text(description).font(.subheadline).foregroundStyle(.secondary)
+                inlineMarkdown(description).font(.subheadline).foregroundStyle(.secondary)
             }
         }
         if !card.detail.isEmpty && card.detail != card.summary {
             DisclosureGroup("Full Description", isExpanded: $showDetail) {
-                Text(card.detail)
+                inlineMarkdown(card.detail)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     #if !os(Android)
@@ -82,7 +85,7 @@ struct ReviewCardView: View {
     }
 
     var toolLine: some View {
-        Text(command).font(.mono(.body)).foregroundStyle(.secondary)
+        Text(command).font(.system(.title3, design: .monospaced).weight(.medium)).foregroundStyle(.secondary)
     }
 
     var argument: String? {
@@ -215,6 +218,21 @@ struct ResultLine: View {
             }
         }
         return styledText(runs)
-            .font(.subheadline)
+            .font(.system(.body, design: .monospaced))
     }
+}
+
+
+/// Deck text with its inline Markdown, such as `code`, rendered. Android shows
+/// the text with the backticks taken out.
+func inlineMarkdown(_ text: String) -> Text {
+    #if os(Android)
+    return Text(text.replacingOccurrences(of: "`", with: ""))
+    #else
+    let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)
+    if let attributed = try? AttributedString(markdown: text, options: options) {
+        return Text(attributed)
+    }
+    return Text(text)
+    #endif
 }

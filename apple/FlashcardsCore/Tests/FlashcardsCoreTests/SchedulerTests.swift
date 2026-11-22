@@ -41,6 +41,19 @@ import Testing
         #expect(later.today.newDone == 1)
     }
 
+    @Test func learningStepsDueLaterTodayAreCounted() throws {
+        let id = "rg:default:ignore-case:flag-to-meaning"
+        _ = try scheduler.grade(id, .good, now: noon)
+
+        let soon = scheduler.queue(now: noon + minute)
+        #expect(!soon.items.map(\.card.id).contains(id))
+        #expect(soon.learningLater == 1)
+        #expect(soon.nextLearningDue != nil)
+
+        let due = scheduler.queue(now: noon + 11 * minute)
+        #expect(due.learningLater == 0)
+    }
+
     @Test func dailyNewCardLimitCountsGradesFromToday() throws {
         try scheduler.repository.updateSettings { $0.newCardsPerDay = 1 }
         #expect(scheduler.queue(now: noon).items.count == 1)

@@ -24,6 +24,8 @@ public struct StudyQueue: Hashable, Sendable {
     public var today: QueueToday
     /// When the next learning-step card comes due later today, if one does.
     public var nextLearningDue: Millis?
+    /// Learning-step cards that come due later today, not yet in `items`.
+    public var learningLater: Int = 0
 }
 
 private func optionKey(_ deckId: String, _ optionId: String) -> String { "\(deckId)\u{0}\(optionId)" }
@@ -76,6 +78,7 @@ public func buildQueue(
     var reviews: [QueueItem] = []
     var fresh: [(item: QueueItem, tier: Int, deck: Int, order: Int)] = []
     var nextLearningDue: Millis?
+    var learningLater = 0
 
     for (deckIndex, stored) in decks.enumerated() where !stored.paused {
         var tierByOption: [String: Tier] = [:]
@@ -95,6 +98,7 @@ public func buildQueue(
                     learning.append(QueueItem(kind: .learning, card: card, state: state))
                 } else if due < dayEnd {
                     nextLearningDue = min(nextLearningDue ?? due, due)
+                    learningLater += 1
                 }
             case .review:
                 if state!.fsrs.due < dayEnd {
@@ -136,6 +140,7 @@ public func buildQueue(
     return StudyQueue(
         items: learning + dueReviews + newCards,
         today: QueueToday(reviewsDone: reviewsDone, reviewsLeft: reviewsLeft, newDone: newDone, newLeft: newLeft),
-        nextLearningDue: nextLearningDue
+        nextLearningDue: nextLearningDue,
+        learningLater: learningLater
     )
 }

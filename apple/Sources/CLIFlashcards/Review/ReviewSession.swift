@@ -55,6 +55,9 @@ func frontFlag(_ card: Card) -> String { card.isFlagPair ? (card.shown ?? card.f
     private(set) var gradedThisSession = 0
     private(set) var notice: ReviewNotice?
     private(set) var nextDue: Millis?
+    /// When the next learning step comes due later today, if one does.
+    private(set) var nextLearningDue: Millis?
+    private(set) var learningLater = 0
     private(set) var error: String?
     private var history: [History] = []
     private var shownAt: Millis = 0
@@ -71,7 +74,9 @@ func frontFlag(_ card: Card) -> String { card.isFlagPair ? (card.shown ?? card.f
     var hasDecks: Bool { !decks.isEmpty }
 
     var counts: (new: Int, learning: Int, review: Int) {
-        var n = 0, l = 0, r = 0
+        // Cards in a learning step count as Learning straight away, even
+        // before the step comes due.
+        var n = 0, l = learningLater, r = 0
         for item in items {
             switch item.kind {
             case .new: n += 1
@@ -129,6 +134,8 @@ func frontFlag(_ card: Card) -> String { card.isFlagPair ? (card.shown ?? card.f
         decks = Dictionary(uniqueKeysWithValues: stored.map { ($0.id, $0.deck) })
         typedDecks = Set(stored.filter(\.typeAnswers).map(\.id))
         nextDue = scheduler.nextDue(now: now)
+        nextLearningDue = queue.nextLearningDue
+        learningLater = queue.learningLater
         var next = queue.items
         if let onScreen = items.first, let index = next.firstIndex(where: { $0.card.id == onScreen.card.id }) {
             let fresh = next.remove(at: index)

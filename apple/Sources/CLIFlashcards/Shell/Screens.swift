@@ -78,6 +78,9 @@ struct ReviewSummary: View {
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, Space.s1)
             }
+            #if os(macOS)
+            .frame(maxWidth: 360)
+            #endif
             .buttonStyle(.borderedProminent)
             #if !os(Android)
             .controlSize(.large)
