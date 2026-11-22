@@ -37,7 +37,7 @@ struct RootView: View {
     }
 }
 
-private struct Sections: View {
+struct Sections: View {
     let model: AppModel
 
     var body: some View {
@@ -61,7 +61,7 @@ private struct Sections: View {
 }
 
 /// One section: its own navigation stack over the backdrop.
-private struct Page<Content: View>: View {
+struct Page<Content: View>: View {
     var section: AppSection
     @ViewBuilder var content: () -> Content
 
