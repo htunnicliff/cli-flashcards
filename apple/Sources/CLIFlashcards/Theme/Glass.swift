@@ -40,9 +40,20 @@ struct GlassPane: ViewModifier {
         let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
         content
             .padding(padding ?? 0)
-            .background { fill(shape) }
+            .background {
+                ZStack {
+                    // The shadow sits on its own layer under the pane. Shadowing
+                    // the whole pane renders it offscreen, and on macOS a
+                    // material inside that layer could come out blank on first
+                    // draw, hiding the pane's content.
+                    if shadow {
+                        shape.fill(frost.card)
+                            .shadow(color: frost.shadow, radius: 15, x: 0, y: 10)
+                    }
+                    fill(shape)
+                }
+            }
             .overlay { shape.stroke(frost.rim, lineWidth: 1) }
-            .shadow(color: shadow ? frost.shadow : .clear, radius: shadow ? 15 : 0, x: 0, y: shadow ? 10 : 0)
     }
 
     @ViewBuilder private func fill(_ shape: RoundedRectangle) -> some View {

@@ -110,6 +110,7 @@ struct SettingsScreen: View {
                         hint: "Solid surfaces instead of frosted glass."
                     )
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .glass()
             }
             if let error = model.saveError {
