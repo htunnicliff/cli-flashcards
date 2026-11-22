@@ -168,6 +168,41 @@ enum AppSection: String, CaseIterable, Hashable, Identifiable {
         }
     }
 
+    // MARK: Backup
+
+    /// Writes a backup to a temporary file, ready to save or share, and
+    /// records the export.
+    func exportBackupFile() throws -> URL {
+        guard let repository else { throw StorageError("Storage isn’t open yet") }
+        let backup = try exportBackup(repository, now: now)
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(backupFileName(now: now))
+        try backup.encode().write(to: url, options: .atomic)
+        settings = repository.settings()
+        return url
+    }
+
+    /// Loads a backup, adds back any decks it used, and says what changed.
+    func importBackup(_ backup: Backup, mode: ImportMode) -> String? {
+        guard let repository else { return nil }
+        do {
+            let result = try FlashcardsCore.importBackup(repository, backup, mode: mode)
+            try sync(repository)
+            settings = repository.settings()
+            refresh()
+            let verb = mode == .merge ? "Merged" : "Restored"
+            return "\(verb) \(result.addedReviews) review\(result.addedReviews == 1 ? "" : "s")."
+        } catch {
+            logger.error("Import failed: \(error)")
+            saveError = "Couldn’t import the backup: \(error)"
+            return nil
+        }
+    }
+
+    /// Clears every deck's progress. Settings and decks stay.
+    func resetAllProgress() {
+        change("reset progress") { try $0.resetProgress() }
+    }
+
     /// Application Support/CLI Flashcards, created if needed. Kept across app
     /// updates.
     static func storageDirectory() throws -> URL {
