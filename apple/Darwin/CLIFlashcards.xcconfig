@@ -15,8 +15,8 @@ INFOPLIST_FILE = Info.plist
 GENERATE_INFOPLIST_FILE = YES
 
 // The user-visible name of the app (localizable)
-//INFOPLIST_KEY_CFBundleDisplayName = App Name
-//INFOPLIST_KEY_LSApplicationCategoryType = public.app-category.utilities
+INFOPLIST_KEY_CFBundleDisplayName = CLI Flashcards
+INFOPLIST_KEY_LSApplicationCategoryType = public.app-category.education
 
 // iOS-specific Info.plist property keys
 INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphone*] = YES

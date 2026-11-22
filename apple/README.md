@@ -1,50 +1,64 @@
-# CLIFlashcards
+# CLI Flashcards (Skip)
 
-This is a [Skip](https://skip.dev) dual-platform app project.
+The native app for iPhone, iPad, Mac and Android, written in Swift and SwiftUI
+with [Skip](https://skip.dev) (Skip Fuse, native mode). It replaces the Flutter
+app in `../app/` and the Vue web app. The plan is in issue #70.
 
-<!-- TODO: add iOS screenshots to fastlane metadata
-## iPhone Screenshots
+## Layout
 
-<img alt="iPhone Screenshot" src="Darwin/fastlane/screenshots/en-US/1_en-US.png" style="width: 18%" /> <img alt="iPhone Screenshot" src="Darwin/fastlane/screenshots/en-US/2_en-US.png" style="width: 18%" /> <img alt="iPhone Screenshot" src="Darwin/fastlane/screenshots/en-US/3_en-US.png" style="width: 18%" /> <img alt="iPhone Screenshot" src="Darwin/fastlane/screenshots/en-US/4_en-US.png" style="width: 18%" /> <img alt="iPhone Screenshot" src="Darwin/fastlane/screenshots/en-US/5_en-US.png" style="width: 18%" />
--->
+```
+Package.swift          The app package (Skip), app ID dev.seafarer.cliflashcards
+Skip.env               Name, bundle ID and version, shared by Xcode and Gradle
+Sources/CLIFlashcards/ SwiftUI app, shared by every platform
+FlashcardsCore/        Plain Swift package: deck schema, cards, FSRS, typed answers
+  Tests/Fixtures/      Parity fixtures written by `pnpm dart:golden`; don't edit by hand
+Darwin/                Xcode project for iOS, iPadOS and macOS (native, not Catalyst)
+Android/               Gradle project for Android
+```
 
-<!-- TODO: add Android screenshots to fastlane metadata
-## Android Screenshots
+`FlashcardsCore` has no UI and no Skip dependency, so its tests run anywhere
+Swift does, Linux included:
 
-<img alt="Android Screenshot" src="Android/fastlane/metadata/android/en-US/images/phoneScreenshots/1_en-US.png" style="width: 18%" /> <img alt="Android Screenshot" src="Android/fastlane/metadata/android/en-US/images/phoneScreenshots/2_en-US.png" style="width: 18%" /> <img alt="Android Screenshot" src="Android/fastlane/metadata/android/en-US/images/phoneScreenshots/3_en-US.png" style="width: 18%" /> <img alt="Android Screenshot" src="Android/fastlane/metadata/android/en-US/images/phoneScreenshots/4_en-US.png" style="width: 18%" /> <img alt="Android Screenshot" src="Android/fastlane/metadata/android/en-US/images/phoneScreenshots/5_en-US.png" style="width: 18%" />
--->
+```sh
+cd apple/FlashcardsCore
+swift test
+```
 
-## Building
+Its parity tests check scheduling, card IDs and typed answers against the
+TypeScript code, so progress and backups move between the apps unchanged.
 
-This project is both a stand-alone Swift Package Manager module,
-as well as an Xcode project that builds and translates the project
-into a Kotlin Gradle project for Android using the skipstone plugin.
+## Setup
 
-## Running
+You need a Mac with Xcode, plus Android Studio for the Android build.
 
-Xcode and Android Studio must be downloaded and installed in order to
-run the app in the iOS simulator / Android emulator.
-An Android emulator must already be running, which can be launched from
-Android Studio's Device Manager.
+```sh
+brew install skiptools/skip/skip
+skip checkup
+open apple/Project.xcworkspace
+```
 
-The project can be opened and run in Xcode from
-`Project.xcworkspace`, which also enabled parallel
-development of any Skip libary dependencies.
+Run the **CLIFlashcards App** scheme on an iPhone or iPad simulator, or on
+**My Mac**. With an Android emulator running, the same build also launches the
+Android app. Set `SKIP_ACTION = none` in `Darwin/CLIFlashcards.xcconfig` to
+skip the Android build while you work on Apple platforms.
 
-To run both the Swift and Kotlin apps simultaneously,
-launch the "CLIFlashcards App" target from Xcode.
-A build phases runs the "Launch Android APK" script that
-will deploy the Skip app to a running Android emulator or connected device.
-Logging output for the iOS app can be viewed in the Xcode console, and in
-Android Studio's logcat tab for the transpiled Kotlin app, or
-using `adb logcat` from a terminal.
+## Installing on your own iPhone, iPad or Mac
 
-## Testing
+No paid Apple Developer account is needed:
 
-The module can be tested using the standard `swift test` command
-or by running the test target for the macOS destination in Xcode,
-which will run the Swift tests as well as the transpiled
-Kotlin JUnit tests in the Robolectric Android simulation environment.
+1. In Xcode, go to **Settings → Accounts** and add your Apple ID. That creates a
+   free "Personal Team".
+2. For an iPhone or iPad, connect it with a cable, then turn on **Settings →
+   Privacy & Security → Developer Mode** on the device and restart when asked.
+3. Select the **CLIFlashcards App** target, open **Signing & Capabilities**,
+   and choose your Personal Team. If Xcode says the bundle ID is taken, change
+   it to something unique, like `dev.seafarer.cliflashcards.yourname`.
+4. Pick the device and press **Run**.
 
-Parity testing can be performed with `skip test`,
-which will output a table of the test results for both platforms.
+Apps signed by a free team stop opening on iPhone and iPad after 7 days. Run
+again from Xcode to renew them; your progress stays. Mac builds don't expire.
+
+## Icons
+
+`python3 tools/skip-icons.py` (needs Pillow) draws every app icon from the
+design in `public/icons/icon.svg`.

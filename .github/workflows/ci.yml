@@ -84,12 +84,12 @@ jobs:
       - name: Check decks
         run: pnpm decks:check
 
-      # The Flutter app's tests compare its Dart ports against these.
-      - name: Check Flutter parity fixtures are up to date
+      # The Swift and Flutter apps' tests compare their ports against these.
+      - name: Check parity fixtures are up to date
         run: |
           pnpm dart:golden
-          git diff --exit-code -- app/test/fixtures || {
-            echo "::error::Run 'pnpm dart:golden' and commit app/test/fixtures."
+          git diff --exit-code -- apple/FlashcardsCore/Tests/Fixtures || {
+            echo "::error::Run 'pnpm dart:golden' and commit apple/FlashcardsCore/Tests/Fixtures."
             exit 1
           }
 
@@ -188,6 +188,84 @@ jobs:
           name: cli-flashcards-${{ matrix.name }}
           path: ${{ matrix.artifact }}
           retention-days: 14
+
+  # The Skip app's core logic is plain Swift, so its tests (including parity
+  # with the TypeScript code) run on Linux, which is quicker and cheaper.
+  swift-core:
+    name: Swift core tests
+    runs-on: ubuntu-latest
+    container: swift:6.2
+    defaults:
+      run:
+        working-directory: apple/FlashcardsCore
+    steps:
+      - uses: actions/checkout@v7
+
+      - run: swift test
+
+  skip:
+    name: Skip app (${{ matrix.name }})
+    needs: swift-core
+    runs-on: macos-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: iOS
+            destination: generic/platform=iOS Simulator
+          - name: macOS
+            destination: generic/platform=macOS
+          - name: Android
+            destination: ''
+    defaults:
+      run:
+        working-directory: apple
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Skip
+        run: brew install skiptools/skip/skip
+
+      - uses: actions/cache@v5
+        with:
+          path: apple/.build
+          key: skip-${{ matrix.name }}-${{ hashFiles('apple/Package.swift', 'apple/FlashcardsCore/Package.swift') }}
+          restore-keys: skip-${{ matrix.name }}-
+
+      # SKIP_ACTION=none skips the Xcode build phase that builds and launches
+      # the Android app; the Android row builds it on its own.
+      - name: Build
+        if: matrix.name != 'Android'
+        run: >-
+          xcodebuild build
+          -workspace Project.xcworkspace
+          -scheme "CLIFlashcards App"
+          -destination "${{ matrix.destination }}"
+          -derivedDataPath build/DerivedData
+          -skipPackagePluginValidation -skipMacroValidation
+          CODE_SIGNING_ALLOWED=NO SKIP_ACTION=none
+
+      - if: matrix.name == 'Android'
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build Android
+        if: matrix.name == 'Android'
+        run: |
+          skip android sdk install
+          skip export --debug -d build/export
+          ls -la build/export
+
+      - if: matrix.name == 'Android'
+        uses: actions/upload-artifact@v7
+        with:
+          name: cli-flashcards-skip-android
+          path: apple/build/export/*.apk
+          retention-days: 14
+          if-no-files-found: warn
 
   e2e:
     name: End-to-end tests

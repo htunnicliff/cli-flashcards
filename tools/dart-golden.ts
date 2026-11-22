@@ -1,10 +1,13 @@
 /**
- * Writes fixtures the Flutter app's tests check its Dart ports against, so
- * both apps behave the same:
+ * Writes fixtures the Swift (`apple/FlashcardsCore`) and Flutter apps' tests
+ * check their ports against, so every app behaves the same:
  *
- * - `app/test/fixtures/fsrs_golden.json`: review sequences graded by ts-fsrs.
- * - `app/test/fixtures/cards_golden.json`: cards derived from every built deck.
- * - `app/test/fixtures/answers_golden.json`: typed answers and their verdicts.
+ * - `fsrs_golden.json`: review sequences graded by ts-fsrs.
+ * - `cards_golden.json`: cards derived from every built deck.
+ * - `answers_golden.json`: typed answers and their verdicts.
+ *
+ * They live in `apple/FlashcardsCore/Tests/Fixtures/`; `app/test/fixtures` is
+ * a symlink to it until the Flutter app is retired.
  *
  * Run with `pnpm dart:golden` after changing scheduling, card or answer logic.
  */
@@ -58,7 +61,8 @@ for (let s = 0; s < 150; s++) {
   sequences.push({ desiredRetention, steps })
 }
 
-const fixture = (name: string) => new URL(`../app/test/fixtures/${name}`, import.meta.url)
+const fixture = (name: string) =>
+  new URL(`../apple/FlashcardsCore/Tests/Fixtures/${name}`, import.meta.url)
 const write = (name: string, data: object) =>
   writeFileSync(
     fixture(name),
