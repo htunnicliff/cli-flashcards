@@ -43,8 +43,8 @@ struct ReviewScreen: View {
     /// The breakdown under the summary, leaving out what's zero.
     private func todayRows(_ queue: StudyQueue) -> [(String, Int)] {
         let rows = [
-            // Cards in a learning step count even before the step comes due.
-            ("Learning", queue.items.filter { $0.kind == .learning }.count + queue.learningLater),
+            ("Learning", queue.items.filter { $0.kind == .learning }.count),
+            ("Learning later today", queue.learningLater),
             ("Reviews due", queue.items.filter { $0.kind == .review }.count),
             ("New", queue.items.filter { $0.kind == .new }.count),
             ("Done today", queue.today.reviewsDone + queue.today.newDone),

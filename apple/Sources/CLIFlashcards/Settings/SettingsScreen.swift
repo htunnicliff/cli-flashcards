@@ -117,12 +117,12 @@ struct SettingsScreen: View {
                 }
             }
             Stepper(value: setting(\.leechThreshold), in: 2...20) {
-                ValueRow(title: "Suspend Leeches After", value: "\(model.settings.leechThreshold) lapses")
+                ValueRow(title: "Leech Threshold", value: "\(model.settings.leechThreshold) lapses")
             }
         } header: {
             Text("Scheduling")
         } footer: {
-            Text("Limits count across all decks. Higher retention means more reviews. A late new-day hour lets late-night study count toward the day before.")
+            Text("A card is suspended as a leech after that many lapses. Limits count across all decks. Higher retention means more reviews. A late new-day hour lets late-night study count toward the day before.")
         }
     }
 
@@ -165,7 +165,7 @@ struct SettingsScreen: View {
     var about: some View {
         Section {
             ValueRow(title: "Version", value: appVersion)
-            NavigationLink("Deck Sources and Licenses") {
+            NavigationLink("Sources and Licenses") {
                 LicensesView(decks: model.decks)
             }
         } header: {
@@ -279,7 +279,7 @@ struct LicensesView: View {
                 }
             }
         }
-        .navigationTitle("Licenses")
+        .navigationTitle("Sources and Licenses")
     }
 }
 

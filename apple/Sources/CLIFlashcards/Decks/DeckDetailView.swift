@@ -26,7 +26,7 @@ struct DeckDetailView: View {
                 Toggle("Include Rarely Used Flags", isOn: binding(stored.includeObscure) { model.setDeckPrefs(deckId, includeObscure: $0) })
                 Toggle("Type Answers", isOn: binding(stored.typeAnswers) { model.setDeckPrefs(deckId, typeAnswers: $0) })
             } header: {
-                Text(sizeSummary(stored.deck))
+                Text(stored.includeObscure ? "\(visibleOptions(stored)) options, all included" : sizeSummary(stored.deck))
             } footer: {
                 Text("Typed answers ask you to type the flag instead of revealing it.")
             }
@@ -42,7 +42,7 @@ struct DeckDetailView: View {
                 }
             }
 
-            Section("Progress") {
+            Section {
                 ValueRow(title: "New", value: "\(progress.statuses[.new] ?? 0)")
                 ValueRow(title: "Learning", value: "\(progress.statuses[.learning] ?? 0)")
                 ValueRow(title: "Learned", value: "\(progress.statuses[.review] ?? 0)")
@@ -51,6 +51,10 @@ struct DeckDetailView: View {
                 }
                 Button("Reset Progress…", role: .destructive) { confirmingReset = true }
                     .disabled(progress.states.isEmpty)
+            } header: {
+                Text("Progress")
+            } footer: {
+                Text("Counted by option. An option is learned once any of its cards is.")
             }
 
             if !progress.leeches.isEmpty {
