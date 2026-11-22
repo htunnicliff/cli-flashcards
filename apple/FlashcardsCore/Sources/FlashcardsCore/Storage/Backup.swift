@@ -1,6 +1,5 @@
-// JSON backups, ported from `src/core/backup/backup.ts`. The file format is
-// shared with the web and Flutter apps, so any of them can read the others'
-// backups.
+// JSON backups, ported from the web app's `backup.ts`. The file format is the
+// one the earlier web and Flutter apps wrote, so their backups import here.
 
 import Foundation
 

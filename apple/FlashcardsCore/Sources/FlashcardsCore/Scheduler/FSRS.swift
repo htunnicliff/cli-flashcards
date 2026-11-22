@@ -1,10 +1,10 @@
 // FSRS-6 scheduling, a line-by-line port of the parts of ts-fsrs 5.4 the apps
-// use (`src/core/scheduler/fsrs.ts`, by way of `app/lib/core/fsrs.dart`):
+// use (`pipeline/core/fsrs.ts`):
 // default weights, learning steps 1m and 10m, relearning step 10m, short-term
 // scheduling on, fuzz off.
 //
 // The parity tests check it against sequences graded by ts-fsrs itself
-// (`tools/dart-golden.ts`), so every app schedules a card identically.
+// (`tools/fixtures-golden.ts`), so the app schedules a card identically.
 
 import Foundation
 

@@ -1,8 +1,8 @@
 # CLI Flashcards (Skip)
 
 The native app for iPhone, iPad, Mac and Android, written in Swift and SwiftUI
-with [Skip](https://skip.dev) (Skip Fuse, native mode). It replaces the Flutter
-app in `../app/` and the Vue web app. The plan is in issue #70.
+with [Skip](https://skip.dev) (Skip Fuse, native mode). It replaced the earlier
+Flutter and Vue web apps. The plan is in issue #70.
 
 ## Layout
 
