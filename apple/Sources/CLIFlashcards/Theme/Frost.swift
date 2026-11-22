@@ -74,7 +74,7 @@ struct Frost: Equatable {
 
     /// The app's tint for system controls. Dark mode uses a deeper blue than
     /// `accent` so white labels on filled buttons stay readable.
-    var tint: Color { isDark ? Color(argb: 0xFF3F68DE) : accent }
+    var tint: Color { isDark ? Color(argb: 0xFF2F5BD0) : accent }
 
     var card: Color { solid ? surface : glassCard }
     var chrome: Color { solid ? surface : glassChrome }

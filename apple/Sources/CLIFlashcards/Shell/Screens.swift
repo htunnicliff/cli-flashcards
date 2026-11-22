@@ -22,18 +22,28 @@ struct ReviewScreen: View {
                         .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets(top: Space.s2, leading: 0, bottom: Space.s2, trailing: 0))
                 }
-                Section("Today") {
-                    ValueRow(title: "Learning", value: count(queue, .learning))
-                    ValueRow(title: "Reviews due", value: count(queue, .review))
-                    ValueRow(title: "New", value: count(queue, .new))
-                    ValueRow(title: "Done today", value: "\(queue.today.reviewsDone + queue.today.newDone)")
+                let today = todayRows(queue)
+                if !today.isEmpty {
+                    Section("Today") {
+                        ForEach(today, id: \.0) { row in
+                            ValueRow(title: row.0, value: "\(row.1)")
+                        }
+                    }
                 }
             }
         }
     }
 
-    private func count(_ queue: StudyQueue, _ kind: QueueKind) -> String {
-        "\(queue.items.filter { $0.kind == kind }.count)"
+    /// The breakdown under the summary, leaving out what's zero.
+    private func todayRows(_ queue: StudyQueue) -> [(String, Int)] {
+        let rows = [
+            ("Learning", queue.items.filter { $0.kind == .learning }.count),
+            ("Reviews due", queue.items.filter { $0.kind == .review }.count),
+            ("New", queue.items.filter { $0.kind == .new }.count),
+            ("Done today", queue.today.reviewsDone + queue.today.newDone),
+        ].filter { $0.1 > 0 }
+        // A breakdown with one line only repeats the total.
+        return rows.count > 1 ? rows : []
     }
 }
 
@@ -47,7 +57,7 @@ struct ReviewSummary: View {
         VStack(spacing: Space.s4) {
             VStack(spacing: Space.s1) {
                 Text("\(total)")
-                    .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                    .font(.system(size: 64, weight: .bold, design: .rounded))
                     .monospacedDigit()
                 Text(total == 1 ? "card to study" : "cards to study")
                     .font(.subheadline)
@@ -90,7 +100,7 @@ struct DecksScreen: View {
                 List {
                     ValueRow(title: "Options", value: "\(visibleOptions(stored))")
                     if stored.deck.variant != "default" {
-                        ValueRow(title: "Flavor", value: flavorLabel(stored.deck.variant))
+                        ValueRow(title: "Platform", value: flavorLabel(stored.deck.variant))
                     }
                 }
                 .navigationTitle(stored.deck.tool)
@@ -116,7 +126,7 @@ struct DeckRow: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text("\(visibleOptions(stored))")
+            Text("\(visibleOptions(stored)) options")
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
         }
@@ -128,15 +138,19 @@ struct StatsScreen: View {
 
     var body: some View {
         let reviews = model.repository?.reviewCount() ?? 0
-        if reviews == 0 {
-            EmptyState(
-                title: "No Reviews Yet",
-                message: "Your streak, retention and forecast appear here after your first review.",
-                systemImage: "chart.bar"
-            )
-        } else {
-            List {
+        // An empty grouped list keeps the same background as the other tabs.
+        List {
+            if reviews > 0 {
                 ValueRow(title: "Reviews", value: "\(reviews)")
+            }
+        }
+        .overlay {
+            if reviews == 0 {
+                EmptyState(
+                    title: "No Reviews Yet",
+                    message: "Your streak, retention and forecast appear here after your first review.",
+                    systemImage: "chart.bar"
+                )
             }
         }
     }
