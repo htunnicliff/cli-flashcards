@@ -42,6 +42,21 @@ Run the **CLIFlashcards App** scheme on an iPhone or iPad simulator, or on
 Android app. Set `SKIP_ACTION = none` in `Darwin/CLIFlashcards.xcconfig` to
 skip the Android build while you work on Apple platforms.
 
+## Downloading a release
+
+Each [release](https://github.com/htunnicliff/cli-flashcards/releases) has:
+
+- **macOS:** a zipped app. It isn't notarized, so the first time, right-click
+  it and choose **Open**, or allow it in **System Settings → Privacy &
+  Security → Open Anyway**.
+- **Android:** an APK that installs over earlier releases and keeps your
+  progress.
+- **iOS and iPadOS:** an unsigned archive, for anyone who re-signs it. Most
+  people should build from Xcode instead, as below.
+
+To make a release, run **Release app** from the Actions tab with a version, or
+push a tag like `app-v1.2.0`.
+
 ## Installing on your own iPhone, iPad or Mac
 
 No paid Apple Developer account is needed:

@@ -1,8 +1,9 @@
 name: Release app
 
-# Builds the Android APK and macOS app and publishes them on a GitHub
-# release. Run it from the Actions tab with a version, or push a tag like
-# app-v0.2.0.
+# Builds the Skip apps and publishes them on a GitHub release: an ad-hoc
+# signed macOS app, a signed Android APK, and an unsigned iOS archive for
+# anyone who re-signs it. Run it from the Actions tab with a version, or push
+# a tag like app-v0.2.0.
 on:
   workflow_dispatch:
     inputs:
@@ -25,24 +26,22 @@ env:
 jobs:
   build:
     name: Build ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 40
+    runs-on: macos-latest
+    timeout-minutes: 60
     strategy:
       matrix:
         include:
-          - name: Android
-            os: ubuntu-latest
           - name: macOS
-            os: macos-latest
+          - name: iOS
+          - name: Android
     defaults:
       run:
-        working-directory: app
+        working-directory: apple
     steps:
       - uses: actions/checkout@v7
 
       - name: Read version
         id: version
-        shell: bash
         run: |
           version="${VERSION#app-v}"
           if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
@@ -51,22 +50,66 @@ jobs:
           fi
           echo "name=$version" >> "$GITHUB_OUTPUT"
 
+      # Skip.env feeds both the Xcode project and the Android build.
+      - name: Stamp the version
+        run: |
+          sed -i '' -E \
+            -e "s/^MARKETING_VERSION = .*/MARKETING_VERSION = ${{ steps.version.outputs.name }}/" \
+            -e "s/^CURRENT_PROJECT_VERSION = .*/CURRENT_PROJECT_VERSION = ${{ github.run_number }}/" \
+            Skip.env
+          grep -E '^(MARKETING_VERSION|CURRENT_PROJECT_VERSION)' Skip.env
+
+      - name: Install Skip
+        run: brew install skiptools/skip/skip
+
+      # Without a paid Apple account the app can't be notarized. An ad-hoc
+      # signature keeps it launchable on Apple silicon; the release notes say
+      # how to open it the first time.
+      - name: Build macOS
+        if: matrix.name == 'macOS'
+        run: |
+          xcodebuild build \
+            -workspace Project.xcworkspace \
+            -scheme "CLIFlashcards App" \
+            -configuration Release \
+            -destination generic/platform=macOS \
+            -derivedDataPath build/DerivedData \
+            -skipPackagePluginValidation -skipMacroValidation \
+            CODE_SIGNING_ALLOWED=NO SKIP_ACTION=none
+          app=$(find build/DerivedData/Build/Products/Release -maxdepth 1 -name '*.app' | head -1)
+          if [ -z "$app" ]; then echo "::error::No .app was built"; exit 1; fi
+          codesign --force --deep --sign - "$app"
+          mkdir -p dist
+          # ditto keeps the bundle's symlinks and permissions.
+          ditto -c -k --keepParent "$app" "dist/cli-flashcards-${{ steps.version.outputs.name }}-macos.zip"
+
+      # Nothing installable can ship for iOS without a paid account. The
+      # archive is for anyone who re-signs it; most people build from Xcode
+      # with a free Personal Team instead.
+      - name: Archive iOS
+        if: matrix.name == 'iOS'
+        run: |
+          xcodebuild archive \
+            -workspace Project.xcworkspace \
+            -scheme "CLIFlashcards App" \
+            -configuration Release \
+            -destination generic/platform=iOS \
+            -archivePath build/CLIFlashcards.xcarchive \
+            -derivedDataPath build/DerivedData \
+            -skipPackagePluginValidation -skipMacroValidation \
+            CODE_SIGNING_ALLOWED=NO SKIP_ACTION=none
+          mkdir -p dist
+          ditto -c -k --keepParent build/CLIFlashcards.xcarchive \
+            "dist/cli-flashcards-${{ steps.version.outputs.name }}-ios-unsigned.xcarchive.zip"
+
       - if: matrix.name == 'Android'
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version: 3.50.1
-          cache: true
-
-      - run: flutter pub get
-
-      # Optional: with these secrets set, every release is signed with the
-      # same key, so a new APK installs over the old one and keeps progress.
+      # The same key as the Flutter releases, so the new APK installs over
+      # the old one. Without the secrets, Gradle falls back to the debug key.
       - name: Set up Android signing
         if: matrix.name == 'Android'
         env:
@@ -77,8 +120,8 @@ jobs:
             echo "::warning::ANDROID_KEYSTORE_BASE64 isn't set, so this APK uses a throwaway debug key and won't install over an earlier release."
             exit 0
           fi
-          echo "$KEYSTORE" | base64 --decode > android/release.jks
-          cat > android/key.properties <<EOF
+          echo "$KEYSTORE" | base64 --decode > Android/app/release.jks
+          cat > Android/app/keystore.properties <<EOF
           storeFile=release.jks
           storePassword=$KEYSTORE_PASSWORD
           keyAlias=release
@@ -88,28 +131,20 @@ jobs:
       - name: Build Android
         if: matrix.name == 'Android'
         run: |
-          flutter build apk --release \
-            --build-name ${{ steps.version.outputs.name }} \
-            --build-number ${{ github.run_number }}
+          skip android sdk install
+          if ! skip export --release -d build/export; then
+            grep -hE "(error|warning: unavailable):" /tmp/skip-export-*.txt | sort -u | head -100
+            exit 1
+          fi
+          apk=$(find build/export -name '*.apk' | head -1)
+          if [ -z "$apk" ]; then echo "::error::No APK was exported"; ls -la build/export; exit 1; fi
           mkdir -p dist
-          cp build/app/outputs/flutter-apk/app-release.apk \
-            dist/cli-flashcards-${{ steps.version.outputs.name }}.apk
-
-      - name: Build macOS
-        if: matrix.name == 'macOS'
-        run: |
-          flutter build macos --release \
-            --build-name ${{ steps.version.outputs.name }} \
-            --build-number ${{ github.run_number }}
-          mkdir -p dist
-          # ditto keeps the bundle's symlinks and permissions.
-          ditto -c -k --keepParent build/macos/Build/Products/Release/cliflashcards.app \
-            dist/cli-flashcards-${{ steps.version.outputs.name }}-macos.zip
+          cp "$apk" "dist/cli-flashcards-${{ steps.version.outputs.name }}.apk"
 
       - uses: actions/upload-artifact@v7
         with:
           name: release-${{ matrix.name }}
-          path: app/dist/*
+          path: apple/dist/*
           retention-days: 7
 
   publish:
@@ -129,7 +164,16 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           version="${VERSION#app-v}"
+          cat > notes.md <<EOF
+          Native apps for macOS, Android and iOS, built with Skip.
+
+          - **macOS:** unzip and move the app to Applications. It isn't notarized, so the first time, right-click it and choose **Open**, or open it from **System Settings › Privacy & Security › Open Anyway**.
+          - **Android:** install the APK. It upgrades earlier releases in place.
+          - **iOS and iPadOS:** the archive is unsigned. To install, build from Xcode with a free Personal Team, as the README describes.
+
+          Install steps: https://github.com/$GH_REPO/blob/main/apple/README.md#downloading-a-release
+          EOF
           gh release create "app-v$version" dist/* \
             --target "$GITHUB_SHA" \
             --title "CLI Flashcards $version" \
-            --notes "Android APK and macOS app. Install steps: https://github.com/$GH_REPO/blob/main/app/README.md#install"
+            --notes-file notes.md
