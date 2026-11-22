@@ -13,6 +13,10 @@ private typealias AppDelegate = CLIFlashcardsAppDelegate
         WindowGroup {
             AppRootView()
         }
+        #if os(macOS)
+        .defaultSize(width: 960, height: 720)
+        .commands { CLIFlashcardsCommands() }
+        #endif
         .onChange(of: scenePhase) { oldPhase, newPhase in
             switch newPhase {
             case .active:
