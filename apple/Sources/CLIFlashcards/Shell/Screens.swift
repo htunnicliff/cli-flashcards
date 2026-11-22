@@ -138,22 +138,31 @@ struct StatsScreen: View {
 
     var body: some View {
         let reviews = model.repository?.reviewCount() ?? 0
-        // An empty grouped list keeps the same background as the other tabs.
-        List {
-            if reviews > 0 {
+        if reviews == 0 {
+            EmptyState(
+                title: "No Reviews Yet",
+                message: "Your streak, retention and forecast appear here after your first review.",
+                systemImage: "chart.bar"
+            )
+            // The same background as the grouped lists on the other tabs.
+            .background(groupedBackground.ignoresSafeArea())
+        } else {
+            List {
                 ValueRow(title: "Reviews", value: "\(reviews)")
             }
         }
-        .overlay {
-            if reviews == 0 {
-                EmptyState(
-                    title: "No Reviews Yet",
-                    message: "Your streak, retention and forecast appear here after your first review.",
-                    systemImage: "chart.bar"
-                )
-            }
-        }
     }
+}
+
+/// The background grouped lists sit on.
+var groupedBackground: Color {
+    #if os(iOS)
+    Color(uiColor: .systemGroupedBackground)
+    #elseif os(macOS)
+    Color(nsColor: .windowBackgroundColor)
+    #else
+    Color.clear
+    #endif
 }
 
 struct SettingsScreen: View {
