@@ -85,7 +85,7 @@ struct Wordmark: View {
     @Environment(\.frost) var frost
 
     var body: some View {
-        (Text("--").foregroundColor(frost.accent) + Text("recall").foregroundColor(frost.text))
+        styledText([TextRun("--", color: frost.tint), TextRun("recall")])
             .font(font.weight(.bold))
             .accessibilityLabel("--recall")
     }

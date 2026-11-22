@@ -143,26 +143,23 @@ struct CommandLineView: View {
             .padding(.horizontal, Space.s4)
             .padding(.vertical, Space.s3)
             .background(RoundedRectangle(cornerRadius: Radii.code).fill(frost.sunken))
-            .accessibilityLabel(accessibleText)
+            .accessibilityLabel(Text(accessibleText))
     }
 
     private var styled: Text {
-        var text = Text("$ ").foregroundColor(frost.muted)
+        var runs = [TextRun("$ ", color: frost.muted)]
         for (i, part) in parts.enumerated() {
-            if i > 0 { text = text + Text(" ") }
+            if i > 0 { runs.append(TextRun(" ")) }
             switch part.kind {
-            case .tool:
-                text = text + Text(part.text)
-            case .flag:
-                text = text + Text(part.text).foregroundColor(frost.accent).bold()
-            case .arg:
-                text = text + Text(part.text).foregroundColor(frost.arg).italic()
+            case .tool: runs.append(TextRun(part.text))
+            case .flag: runs.append(TextRun(part.text, color: frost.tint, bold: true))
+            case .arg: runs.append(TextRun(part.text, color: frost.arg, italic: true))
             case .blank:
-                text = text + Text("\u{2007}\u{2007}\u{2007}\u{2007}\u{2007}").underline(color: frost.accent)
-                    + Text(part.text)
+                runs.append(TextRun("\u{2007}\u{2007}\u{2007}\u{2007}\u{2007}", underline: frost.tint))
+                runs.append(TextRun(part.text))
             }
         }
-        return text
+        return styledText(runs)
     }
 
     private var accessibleText: String {
@@ -272,4 +269,44 @@ func listOf(_ names: [String]) -> String {
     case 1: names[0]
     default: names.dropLast().joined(separator: ", ") + " and " + names[names.count - 1]
     }
+}
+
+/// A run of text with its own colour and style, for `styledText`.
+struct TextRun {
+    var text: String
+    var color: Color?
+    var bold = false
+    var italic = false
+    var underline: Color?
+    var strikethrough = false
+
+    init(
+        _ text: String, color: Color? = nil, bold: Bool = false, italic: Bool = false,
+        underline: Color? = nil, strikethrough: Bool = false
+    ) {
+        self.text = text
+        self.color = color
+        self.bold = bold
+        self.italic = italic
+        self.underline = underline
+        self.strikethrough = strikethrough
+    }
+}
+
+/// Joins styled runs into one `Text` that wraps as a whole. Android can't
+/// concatenate `Text` yet, so there the runs join as plain text.
+func styledText(_ runs: [TextRun]) -> Text {
+    #if os(Android)
+    return Text(runs.map(\.text).joined())
+    #else
+    return runs.reduce(Text("")) { text, run in
+        var piece = Text(run.text)
+        if let color = run.color { piece = piece.foregroundColor(color) }
+        if run.bold { piece = piece.bold() }
+        if run.italic { piece = piece.italic() }
+        if let underline = run.underline { piece = piece.underline(color: underline) }
+        if run.strikethrough { piece = piece.strikethrough() }
+        return text + piece
+    }
+    #endif
 }
