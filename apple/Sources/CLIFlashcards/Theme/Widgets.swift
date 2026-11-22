@@ -45,7 +45,9 @@ struct FrostButtonStyle: ButtonStyle {
                 color: variant == .primary ? frost.primaryShadow : frost.shadow.opacity(0.06),
                 radius: variant == .primary ? 9 : 4, x: 0, y: variant == .primary ? 6 : 2
             )
+            #if !os(Android)
             .contentShape(shape)
+            #endif
             .opacity(isEnabled ? (configuration.isPressed ? 0.8 : 1) : 0.5)
     }
 
