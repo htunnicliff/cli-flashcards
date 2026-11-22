@@ -5,17 +5,34 @@
 import SwiftUI
 import FlashcardsCore
 
+/// Opens a study session. The session is made once, when the page appears:
+/// SwiftUI rebuilds this view whenever the Review screen redraws, and making
+/// a session there would rebuild the queue on every redraw.
 struct StudyView: View {
-    @State var session: ReviewSession
+    let model: AppModel
+    @State var session: ReviewSession?
+
+    var body: some View {
+        Group {
+            if let session {
+                StudySessionView(session: session)
+            } else {
+                groupedBackground.ignoresSafeArea()
+            }
+        }
+        .onAppear {
+            if session == nil { session = ReviewSession(model: model) }
+        }
+    }
+}
+
+struct StudySessionView: View {
+    let session: ReviewSession
     @Environment(\.reducedMotion) var reducedMotion
     @Environment(\.frost) var frost
     @State var drag: CGFloat = 0
     @FocusState var typedFocused: Bool
     @State var typed = ""
-
-    init(model: AppModel) {
-        _session = State(initialValue: ReviewSession(model: model))
-    }
 
     var body: some View {
         Group {
@@ -113,9 +130,6 @@ struct StudyView: View {
                 .transition(reducedMotion ? .opacity : .asymmetric(
                     insertion: .opacity, removal: .move(edge: .leading).combined(with: .opacity)
                 ))
-                if let notice = session.notice {
-                    NoticeBar(notice: notice, onUndo: { session.undo() }, onDismiss: { session.dismissNotice() })
-                }
                 if let error = session.error {
                     Text(error).font(.footnote).foregroundStyle(.red)
                 }
@@ -130,6 +144,11 @@ struct StudyView: View {
 
     @ViewBuilder func controls(_ item: QueueItem) -> some View {
         VStack(spacing: Space.s3) {
+            // In the pinned bar, so the typed-answer field and keyboard never
+            // cover it.
+            if let notice = session.notice {
+                NoticeBar(notice: notice, onUndo: { session.undo() }, onDismiss: { session.dismissNotice() })
+            }
             if session.typing {
                 TypedAnswerField(
                     command: session.command, text: $typed, result: session.answer,

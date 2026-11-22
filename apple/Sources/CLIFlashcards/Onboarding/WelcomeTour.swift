@@ -50,8 +50,10 @@ struct WelcomeTour: View {
                 .frame(maxWidth: 560)
             }
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Skip") { model.finishTour() }
+                if step < Self.count - 1 {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Skip") { model.finishTour() }
+                    }
                 }
             }
         }
@@ -70,7 +72,7 @@ struct WelcomeTour: View {
         case 0:
             VStack(alignment: .leading, spacing: Space.s4) {
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Welcome to").font(.title2.weight(.semibold)).foregroundStyle(.secondary)
+                    Text("Welcome to").font(.largeTitle.weight(.bold))
                     Wordmark(font: .system(.largeTitle, design: .monospaced))
                 }
                 Text("Learn the flags of the command-line tools you use, one flashcard at a time. Each card comes back just before you’d forget it, so a few minutes a day is enough.")
