@@ -36,6 +36,11 @@ import Testing
         #expect(searchOptions(options, "summary").count == 2)
     }
 
+    @Test func searchPutsExactFlagMatchesFirst() {
+        let options = [option("head", ["-I", "--head"]), option("ignore-case", ["-i", "--ignore-case"])]
+        #expect(searchOptions(options, "-i").map(\.id) == ["ignore-case", "head"])
+    }
+
     @Test func describesChanges() {
         let a = deck([option("a", ["-a"])])
         let b = deck([option("b", ["-b"]), option("c", ["-c"])])

@@ -65,7 +65,9 @@ func frontFlag(_ card: Card) -> String { card.isFlagPair ? (card.shown ?? card.f
 
     init(model: AppModel) {
         self.model = model
-        refresh()
+        // Reads only: the model already shows the same queue, and writing to
+        // it here would redraw the screen that opened this session.
+        refresh(updateModel: false)
     }
 
     var current: QueueItem? { items.first }
@@ -126,7 +128,7 @@ func frontFlag(_ card: Card) -> String { card.isFlagPair ? (card.shown ?? card.f
     }
 
     /// Reloads the queue, keeping the card on screen in front if still due.
-    func refresh() {
+    func refresh(updateModel: Bool = true) {
         guard let repository = model.repository, let scheduler = model.scheduler else { return }
         let now = model.now
         let queue = scheduler.queue(now: now)
@@ -146,7 +148,7 @@ func frontFlag(_ card: Card) -> String { card.isFlagPair ? (card.shown ?? card.f
         }
         items = next
         if shownAt == 0 { shownAt = now }
-        model.refresh()
+        if updateModel { model.refresh() }
     }
 
     func reveal() {

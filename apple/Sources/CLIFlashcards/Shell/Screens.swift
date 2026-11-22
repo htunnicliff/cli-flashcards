@@ -44,6 +44,7 @@ struct ReviewScreen: View {
     private func todayRows(_ queue: StudyQueue) -> [(String, Int)] {
         let rows = [
             ("Learning", queue.items.filter { $0.kind == .learning }.count),
+            ("Learning later today", queue.learningLater),
             ("Reviews due", queue.items.filter { $0.kind == .review }.count),
             ("New", queue.items.filter { $0.kind == .new }.count),
             ("Done today", queue.today.reviewsDone + queue.today.newDone),

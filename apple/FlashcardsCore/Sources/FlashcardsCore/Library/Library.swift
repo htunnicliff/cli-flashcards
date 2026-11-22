@@ -111,7 +111,9 @@ public func searchOptions(_ options: [Option], _ query: String) -> [Option] {
             .joined(separator: " ").lowercased()
         if haystack.contains(q) { textHits.append(option) }
     }
-    return flagHits + textHits
+    // An exact flag match comes first, so "-i" finds -i before -I.
+    let exact = flagHits.filter { $0.flags.contains(query.trimmingCharacters(in: .whitespacesAndNewlines)) }
+    return exact + flagHits.filter { !exact.contains($0) } + textHits
 }
 
 private let flavorLabels = ["gnu": "GNU / Linux", "bsd": "BSD / macOS"]

@@ -28,7 +28,7 @@ struct StatsScreen: View {
         _ = model.revision
         guard let repository = model.repository else { return nil }
         return computeStats(
-            decks: model.decks, states: repository.allCardStates(), log: repository.allReviews(),
+            decks: model.decks.filter { !$0.paused }, states: repository.allCardStates(), log: repository.allReviews(),
             now: model.now, rolloverHour: model.settings.dayRolloverHour, flagPairs: model.settings.flagPairs
         )
     }
@@ -79,14 +79,18 @@ struct StatsList: View {
             } header: {
                 Text("Past Year")
             } footer: {
-                Text("\(historyTotal) reviews on \(activeDays) days.")
+                Text("\(historyTotal) review\(historyTotal == 1 ? "" : "s") on \(activeDays) day\(activeDays == 1 ? "" : "s").")
             }
 
             if !stats.cards.isEmpty {
-                Section("Cards") {
+                Section {
                     ForEach(stats.cards, id: \.deckId) { counts in
                         DeckCountsRow(name: names[counts.deckId] ?? counts.deckId, counts: counts)
                     }
+                } header: {
+                    Text("Cards")
+                } footer: {
+                    Text("Every card in the decks you’re studying, including flag-pair and rarely used cards.")
                 }
             }
         }
@@ -135,7 +139,7 @@ struct DeckCountsRow: View {
     }
 
     var summary: String {
-        var parts = ["\(counts.new) new", "\(counts.learning) learning", "\(counts.review) learned"]
+        var parts = ["\(counts.total) cards", "\(counts.new) new", "\(counts.learning) learning", "\(counts.review) learned"]
         if counts.suspended > 0 { parts.append("\(counts.suspended) suspended") }
         return parts.joined(separator: " · ")
     }
