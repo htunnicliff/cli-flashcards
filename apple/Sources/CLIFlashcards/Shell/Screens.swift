@@ -1,32 +1,46 @@
-// First versions of the four sections. Review (#80), Decks (#81), Stats (#82)
-// and Settings (#83) replace these with the full screens.
+// First versions of the four sections, built from standard lists and forms so
+// they look native on each platform (and map to Material on Android). Review
+// (#80), Decks (#81), Stats (#82) and Settings (#83) fill them out.
 
 import SwiftUI
 import FlashcardsCore
 
 struct ReviewScreen: View {
     let model: AppModel
-    @Environment(\.frost) var frost
 
     var body: some View {
-        PageBody {
-            Wordmark(font: .mono(.largeTitle))
+        List {
             if let error = model.loadError {
-                Text("Couldn’t open saved progress: \(error)")
-                    .foregroundStyle(frost.again)
-                    .padding(.top, Space.s4)
+                Section {
+                    Label("Couldn’t open saved progress: \(error)", systemImage: "exclamationmark.triangle")
+                        .foregroundStyle(.red)
+                }
             }
             if let queue = model.queue {
-                VStack(alignment: .leading, spacing: Space.s2) {
-                    Text("\(queue.items.count) cards to study")
-                        .font(.title2.weight(.bold))
-                        .foregroundStyle(frost.text)
-                    Text("\(queue.today.newLeft) new cards left today")
-                        .foregroundStyle(frost.muted)
+                Section {
+                    VStack(alignment: .leading, spacing: Space.s1) {
+                        Text("\(queue.items.count)")
+                            .font(.system(size: 56, weight: .bold, design: .rounded))
+                            .monospacedDigit()
+                        Text(queue.items.count == 1 ? "card to study" : "cards to study")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, Space.s2)
+                    Button {
+                        // The review session lands in #80.
+                    } label: {
+                        Text("Start review")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, Space.s1)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(queue.items.isEmpty)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .glass()
-                .padding(.top, Space.s6)
+                Section("Today") {
+                    ValueRow(title: "New cards left", value: "\(queue.today.newLeft)", systemImage: "sparkles")
+                }
             }
         }
     }
@@ -34,90 +48,86 @@ struct ReviewScreen: View {
 
 struct DecksScreen: View {
     let model: AppModel
-    @Environment(\.frost) var frost
 
     var body: some View {
-        PageBody {
-            if let notice = model.notice {
-                Text(notice)
-                    .font(.subheadline)
-                    .foregroundStyle(frost.muted)
-            }
-            VStack(spacing: 0) {
+        List {
+            Section {
                 ForEach(model.decks) { stored in
-                    HStack {
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(stored.deck.tool)
                             .font(.mono(.body).weight(.semibold))
-                            .foregroundStyle(frost.text)
-                        Spacer()
-                        FrostChip(flavorLabel(stored.deck.variant))
+                        Text(flavorLabel(stored.deck.variant))
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
-                    .padding(.vertical, Space.s3)
+                    .padding(.vertical, 2)
+                }
+            } footer: {
+                if let notice = model.notice {
+                    Text(notice)
                 }
             }
-            .glass(padding: Space.s4)
-            .padding(.top, Space.s4)
         }
     }
 }
 
 struct StatsScreen: View {
     let model: AppModel
-    @Environment(\.frost) var frost
 
     var body: some View {
-        PageBody {
-            Text("\(model.repository?.reviewCount() ?? 0) reviews so far")
-                .foregroundStyle(frost.text)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .glass()
+        List {
+            Section("All time") {
+                ValueRow(
+                    title: "Reviews", value: "\(model.repository?.reviewCount() ?? 0)",
+                    systemImage: "checkmark.circle"
+                )
+            }
         }
     }
 }
 
 struct SettingsScreen: View {
     let model: AppModel
-    @Environment(\.frost) var frost
 
     var body: some View {
         let theme = Binding(get: { model.settings.theme }, set: { v in model.updateSettings { $0.theme = v } })
         let motion = Binding(get: { model.settings.motion }, set: { v in model.updateSettings { $0.motion = v } })
-        let solid = Binding(
-            get: { model.settings.reduceTransparency },
-            set: { v in model.updateSettings { $0.reduceTransparency = v } }
-        )
-        PageBody {
-            PageSection(title: "Appearance") {
-                VStack(alignment: .leading, spacing: Space.s4) {
-                    Text("Theme").foregroundStyle(frost.text)
-                    Segmented(values: AppTheme.allCases, selected: theme) { t in
-                        switch t {
-                        case .system: "System"
-                        case .light: "Light"
-                        case .dark: "Dark"
-                        }
-                    }
-                    Text("Motion").foregroundStyle(frost.text)
-                    Segmented(values: MotionPreference.allCases, selected: motion) { m in
-                        switch m {
-                        case .system: "System"
-                        case .reduce: "Reduce"
-                        case .full: "Full"
-                        }
-                    }
-                    CheckRow(
-                        label: "Reduce transparency", isOn: solid,
-                        hint: "Solid surfaces instead of frosted glass."
-                    )
+        Form {
+            Section {
+                Picker("Theme", selection: theme) {
+                    Text("System").tag(AppTheme.system)
+                    Text("Light").tag(AppTheme.light)
+                    Text("Dark").tag(AppTheme.dark)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .glass()
+                Picker("Motion", selection: motion) {
+                    Text("System").tag(MotionPreference.system)
+                    Text("Reduce").tag(MotionPreference.reduce)
+                    Text("Full").tag(MotionPreference.full)
+                }
+            } header: {
+                Text("Appearance")
+            } footer: {
+                if let error = model.saveError {
+                    Text(error).foregroundStyle(.red)
+                }
             }
-            if let error = model.saveError {
-                Text(error)
-                    .foregroundStyle(frost.again)
-                    .padding(.top, Space.s4)
-            }
+        }
+    }
+}
+
+/// A row with a label on the left and a value on the right.
+struct ValueRow: View {
+    var title: String
+    var value: String
+    var systemImage: String
+
+    var body: some View {
+        HStack {
+            Label(title, systemImage: systemImage)
+            Spacer()
+            Text(value)
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
         }
     }
 }

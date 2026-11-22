@@ -1,6 +1,7 @@
-// The frame around every page, ported from `app/lib/app/shell.dart` and
+// The frame around every page, in the role of `app/lib/app/shell.dart` and
 // `router.dart`: a tab bar on iPhone and Android, a sidebar on iPad and Mac
-// (`.sidebarAdaptable`), over the Frost backdrop.
+// (`.sidebarAdaptable`). Screens use standard lists and forms; Frost supplies
+// the accent colour and the review card's look.
 
 import SwiftUI
 import FlashcardsCore
@@ -74,7 +75,6 @@ struct Page<Content: View>: View {
         NavigationStack {
             content()
                 .navigationTitle(section.title)
-                .background(FrostBackdrop())
         }
     }
 }
