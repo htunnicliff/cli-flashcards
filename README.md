@@ -4,7 +4,7 @@ Spaced repetition flashcards for learning the flags of well-known command-line t
 
 The app is native SwiftUI for iPhone, iPad and Mac, and also runs on Android through [Skip](https://skip.dev). It lives in [`apple/`](apple/README.md), and its decks are bundled into it, so it works offline from the first launch. Downloads are on the [releases page](https://github.com/htunnicliff/cli-flashcards/releases). See the [roadmap](https://github.com/htunnicliff/cli-flashcards/issues/70) for the plan.
 
-This top level holds the TypeScript deck pipeline. It generates the decks in `public/data/decks/` from manpages and tldr-pages, and writes the parity fixtures that the Swift tests check against. The Flutter app in [`app/`](app/README.md) is being retired ([#89](https://github.com/htunnicliff/cli-flashcards/issues/89)).
+This top level holds the TypeScript deck pipeline. It generates the decks in `public/data/decks/` from manpages and tldr-pages, and writes the parity fixtures that the Swift tests check against.
 
 ## Prerequisites
 

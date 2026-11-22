@@ -1,13 +1,12 @@
 /**
- * Writes fixtures the Swift (`apple/FlashcardsCore`) and Flutter apps' tests
- * check their ports against, so every app behaves the same:
+ * Writes fixtures the Swift (`apple/FlashcardsCore`) tests check their ports
+ * against, so the app behaves exactly like the deck pipeline:
  *
  * - `fsrs_golden.json`: review sequences graded by ts-fsrs.
  * - `cards_golden.json`: cards derived from every built deck.
  * - `answers_golden.json`: typed answers and their verdicts.
  *
- * They live in `apple/FlashcardsCore/Tests/Fixtures/`; `app/test/fixtures` is
- * a symlink to it until the Flutter app is retired.
+ * They live in `apple/FlashcardsCore/Tests/Fixtures/`.
  *
  * Run with `pnpm fixtures:golden` after changing scheduling, card or answer logic.
  */

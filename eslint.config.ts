@@ -4,7 +4,7 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  globalIgnores(['**/coverage/**', 'app/**', 'apple/**', 'vendor/**']),
+  globalIgnores(['**/coverage/**', 'apple/**', 'vendor/**']),
 
   tseslint.configs.recommended,
 

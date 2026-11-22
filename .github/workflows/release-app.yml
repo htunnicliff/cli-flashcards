@@ -108,8 +108,8 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      # The same key as the Flutter releases, so the new APK installs over
-      # the old one. Without the secrets, Gradle falls back to the debug key.
+      # The same key as the earlier Flutter releases, so the new APK installs
+      # over the old one. Without the secrets, Gradle falls back to the debug key.
       - name: Set up Android signing
         if: matrix.name == 'Android'
         env:

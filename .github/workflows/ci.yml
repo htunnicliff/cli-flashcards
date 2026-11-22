@@ -81,7 +81,7 @@ jobs:
       - name: Check decks
         run: pnpm decks:check
 
-      # The Swift and Flutter apps' tests compare their ports against these.
+      # The Swift tests compare their ports against these.
       - name: Check parity fixtures are up to date
         run: |
           pnpm fixtures:golden
@@ -89,86 +89,6 @@ jobs:
             echo "::error::Run 'pnpm fixtures:golden' and commit apple/FlashcardsCore/Tests/Fixtures."
             exit 1
           }
-
-  flutter:
-    name: Flutter app
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: app
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version: 3.50.1
-          cache: true
-
-      - run: flutter pub get
-
-      - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed lib test
-
-      - name: Analyze
-        run: flutter analyze
-
-      - name: Test
-        run: flutter test
-
-  native:
-    name: Build ${{ matrix.name }}
-    needs: flutter
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 40
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Android
-            os: ubuntu-latest
-            build: flutter build apk --release
-            artifact: app/build/app/outputs/flutter-apk/app-release.apk
-          - name: iOS
-            os: macos-latest
-            build: flutter build ios --release --no-codesign
-            artifact: ''
-          - name: macOS
-            os: macos-latest
-            # Zipped with ditto so the bundle keeps its symlinks and permissions.
-            build: >-
-              flutter build macos --release &&
-              ditto -c -k --keepParent build/macos/Build/Products/Release/cliflashcards.app build/cli-flashcards-macos.zip
-            artifact: app/build/cli-flashcards-macos.zip
-    defaults:
-      run:
-        working-directory: app
-    steps:
-      - uses: actions/checkout@v7
-
-      - if: matrix.name == 'Android'
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          flutter-version: 3.50.1
-          cache: true
-
-      - run: flutter pub get
-
-      - name: Build
-        run: ${{ matrix.build }}
-
-      - if: matrix.artifact != ''
-        uses: actions/upload-artifact@v7
-        with:
-          name: cli-flashcards-${{ matrix.name }}
-          path: ${{ matrix.artifact }}
-          retention-days: 14
 
   # The Skip app's core logic is plain Swift, so its tests (including parity
   # with the TypeScript code) run on Linux, which is quicker and cheaper.
