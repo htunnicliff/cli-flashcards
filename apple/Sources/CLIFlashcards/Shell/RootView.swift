@@ -8,11 +8,11 @@ import FlashcardsCore
 /// Resolves the theme from the settings and the device, then shows the
 /// sections.
 struct RootView: View {
-    @State private var model = AppModel.shared
-    @Environment(\.colorScheme) private var systemScheme
-    @Environment(\.accessibilityReduceTransparency) private var systemReduceTransparency
-    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
-    @Environment(\.colorSchemeContrast) private var contrast
+    @State var model = AppModel.shared
+    @Environment(\.colorScheme) var systemScheme
+    @Environment(\.accessibilityReduceTransparency) var systemReduceTransparency
+    @Environment(\.accessibilityReduceMotion) var systemReduceMotion
+    @Environment(\.colorSchemeContrast) var contrast
 
     var body: some View {
         let settings = model.settings
@@ -82,7 +82,7 @@ private struct Page<Content: View>: View {
 /// The `--recall` wordmark, with the dashes in the accent colour.
 struct Wordmark: View {
     var font: Font = .mono(.title3)
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
 
     var body: some View {
         (Text("--").foregroundColor(frost.accent) + Text("recall").foregroundColor(frost.text))

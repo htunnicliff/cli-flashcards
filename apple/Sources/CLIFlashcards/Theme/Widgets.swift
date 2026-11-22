@@ -21,8 +21,8 @@ struct FrostButtonStyle: ButtonStyle {
     var variant: ButtonVariant = .neutral
     var block = false
     var highlighted = false
-    @Environment(\.frost) private var frost
-    @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.frost) var frost
+    @Environment(\.isEnabled) var isEnabled
 
     func makeBody(configuration: Configuration) -> some View {
         let shape = RoundedRectangle(cornerRadius: Radii.button, style: .continuous)
@@ -71,7 +71,7 @@ extension ButtonStyle where Self == FrostButtonStyle {
 struct Kbd: View {
     var label: String
     var onPrimary = false
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
 
     init(_ label: String, onPrimary: Bool = false) {
         self.label = label
@@ -104,7 +104,7 @@ struct FrostChip: View {
     var label: String
     var mono = false
     var color: Color?
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
 
     init(_ label: String, mono: Bool = false, color: Color? = nil) {
         self.label = label
@@ -126,7 +126,7 @@ struct FrostChip: View {
 struct CommandLineView: View {
     var parts: [CommandPart]
     var large = false
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
 
     init(_ parts: [CommandPart], large: Bool = false) {
         self.parts = parts
@@ -173,7 +173,7 @@ struct Segmented<T: Hashable>: View {
     var values: [T]
     @Binding var selected: T
     var label: (T) -> String
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
 
     var body: some View {
         HStack(spacing: Space.s1) {
@@ -205,7 +205,7 @@ struct CheckRow: View {
     @Binding var isOn: Bool
     var hint: String?
     var strong = false
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
 
     var body: some View {
         Toggle(isOn: $isOn) {
@@ -227,7 +227,7 @@ struct CheckRow: View {
 /// A page's content column: scrolling, centred, at most `contentWidth` wide.
 struct PageBody<Content: View>: View {
     @ViewBuilder var content: () -> Content
-    @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.horizontalSizeClass) var sizeClass
 
     var body: some View {
         let compact = sizeClass == .compact
@@ -248,7 +248,7 @@ struct PageBody<Content: View>: View {
 struct PageSection<Content: View>: View {
     var title: String
     @ViewBuilder var content: () -> Content
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
 
     var body: some View {
         VStack(alignment: .leading, spacing: Space.s3) {

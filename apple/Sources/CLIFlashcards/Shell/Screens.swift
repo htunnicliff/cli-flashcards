@@ -6,7 +6,7 @@ import FlashcardsCore
 
 struct ReviewScreen: View {
     let model: AppModel
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
 
     var body: some View {
         PageBody {
@@ -34,7 +34,7 @@ struct ReviewScreen: View {
 
 struct DecksScreen: View {
     let model: AppModel
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
 
     var body: some View {
         PageBody {
@@ -63,7 +63,7 @@ struct DecksScreen: View {
 
 struct StatsScreen: View {
     let model: AppModel
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
 
     var body: some View {
         PageBody {
@@ -77,7 +77,7 @@ struct StatsScreen: View {
 
 struct SettingsScreen: View {
     let model: AppModel
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
 
     var body: some View {
         let theme = Binding(get: { model.settings.theme }, set: { v in model.updateSettings { $0.theme = v } })

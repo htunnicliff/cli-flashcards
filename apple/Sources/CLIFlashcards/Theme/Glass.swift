@@ -5,7 +5,7 @@ import SwiftUI
 /// The soft colour wash behind every page: warm from the top left, cool from
 /// the bottom right. Solid mode drops it for the plain background.
 struct FrostBackdrop: View {
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
 
     var body: some View {
         ZStack {
@@ -30,7 +30,7 @@ struct FrostBackdrop: View {
 /// A frosted pane: a card (nearly opaque, light blur) or chrome (clearer,
 /// stronger blur). Solid mode gives a plain surface with a border.
 struct GlassPane: ViewModifier {
-    @Environment(\.frost) private var frost
+    @Environment(\.frost) var frost
     var radius: CGFloat = Radii.card
     var chrome = false
     var shadow = true
