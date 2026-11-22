@@ -6,8 +6,8 @@
  *   --color[=WHEN]          -i[SUFFIX]          -C[<n>]
  *   --colour=[when]         -n <number>         --[no-]verify
  */
-import { FLAG_PATTERN, isShortFlag, normalizeFlags } from '../../src/schema/flags'
-import type { Argument } from '../../src/schema/deck'
+import { FLAG_PATTERN, isShortFlag, normalizeFlags } from '../../pipeline/schema/flags'
+import type { Argument } from '../../pipeline/schema/deck'
 
 export interface ParsedTag {
   /** Short first, de-duplicated. */

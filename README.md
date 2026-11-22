@@ -1,15 +1,16 @@
 # CLI Flashcards
 
-A spaced repetition web app for learning the flags of well-known command-line tools (git, ripgrep, sed, …). It is a Vue 3 single-page app that will become an offline-first PWA. See the [roadmap](https://github.com/htunnicliff/cli-flashcards/issues/1) for the plan.
+Spaced repetition flashcards for learning the flags of well-known command-line tools (git, ripgrep, sed, …).
 
-**Live:** <https://htunnicliff.github.io/cli-flashcards/>
+The app is native SwiftUI for iPhone, iPad and Mac, and also runs on Android through [Skip](https://skip.dev). It lives in [`apple/`](apple/README.md), and its decks are bundled into it, so it works offline from the first launch. Downloads are on the [releases page](https://github.com/htunnicliff/cli-flashcards/releases). See the [roadmap](https://github.com/htunnicliff/cli-flashcards/issues/70) for the plan.
 
-The live site is the cross-platform Flutter app in [`app/`](app/README.md) (web, iOS, iPadOS, Android, macOS). The Vue app in `src/` is still deployed at [`/cli-flashcards/classic/`](https://htunnicliff.github.io/cli-flashcards/classic/) so anyone with progress there can export a backup and import it in the new app.
+This top level holds the TypeScript deck pipeline. It generates the decks in `public/data/decks/` from manpages and tldr-pages, and writes the parity fixtures that the Swift tests check against. The Flutter app in [`app/`](app/README.md) is being retired ([#89](https://github.com/htunnicliff/cli-flashcards/issues/89)).
 
 ## Prerequisites
 
 - **Node.js 22** (22.12 or later). The exact version is pinned in [`.nvmrc`](.nvmrc), so `nvm use` or `fnm use` picks it up.
 - **pnpm 10**. The version is pinned in `package.json` under `packageManager`; running `corepack enable` once makes the right version available.
+- For the app: Xcode and [Skip](https://skip.dev). See [`apple/README.md`](apple/README.md).
 
 ## Install
 
@@ -19,54 +20,36 @@ pnpm install
 
 ## Scripts
 
-| Command              | What it does                                                         |
-| -------------------- | -------------------------------------------------------------------- |
-| `pnpm dev`           | Start the Vite dev server with hot reload.                           |
-| `pnpm build`         | Type check, then build the production bundle into `dist/`.           |
-| `pnpm preview`       | Serve the built `dist/` locally.                                     |
-| `pnpm typecheck`     | Run `vue-tsc` across the app, Node scripts and tests.                |
-| `pnpm lint`          | Run ESLint and check formatting with Prettier.                       |
-| `pnpm lint:fix`      | Fix what ESLint can and rewrite files with Prettier.                 |
-| `pnpm format`        | Rewrite files with Prettier.                                         |
-| `pnpm test`          | Run all Vitest tests once.                                           |
-| `pnpm test:watch`    | Run Vitest in watch mode.                                            |
-| `pnpm test:coverage` | Run tests with a coverage report for `src/core/` and `tools/`.       |
-| `pnpm test:e2e`      | Build the app and run the Playwright E2E tests against it.           |
-| `pnpm test:e2e --ui` | Open Playwright's UI mode to run and debug E2E tests.                |
-| `pnpm schema:export` | Regenerate `schemas/deck.schema.json` from the Zod deck schema.      |
-| `pnpm deck:generate` | Generate a deck from a tool's manpage (see below).                   |
-| `pnpm decks:check`   | Validate the built decks in `public/data/decks/` against the schema. |
+| Command                | What it does                                                               |
+| ---------------------- | -------------------------------------------------------------------------- |
+| `pnpm typecheck`       | Type check the pipeline, tools and tests.                                  |
+| `pnpm lint`            | Run ESLint and check formatting with Prettier.                             |
+| `pnpm lint:fix`        | Fix what ESLint can and rewrite files with Prettier.                       |
+| `pnpm format`          | Rewrite files with Prettier.                                               |
+| `pnpm test`            | Run all Vitest tests once.                                                 |
+| `pnpm test:watch`      | Run Vitest in watch mode.                                                  |
+| `pnpm test:coverage`   | Run tests with a coverage report for `pipeline/` and `tools/`.             |
+| `pnpm schema:export`   | Regenerate `schemas/deck.schema.json` from the Zod deck schema.            |
+| `pnpm deck:generate`   | Generate a deck from a tool's manpage (see below).                         |
+| `pnpm deck:build`      | Apply overrides and write the built decks, manifest and `ATTRIBUTIONS.md`. |
+| `pnpm decks:check`     | Validate the built decks in `public/data/decks/` against the schema.       |
+| `pnpm fixtures:golden` | Rewrite the parity fixtures in `apple/FlashcardsCore/Tests/Fixtures/`.     |
 
-CI runs lint, typecheck, tests with coverage and a build on every pull request and every push to `main`. Separate jobs check the decks and run the E2E tests (uploading the Playwright report and traces when they fail).
-
-## Offline and updates
-
-Production builds register a service worker ([vite-plugin-pwa](https://vite-pwa-org.netlify.app/), `generateSW`). It precaches the app shell, so the app loads and reviews work with no network once it has been opened. `data/decks/index.json` is network-first with a cache fallback, and deck files are cached as they are fetched; the decks themselves live in IndexedDB. There is no install step: every deck downloads on its own, one flavor per tool, when the app starts, comes back to the foreground or regains its connection, and updates itself when a newer version is listed (see `src/app/decks/sync.ts`). Updates keep progress because card IDs don't change between versions. The Decks page only chooses which decks to study.
-
-New deploys apply themselves with no prompt. A new version downloads in the background and waits for a quiet moment to take over: before the user has touched a freshly opened page, right after they move to another screen, or while the app is in the background. It never takes over during a review with cards left, a deck download, or a backup import (see `src/app/pwa/update-holds.ts`). The app checks for a new version when it comes back to the foreground and hourly while open. The header shows "Offline" while the browser has no connection. The manifest is the hand-written `public/manifest.webmanifest`. There is no service worker in `pnpm dev`; use the production build (`pnpm build && pnpm preview`) or the E2E tests in `e2e/offline.spec.ts`.
-
-## Deploy
-
-Every push to `main` deploys to [GitHub Pages](https://htunnicliff.github.io/cli-flashcards/) from the `deploy` job in [`ci.yml`](.github/workflows/ci.yml). It runs only after the unit, deck, E2E and Flutter jobs pass, builds the decks, and fails if any deck is invalid. Then it builds the Flutter app at `/cli-flashcards/` (with `--no-web-resources-cdn` and the Workbox service worker from `pnpm flutter:sw`) and the Vue app at `/cli-flashcards/classic/`. Deck data is served from `/cli-flashcards/data/decks/`. `404.html` is a copy of the Flutter `index.html`, so deep links like `/cli-flashcards/decks` load the app; a missing page under `/classic/` sends you to the classic app's start page.
-
-To try the subpath build locally: `BASE_PATH=/cli-flashcards/ pnpm exec vite build && BASE_PATH=/cli-flashcards/ pnpm preview`, then open <http://localhost:4173/cli-flashcards/>.
+CI runs lint, typecheck and tests with coverage on every pull request and every push to `main`. Separate jobs check the decks and the parity fixtures, run the Swift core tests, and build the app for iOS, macOS and Android.
 
 ## Layout
 
 ```
-src/
-  app/      Vue components, views, router and Pinia stores
-  schema/   Shared types and Zod schemas, used by the app and by build scripts
-  core/     Framework-free logic (scheduling, answer checking), tested without Vue
-tools/      Node build scripts (deck generation)
+pipeline/
+  schema/   Zod schemas and types for decks, cards and flags
+  core/     The scheduling (ts-fsrs) and answer-checking logic the parity fixtures come from
+tools/      Node build scripts: deck generation, building, checks, fixtures
 decks/      Generated and curated deck data
+public/data/decks/   Built decks, bundled into the app
+apple/      The Skip app and its Swift core (FlashcardsCore)
 ```
 
-`src/schema/` and `src/core/` must not import Vue or browser APIs, so the Node tools in `tools/` can import them too. The `@/` alias points at `src/`.
-
-### Storage
-
-All persistent state lives in IndexedDB through [Dexie](https://dexie.org/), behind the typed repository in `src/core/storage/`. The rest of the app gets it with `useRepository()` (or `getRepository()` outside components) and never touches Dexie directly. Browser globals are injected, so the repository runs in Node tests against [fake-indexeddb](https://github.com/dumbmatter/fakeIndexedDB). The review log is append-only and is only cleared by an explicit progress reset. Schema changes follow the steps documented on `SCHEMA_VERSIONS` in `src/core/storage/database.ts`.
+The Swift core in `apple/FlashcardsCore` is a port of `pipeline/`. When you change scheduling, card or answer logic here, run `pnpm fixtures:golden` and make the Swift tests pass against the new fixtures.
 
 ## Generating decks
 
@@ -126,32 +109,6 @@ add: # options the parser missed
 
 ## Tests
 
-Tests sit next to the code they cover as `*.test.ts`. Vitest runs two projects:
+Tests sit next to the code they cover as `*.test.ts` and run in Node. [fast-check](https://fast-check.dev/) is available for property-based tests; see `pipeline/schema/cards.test.ts` for examples.
 
-- **unit**: `src/core/`, `src/schema/` and `tools/` in a Node environment.
-- **app**: `src/app/` in [happy-dom](https://github.com/capricorn86/happy-dom), with [Vue Test Utils](https://test-utils.vuejs.org/) for component tests.
-
-[fast-check](https://fast-check.dev/) is available for property-based tests; see `src/core/clamp.test.ts` for an example.
-
-## End-to-end tests
-
-E2E tests live in `e2e/` and use [Playwright](https://playwright.dev/). They run against the production build, because the service worker only exists there. `e2e/build.ts` builds into `dist-e2e/` and replaces the real decks with the fixture decks in `e2e/fixtures/decks/`, and `e2e/serve.ts` serves it (it can also simulate a new deploy or a network outage per browser context; see `e2e/support/pwa.ts`), so deck content changes don't break E2E tests.
-
-```sh
-pnpm exec playwright install chromium webkit   # once
-pnpm test:e2e                                  # all projects
-pnpm test:e2e --project=chromium               # one project
-pnpm test:e2e --ui                             # UI mode
-```
-
-There are three projects: desktop Chromium, desktop WebKit (closest to iOS Safari) and a mobile viewport. Every test runs with reduced motion and in a new browser context, so storage starts empty.
-
-Import `test` and `expect` from `e2e/support/test.ts`, which fails a test on any uncaught page error. Helpers:
-
-- `expectNoA11yViolations(page)` in `e2e/support/a11y.ts` fails on serious or critical axe violations.
-- `seedIndexedDB(page, seed)` in `e2e/support/storage.ts` creates a database with records before the app loads, for tests that need existing progress. `readStore()` reads one back.
-- `fixtureDeck()` in `e2e/support/fixtures.ts` returns a fixture deck's JSON.
-
-`page.route()` doesn't see requests the service worker answers, so a spec that stubs responses with it should add `test.use({ serviceWorkers: 'block' })`.
-
-Keep E2E tests few and focused on flows that cross boundaries (UI, storage, service worker). Logic edge cases belong in unit tests. Avoid screenshot comparisons.
+The app's tests are Swift: `swift test` in `apple/FlashcardsCore/`, and UI tests in Xcode. See [`apple/README.md`](apple/README.md).

@@ -6,7 +6,7 @@
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
-import { jsonSchemaFiles } from '../src/schema/json-schema'
+import { jsonSchemaFiles } from '../pipeline/schema/json-schema'
 
 const check = process.argv.includes('--check')
 let stale = false

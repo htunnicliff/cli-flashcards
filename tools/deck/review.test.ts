@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DeckSchema, type DeckInput } from '../../src/schema/deck'
+import { DeckSchema, type DeckInput } from '../../pipeline/schema/deck'
 import {
   attributionsMarkdown,
   copiedSummaries,

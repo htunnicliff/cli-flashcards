@@ -11,7 +11,7 @@ Package.swift          The app package (Skip), app ID dev.seafarer.cliflashcards
 Skip.env               Name, bundle ID and version, shared by Xcode and Gradle
 Sources/CLIFlashcards/ SwiftUI app, shared by every platform
 FlashcardsCore/        Plain Swift package: deck schema, cards, FSRS, typed answers
-  Tests/Fixtures/      Parity fixtures written by `pnpm dart:golden`; don't edit by hand
+  Tests/Fixtures/      Parity fixtures written by `pnpm fixtures:golden`; don't edit by hand
 Darwin/                Xcode project for iOS, iPadOS and macOS (native, not Catalyst)
 Android/               Gradle project for Android
 ```

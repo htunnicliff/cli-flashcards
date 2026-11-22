@@ -1,7 +1,7 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
-import type { OptionInput } from '../../src/schema/deck'
-import { makeOption } from '../../src/schema/fixtures'
+import type { OptionInput } from '../../pipeline/schema/deck'
+import { makeOption } from '../../pipeline/schema/fixtures'
 import {
   matchOptions,
   mentionedFlags,

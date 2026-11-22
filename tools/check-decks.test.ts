@@ -85,7 +85,7 @@ describe('checkDecks', () => {
     expect((await checkDecks(dir))[0]).toMatch(/^index\.json: manifestVersion/)
   })
 
-  it('checks the E2E fixture decks', async () => {
-    expect(await checkDecks(join(import.meta.dirname, '../e2e/fixtures/decks'))).toEqual([])
+  it('checks the fixture decks', async () => {
+    expect(await checkDecks(join(import.meta.dirname, 'fixtures/decks'))).toEqual([])
   })
 })

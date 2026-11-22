@@ -2,9 +2,9 @@
  * Applies a curator's overrides to a generated deck. Order: merges, then
  * per-option patches (so a patch can target a merged option), then additions.
  */
-import type { Deck, OptionInput } from '../../src/schema/deck'
-import { deriveOptionId, normalizeFlags } from '../../src/schema/flags'
-import type { Overrides } from '../../src/schema/overrides'
+import type { Deck, OptionInput } from '../../pipeline/schema/deck'
+import { deriveOptionId, normalizeFlags } from '../../pipeline/schema/flags'
+import type { Overrides } from '../../pipeline/schema/overrides'
 
 export interface ApplyResult {
   /** Not yet validated; run it through `DeckSchema`. */

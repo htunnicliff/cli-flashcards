@@ -22,11 +22,11 @@ import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import { format } from 'prettier'
 import { parse as parseYaml, YAMLParseError } from 'yaml'
-import { MANIFEST_VERSION, type DeckManifest } from '../src/schema/manifest'
+import { MANIFEST_VERSION, type DeckManifest } from '../pipeline/schema/manifest'
 import { buildDeck, manifestEntry } from './deck/build'
 import { DeckValidationError } from './deck/generate'
 import { attributionsMarkdown, copiedSummaries, coreWithoutExamples } from './deck/review'
-import type { Deck } from '../src/schema/deck'
+import type { Deck } from '../pipeline/schema/deck'
 
 const { values } = parseArgs({ options: { check: { type: 'boolean', default: false } } })
 const check = values.check!

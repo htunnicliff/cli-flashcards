@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { DeckSchema } from '../../src/schema/deck'
-import { makeDeck, makeOption } from '../../src/schema/fixtures'
-import { OverridesSchema, type OverridesInput } from '../../src/schema/overrides'
+import { DeckSchema } from '../../pipeline/schema/deck'
+import { makeDeck, makeOption } from '../../pipeline/schema/fixtures'
+import { OverridesSchema, type OverridesInput } from '../../pipeline/schema/overrides'
 import { applyOverrides } from './overrides'
 
 const generated = DeckSchema.parse(

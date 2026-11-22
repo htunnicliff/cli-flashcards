@@ -83,7 +83,7 @@ Everything an overrides file can do:
 | `add`                            | Adds an option the parser missed. Give `flags`, `summary` and `examples`; `tier` defaults to `common`, and `subcommand` places it in a git-style deck.     |
 | `deck`                           | Overrides deck-level `license`, `attribution` or `toolVersion`.                                                                                            |
 
-The full formats are JSON Schemas generated from the Zod schemas in `src/schema/`: [`schemas/deck.schema.json`](schemas/deck.schema.json) for decks and [`schemas/overrides.schema.json`](schemas/overrides.schema.json) for overrides. The `yaml-language-server` comment on the first line gives you completion and validation in editors that support it. Run `pnpm schema:export` after changing a Zod schema.
+The full formats are JSON Schemas generated from the Zod schemas in `pipeline/schema/`: [`schemas/deck.schema.json`](schemas/deck.schema.json) for decks and [`schemas/overrides.schema.json`](schemas/overrides.schema.json) for overrides. The `yaml-language-server` comment on the first line gives you completion and validation in editors that support it. Run `pnpm schema:export` after changing a Zod schema.
 
 Write every **core summary in your own words**. Aim for a short line that answers "what does this flag do for me?", such as "Print strings without JSON quotes". The generated summary is the manpage's first sentence, which is often too long for a card and, for GNU tools, GPL or GFDL text.
 
@@ -99,7 +99,7 @@ pnpm deck:build --check   # what CI runs
 pnpm decks:check
 ```
 
-`deck:build` applies your overrides, validates the result, and writes `public/data/decks/<tool>-<variant>.json`, the manifest `public/data/decks/index.json`, and `ATTRIBUTIONS.md`. It raises a deck's `deckVersion` whenever its content changes, which is how the app notices updates. Run `pnpm dev` to try the deck in the app.
+`deck:build` applies your overrides, validates the result, and writes `public/data/decks/<tool>-<variant>.json`, the manifest `public/data/decks/index.json`, and `ATTRIBUTIONS.md`. It raises a deck's `deckVersion` whenever its content changes, which is how the app notices updates. The app bundles everything in `public/data/decks/`, so run it from Xcode to try the deck (see [`apple/README.md`](apple/README.md)).
 
 With `--check`, or whenever `CI` is set, these are errors:
 
@@ -140,7 +140,7 @@ For example, `jq --help` aligns descriptions in a column but lets one long optio
 
 ## Testing
 
-Every pull request runs lint, typecheck, unit and component tests, the deck checks and the E2E tests in CI. Run the fast ones before pushing:
+Every pull request runs lint, typecheck, unit tests, the deck checks, the Swift core tests and the app builds in CI. Run the fast ones before pushing:
 
 ```sh
 pnpm lint && pnpm typecheck && pnpm test
@@ -148,48 +148,17 @@ pnpm lint && pnpm typecheck && pnpm test
 
 Each layer has a job, and a test belongs in the cheapest layer that can catch the bug:
 
-| Layer       | Where                                                                | What belongs there                                                                                                                             | Run                                           |
-| ----------- | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| Unit        | `*.test.ts` next to the code in `src/core/`, `src/schema/`, `tools/` | Plain TypeScript logic: the scheduler, card building, flag handling, parsers, backups. Most tests live here.                                   | `pnpm test`                                   |
-| Property    | the same files, using [fast-check](https://fast-check.dev/)          | Invariants over many generated inputs, such as "shuffling options never changes a card ID" (`src/schema/cards.test.ts`) or backup round-trips. | `pnpm test`                                   |
-| Snapshot    | `tools/deck/*.test.ts`, `tools/deck/__snapshots__/`                  | Parser output over real manpages and `--help` fixtures, so parser changes show up in review.                                                   | `pnpm test` (`pnpm test -u` to update)        |
-| Component   | `*.test.ts` in `src/app/`, in happy-dom with Vue Test Utils          | One component or view: keyboard controls, undo, what renders for a given state. Reduced motion is forced.                                      | `pnpm test`                                   |
-| Deck checks | `tools/deck-build.ts`, `tools/check-decks.ts`                        | The shipped decks: schema validation, stale overrides, duplicate flags, copied summaries, missing examples, out-of-date files.                 | `pnpm deck:build --check`, `pnpm decks:check` |
-| End-to-end  | `e2e/*.spec.ts`, with [Playwright](https://playwright.dev/)          | A few flows that cross boundaries: UI with storage, reloads, offline through the service worker, accessibility.                                | `pnpm test:e2e`                               |
+| Layer       | Where                                                         | What belongs there                                                                                                             | Run                                           |
+| ----------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------- |
+| Unit        | `*.test.ts` next to the code in `pipeline/` and `tools/`      | Plain TypeScript logic: scheduling, card building, flag handling, parsers. Most tests live here.                               | `pnpm test`                                   |
+| Property    | the same files, using [fast-check](https://fast-check.dev/)   | Invariants over many generated inputs, such as "shuffling options never changes a card ID" (`pipeline/schema/cards.test.ts`).  | `pnpm test`                                   |
+| Snapshot    | `tools/deck/*.test.ts`, `tools/deck/__snapshots__/`           | Parser output over real manpages and `--help` fixtures, so parser changes show up in review.                                   | `pnpm test` (`pnpm test -u` to update)        |
+| Deck checks | `tools/deck-build.ts`, `tools/check-decks.ts`                 | The shipped decks: schema validation, stale overrides, duplicate flags, copied summaries, missing examples, out-of-date files. | `pnpm deck:build --check`, `pnpm decks:check` |
+| Parity      | `apple/FlashcardsCore/Tests/`, against `pnpm fixtures:golden` | The Swift port of scheduling, cards and answers gives the same results as `pipeline/`.                                         | `swift test` in `apple/FlashcardsCore/`       |
+| App         | the app in `apple/`                                           | Screens and flows: review, decks, stats, settings, backup.                                                                     | Xcode                                         |
 
-E2E tests run against a production build with fixture decks from `e2e/fixtures/decks/`, so changing a real deck doesn't break them. The README's [End-to-end tests](README.md#end-to-end-tests) section covers setup and helpers.
-
-A bug in a function needs a unit test, even if you found it through the UI. Reach for E2E only when the behaviour depends on the browser, storage or the service worker working together.
+A bug in a function needs a unit test, even if you found it in the app.
 
 ## Motion
 
-Animation in this app explains state changes: a card revealing its answer, a graded card leaving, a list re-ordering. It isn't decoration.
-
-### Motion or CSS?
-
-Use [Motion for Vue](https://motion.dev/docs/vue) (`motion-v`) when it adds something CSS can't do well:
-
-- springs and gestures (drag, swipe)
-- layout and shared-element animation (`layout`, `layoutId`)
-- exit animations and coordinated enter/exit (`AnimatePresence`)
-
-Use plain CSS or Vue's `<Transition>` for hover and focus colours and simple fades. CSS transitions use the `--duration-*` and `--ease-*` tokens in `src/app/styles/tokens.css`.
-
-### How to use it
-
-- Take durations and springs from `src/app/motion/tokens.ts` (`spring.snappy`, `spring.gentle`, `fade.quick`, `presets.slideUp`, …). Don't write inline values; add a token if none fits.
-- Use `m.div` (import `m` from `motion-v`), not `<Motion>`. The app is wrapped in `LazyMotion`, which loads Motion's animation features as a separate chunk after first paint; `<Motion>` pulls them back into the initial bundle (about 16 kB gzipped).
-- `<AnimatePresence>` and the other Motion components are auto-imported in templates.
-- With `AnimatePresence`, put the conditional (`v-if`, `v-show` or a changing `key`) on its **direct child**, never on `AnimatePresence` itself.
-- Animate `transform` and `opacity` only, so mid-range phones stay smooth.
-- Keep UI transitions under about 200 ms. Springs should settle quickly: high stiffness, enough damping that they don't bounce.
-
-### Never block input
-
-People review by keyboard, fast. Animations must be interruptible: a keypress during an exit animation applies immediately, and the next card appears without waiting for the old one to finish leaving. Never `await` an animation before updating state, and never disable controls while something animates.
-
-### Reduced motion
-
-`MotionRoot` (`src/app/motion/MotionRoot.vue`) sets Motion's `reducedMotion` from Settings > Reduce motion: **System** follows `prefers-reduced-motion`, **On** and **Off** override it. With reduced motion, Motion skips transform and layout animations and keeps opacity fades. Plain CSS transitions follow the same setting through `data-motion` on `<html>` (see `src/app/styles/base.css`).
-
-Component tests and E2E tests run with reduced motion forced, so animations can't make results timing-dependent.
+Animation in the app explains state changes, such as a card revealing its answer or a graded card leaving. It isn't decoration. Keep it short, never block input, and follow the Motion setting: `apple/Sources/CLIFlashcards/Theme/Motion.swift` resolves it against the system's Reduce Motion, and views read `\.reducedMotion` to swap movement for a fade.

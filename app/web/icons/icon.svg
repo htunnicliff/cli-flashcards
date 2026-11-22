@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <style>
-    .bg { fill: #F6F5F2; } .dash { fill: #2B54C9; }
-    @media (prefers-color-scheme: dark) { .bg { fill: #121315; } .dash { fill: #94B2FF; } }
-  </style>
-  <rect class="bg" width="512" height="512" rx="112"/>
-  <rect class="dash" x="112" y="232" width="128" height="48" rx="12"/>
-  <rect class="dash" x="272" y="232" width="128" height="48" rx="12"/>
-</svg>

@@ -7,8 +7,8 @@
  * `copiedSummaries` finds the ones that still read like the manpage, and
  * `attributionsMarkdown` renders ATTRIBUTIONS.md from deck metadata.
  */
-import { findCloze } from '../../src/schema/cards'
-import type { Deck, Option } from '../../src/schema/deck'
+import { findCloze } from '../../pipeline/schema/cards'
+import type { Deck, Option } from '../../pipeline/schema/deck'
 
 function words(text: string): string[] {
   return text
