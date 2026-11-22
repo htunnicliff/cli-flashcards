@@ -310,3 +310,15 @@ func styledText(_ runs: [TextRun]) -> Text {
     }
     #endif
 }
+
+extension View {
+    /// Fixed-width digits, so counts don't jiggle as they change. Android has
+    /// no equivalent, so the text is left as it is there.
+    @ViewBuilder func tabularDigits() -> some View {
+        #if os(Android)
+        self
+        #else
+        self.monospacedDigit()
+        #endif
+    }
+}

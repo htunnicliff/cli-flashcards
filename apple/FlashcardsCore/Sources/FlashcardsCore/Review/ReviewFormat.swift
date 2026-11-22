@@ -58,6 +58,11 @@ public enum PartKind: String, Sendable { case tool, flag, arg, blank }
 public struct CommandPart: Hashable, Sendable {
     public var kind: PartKind
     public var text: String
+
+    public init(kind: PartKind, text: String) {
+        self.kind = kind
+        self.text = text
+    }
 }
 
 /// Splits a command into parts for display.

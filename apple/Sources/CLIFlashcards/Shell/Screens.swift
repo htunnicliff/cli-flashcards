@@ -7,6 +7,7 @@ import FlashcardsCore
 
 struct ReviewScreen: View {
     let model: AppModel
+    @State var studying = false
 
     var body: some View {
         List {
@@ -18,7 +19,7 @@ struct ReviewScreen: View {
             }
             if let queue = model.queue {
                 Section {
-                    ReviewSummary(queue: queue)
+                    ReviewSummary(queue: queue) { studying = true }
                         .listRowBackground(Color.clear)
                         #if !os(Android)
                         .listRowInsets(EdgeInsets(top: Space.s2, leading: 0, bottom: Space.s2, trailing: 0))
@@ -33,6 +34,9 @@ struct ReviewScreen: View {
                     }
                 }
             }
+        }
+        .navigationDestination(isPresented: $studying) {
+            StudyView(model: model)
         }
     }
 
@@ -53,6 +57,7 @@ struct ReviewScreen: View {
 /// the list background rather than in a cell.
 struct ReviewSummary: View {
     let queue: StudyQueue
+    let start: () -> Void
 
     var body: some View {
         let total = queue.items.count
@@ -67,14 +72,15 @@ struct ReviewSummary: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            Button {
-                // The review session lands in #80.
-            } label: {
+            Button(action: start) {
                 Text(total == 0 ? "All caught up" : "Start Review")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, Space.s1)
             }
+            #if os(macOS)
+            .frame(maxWidth: 360)
+            #endif
             .buttonStyle(.borderedProminent)
             #if !os(Android)
             .controlSize(.large)
