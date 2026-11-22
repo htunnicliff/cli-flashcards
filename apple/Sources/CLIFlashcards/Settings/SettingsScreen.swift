@@ -3,7 +3,9 @@
 
 import SwiftUI
 import FlashcardsCore
-#if !os(Android)
+#if os(Android)
+import SkipKit
+#else
 import UniformTypeIdentifiers
 #endif
 
@@ -17,6 +19,11 @@ struct SettingsScreen: View {
     @State var confirmingImport = false
     @State var confirmingReset = false
     @State var backupMessage: String?
+    #if os(Android)
+    @State var pickedURL: URL?
+    @State var pickedName: String?
+    @State var pickedType: String?
+    #endif
 
     var body: some View {
         Form {
@@ -59,6 +66,17 @@ struct SettingsScreen: View {
             case .success(let url): readImport(url)
             case .failure(let error): backupMessage = "Couldn’t open the file: \(error.localizedDescription)"
             }
+        }
+        #else
+        // Android's picker copies the chosen file into the app's cache.
+        .withDocumentPicker(
+            isPresented: $importing, allowedContentTypes: [.json],
+            selectedDocumentURL: $pickedURL, selectedFilename: $pickedName, selectedFileMimeType: $pickedType
+        )
+        .onChange(of: pickedURL) { _, url in
+            guard let url else { return }
+            pickedURL = nil
+            readImport(url)
         }
         #endif
     }
@@ -144,8 +162,8 @@ struct SettingsScreen: View {
         Section {
             #if !os(Android)
             Button("Export Backup…") { startExport() }
-            Button("Import Backup…") { importing = true }
             #endif
+            Button("Import Backup…") { importing = true }
             #if !os(macOS)
             if let shareURL {
                 ShareLink(item: shareURL) {
@@ -230,10 +248,11 @@ struct SettingsScreen: View {
         }
     }
 
-    #if !os(Android)
     func readImport(_ url: URL) {
+        #if !os(Android)
         let scoped = url.startAccessingSecurityScopedResource()
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        #endif
         do {
             pendingImport = try parseBackup(try Data(contentsOf: url))
             confirmingImport = true
@@ -241,8 +260,6 @@ struct SettingsScreen: View {
             backupMessage = "That file isn’t a backup this app can read: \(error)"
         }
     }
-
-    #endif
 
     func finishImport(_ mode: ImportMode) {
         guard let backup = pendingImport else { return }
