@@ -49,9 +49,11 @@ const button = (wrapper: VueWrapper, tool: string, text: string) =>
 describe('DecksView', () => {
   it('downloads every deck on its own and lists how many options each starts with', async () => {
     const wrapper = await mountView([grepDeck()])
+    // On a slow runner the background download may not have started when
+    // mountView stops waiting, so wait for it to land.
+    await vi.waitFor(() => expect(card(wrapper, 'grep').attributes('data-installed')).toBe('true'))
     const grep = card(wrapper, 'grep')
     expect(grep.text()).toContain('2 options, starting with the 1 most used')
-    expect(grep.attributes('data-installed')).toBe('true')
     expect(grep.attributes('data-studying')).toBe('true')
     expect(grep.find('button').exists() && grep.text()).not.toContain('Install')
     expect(await repo.decks.get('grep-gnu')).toBeDefined()
