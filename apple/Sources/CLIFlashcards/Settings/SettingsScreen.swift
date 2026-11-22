@@ -177,7 +177,7 @@ struct SettingsScreen: View {
 
     // MARK: Helpers
 
-    func setting<T>(_ key: WritableKeyPath<Settings, T>) -> Binding<T> {
+    func setting<T>(_ key: WritableKeyPath<FlashcardsCore.Settings, T>) -> Binding<T> {
         Binding(get: { model.settings[keyPath: key] }, set: { value in model.updateSettings { $0[keyPath: key] = value } })
     }
 
@@ -230,6 +230,7 @@ struct SettingsScreen: View {
         }
     }
 
+    #if !os(Android)
     func readImport(_ url: URL) {
         let scoped = url.startAccessingSecurityScopedResource()
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
@@ -240,6 +241,8 @@ struct SettingsScreen: View {
             backupMessage = "That file isn’t a backup this app can read: \(error)"
         }
     }
+
+    #endif
 
     func finishImport(_ mode: ImportMode) {
         guard let backup = pendingImport else { return }
