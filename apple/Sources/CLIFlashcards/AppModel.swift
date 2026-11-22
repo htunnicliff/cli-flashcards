@@ -64,8 +64,21 @@ enum AppSection: String, CaseIterable, Hashable, Identifiable {
 
     var section: AppSection = .review
 
-    /// Whether the welcome tour should open (#84).
+    /// Whether the welcome tour is showing.
     var tourOpen = false
+
+    /// A replay from Settings, rather than the first-launch tour.
+    var tourReplay: Bool { settings.onboardingDone }
+
+    /// Closes the tour for good. After the first-launch tour, goes to Review.
+    func finishTour() {
+        let first = !settings.onboardingDone
+        tourOpen = false
+        if first {
+            updateSettings { $0.onboardingDone = true }
+            section = .review
+        }
+    }
 
     init() {}
 

@@ -26,7 +26,9 @@ struct RootView: View {
         let solid = settings.reduceTransparency || systemReduceTransparency || contrast == .increased
         let frost = Frost.resolve(dark: dark, solid: solid)
 
+        let tour = Binding(get: { model.tourOpen }, set: { open in if !open { model.finishTour() } })
         Sections(model: model)
+            .sheet(isPresented: tour) { WelcomeTour(model: model) }
             .environment(\.frost, frost)
             .environment(\.reducedMotion, reducedMotion(settings.motion, system: systemReduceMotion))
             .tint(frost.tint)
