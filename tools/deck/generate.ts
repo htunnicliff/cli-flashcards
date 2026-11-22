@@ -2,8 +2,8 @@
  * Turns parsed manpages into a deck. Pure: text in, deck out. The CLI in
  * `tools/deck-generate.ts` finds the files and writes the result.
  */
-import { DeckSchema, SCHEMA_VERSION, type Deck, type OptionInput } from '../../src/schema/deck'
-import { deriveOptionId } from '../../src/schema/flags'
+import { DeckSchema, SCHEMA_VERSION, type Deck, type OptionInput } from '../../pipeline/schema/deck'
+import { deriveOptionId } from '../../pipeline/schema/flags'
 import { parseHelp, stripHelpAnnotations } from './help'
 import { parseManpage } from './manpage'
 import type { RawEntry } from './manpage/types'

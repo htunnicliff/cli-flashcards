@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { makeDeck, makeOption } from '../../src/schema/fixtures'
+import { makeDeck, makeOption } from '../../pipeline/schema/fixtures'
 import { buildDeck, contentHash, isHelpOrVersion, manifestEntry } from './build'
 import { DeckValidationError } from './generate'
 

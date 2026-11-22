@@ -1,13 +1,6 @@
 {
   "extends": "@tsconfig/node22/tsconfig.json",
-  "include": [
-    "vite.config.ts",
-    "vitest.config.ts",
-    "eslint.config.ts",
-    "tools/**/*.ts",
-    "src/schema/**/*.ts",
-    "src/core/**/*.ts"
-  ],
+  "include": ["vitest.config.ts", "eslint.config.ts", "tools/**/*.ts", "pipeline/**/*.ts"],
   "exclude": ["**/*.test.ts"],
   "compilerOptions": {
     "noEmit": true,

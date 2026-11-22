@@ -3,9 +3,9 @@
  * options. The number of examples an option appears in is the usage signal
  * for relevance tiers, and the examples themselves are attached to options.
  */
-import type { Example, OptionInput } from '../../src/schema/deck'
-import { isShortFlag } from '../../src/schema/flags'
-import { primaryFlag } from '../../src/schema/cards'
+import type { Example, OptionInput } from '../../pipeline/schema/deck'
+import { isShortFlag } from '../../pipeline/schema/flags'
+import { primaryFlag } from '../../pipeline/schema/cards'
 
 export interface TldrExample {
   description: string

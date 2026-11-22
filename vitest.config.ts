@@ -1,43 +1,16 @@
-import { defineConfig, mergeConfig } from 'vitest/config'
+import { defineConfig } from 'vitest/config'
 
-import viteConfig from './vite.config.ts'
-
-export default mergeConfig(
-  viteConfig,
-  defineConfig({
-    test: {
-      projects: [
-        {
-          // Framework-free code: shared schema, core logic and Node build scripts.
-          extends: true,
-          test: {
-            name: 'unit',
-            environment: 'node',
-            include: [
-              'src/core/**/*.test.ts',
-              'src/schema/**/*.test.ts',
-              'tools/**/*.test.ts',
-              'e2e/fixtures/**/*.test.ts',
-            ],
-          },
-        },
-        {
-          // Vue components, views and stores.
-          extends: true,
-          test: {
-            name: 'app',
-            environment: 'happy-dom',
-            include: ['src/app/**/*.test.ts'],
-            setupFiles: ['src/app/test-setup.ts'],
-          },
-        },
-      ],
-      coverage: {
-        provider: 'v8',
-        include: ['src/core/**/*.ts', 'tools/**/*.ts'],
-        exclude: ['**/*.test.ts'],
-        reporter: ['text', 'json-summary', 'html'],
-      },
+// The deck pipeline: schema, the scheduling and answer logic the parity
+// fixtures come from, and the Node build scripts.
+export default defineConfig({
+  test: {
+    environment: 'node',
+    include: ['pipeline/**/*.test.ts', 'tools/**/*.test.ts'],
+    coverage: {
+      provider: 'v8',
+      include: ['pipeline/**/*.ts', 'tools/**/*.ts'],
+      exclude: ['**/*.test.ts'],
+      reporter: ['text', 'json-summary', 'html'],
     },
-  }),
-)
+  },
+})

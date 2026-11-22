@@ -1,32 +1,18 @@
-import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
+import prettier from 'eslint-config-prettier'
 import { globalIgnores } from 'eslint/config'
-import pluginVue from 'eslint-plugin-vue'
 import globals from 'globals'
+import tseslint from 'typescript-eslint'
 
-export default defineConfigWithVueTs(
-  {
-    name: 'app/files-to-lint',
-    files: ['**/*.{ts,mts,tsx,vue}'],
-  },
+export default tseslint.config(
+  globalIgnores(['**/coverage/**', 'app/**', 'apple/**', 'vendor/**']),
 
-  globalIgnores([
-    '**/dist/**',
-    '**/dist-e2e/**',
-    '**/coverage/**',
-    'app/**',
-    'playwright-report/**',
-    'test-results/**',
-  ]),
-
-  pluginVue.configs['flat/essential'],
-  vueTsConfigs.recommended,
+  tseslint.configs.recommended,
 
   {
-    name: 'app/node-scripts',
-    files: ['tools/**/*.ts', 'e2e/**/*.ts', '*.config.ts'],
+    name: 'pipeline/node',
+    files: ['**/*.ts'],
     languageOptions: { globals: globals.node },
   },
 
-  skipFormatting,
+  prettier,
 )

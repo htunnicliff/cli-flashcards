@@ -8,7 +8,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
-import { DeckSchema, TIERS } from '../src/schema/deck'
+import { DeckSchema, TIERS } from '../pipeline/schema/deck'
 import { tldrUsage } from './deck/tldr'
 import { loadTldrPages } from './deck/tldr-files'
 import { copiedSummaries, coreWithoutExamples } from './deck/review'

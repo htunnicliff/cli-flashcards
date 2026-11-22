@@ -3,8 +3,8 @@
  * validated, with `deckVersion` bumped whenever the content changes.
  */
 import { createHash } from 'node:crypto'
-import { DeckSchema, type Deck } from '../../src/schema/deck'
-import { OverridesSchema } from '../../src/schema/overrides'
+import { DeckSchema, type Deck } from '../../pipeline/schema/deck'
+import { OverridesSchema } from '../../pipeline/schema/overrides'
 import { DeckValidationError } from './generate'
 import { applyOverrides } from './overrides'
 
@@ -97,4 +97,4 @@ export function buildDeck(input: BuildInput, label = 'deck'): BuildResult {
   return { deck, stale }
 }
 
-export { manifestEntry } from '../../src/schema/manifest'
+export { manifestEntry } from '../../pipeline/schema/manifest'

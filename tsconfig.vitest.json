@@ -1,6 +1,6 @@
 {
-  "extends": "./tsconfig.app.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "tools/**/*.ts", "e2e/fixtures/**/*.test.ts"],
+  "extends": "./tsconfig.node.json",
+  "include": ["tools/**/*.ts", "pipeline/**/*.ts"],
   "exclude": [],
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.vitest.tsbuildinfo",

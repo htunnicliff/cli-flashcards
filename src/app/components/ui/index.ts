@@ -1,6 +1,0 @@
-export { default as CommandLine } from './CommandLine.vue'
-export type { CommandPart, CommandPartKind } from './command'
-export { default as UiButton } from './UiButton.vue'
-export { default as UiCard } from './UiCard.vue'
-export { default as UiChip } from './UiChip.vue'
-export { default as UiKbd } from './UiKbd.vue'

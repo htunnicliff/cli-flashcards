@@ -1,8 +1,8 @@
 import { readdir, readFile, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import { DeckSchema } from '../src/schema/deck'
-import { DeckManifestSchema } from '../src/schema/manifest'
+import { DeckSchema } from '../pipeline/schema/deck'
+import { DeckManifestSchema } from '../pipeline/schema/manifest'
 
 async function exists(path: string) {
   return stat(path).then(
