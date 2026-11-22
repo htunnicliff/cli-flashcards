@@ -51,6 +51,11 @@ enum AppSection: String, CaseIterable, Hashable, Identifiable {
     private(set) var settings = Settings()
     private(set) var decks: [StoredDeck] = []
     private(set) var queue: StudyQueue?
+    /// Every deck bundled with the app, installed or not.
+    private(set) var manifest: DeckManifest?
+    /// Goes up whenever progress or decks change, so screens that read
+    /// storage directly know to read it again.
+    private(set) var revision = 0
     /// A one-line note after decks change, like "Updated rg to version 2".
     var notice: String?
     private(set) var loadError: String?
@@ -72,11 +77,8 @@ enum AppSection: String, CaseIterable, Hashable, Identifiable {
         guard repository == nil, loadError == nil else { return }
         do {
             let repository = try Repository(backend: FileBackend(directory: try Self.storageDirectory()))
-            let result = try syncDecks(repository, BundledDecks(), platformFlavor: platformFlavor, now: { [now] in now })
-            if !result.failed.isEmpty {
-                logger.error("Bundled decks failed to load: \(result.failed.joined(separator: ", "))")
-            }
-            notice = describeSync(result)
+            manifest = try? BundledDecks().manifest()
+            try sync(repository)
             self.repository = repository
             self.scheduler = Scheduler(repository: repository)
             settings = repository.settings()
@@ -99,6 +101,56 @@ enum AppSection: String, CaseIterable, Hashable, Identifiable {
         guard let repository, let scheduler else { return }
         decks = repository.listDecks()
         queue = scheduler.queue(now: now)
+        revision += 1
+    }
+
+    private func sync(_ repository: Repository) throws {
+        let result = try syncDecks(repository, BundledDecks(), platformFlavor: platformFlavor, now: { [now] in now })
+        if !result.failed.isEmpty {
+            logger.error("Bundled decks failed to load: \(result.failed.joined(separator: ", "))")
+        }
+        notice = describeSync(result)
+    }
+
+    /// Runs a change to storage, then refreshes. A failure is shown, not thrown.
+    private func change(_ what: String, _ work: (Repository) throws -> Void) {
+        guard let repository else { return }
+        do {
+            try work(repository)
+        } catch {
+            logger.error("\(what) failed: \(error)")
+            saveError = "Couldn’t \(what): \(error)"
+        }
+        refresh()
+    }
+
+    func setDeckPrefs(_ id: String, paused: Bool? = nil, includeObscure: Bool? = nil, typeAnswers: Bool? = nil) {
+        change("save the deck") {
+            try $0.updateDeck(id, includeObscure: includeObscure, paused: paused, typeAnswers: typeAnswers)
+        }
+    }
+
+    func resetProgress(_ deckId: String) {
+        change("reset progress") { try $0.resetProgress(deckId: deckId) }
+    }
+
+    func unsuspend(_ cardIds: [String]) {
+        guard let scheduler else { return }
+        change("unsuspend") { _ in try scheduler.unsuspend(cardIds) }
+    }
+
+    /// The GNU or BSD decks, for tools whose flags differ. Switching swaps
+    /// the installed decks and keeps their settings.
+    var deckFlavor: DeckFlavor {
+        resolveFlavor(settings.deckFlavor, decks.map(\.deck.variant), platformFlavor)
+    }
+
+    func setDeckFlavor(_ flavor: DeckFlavor) {
+        guard flavor != deckFlavor else { return }
+        change("switch decks") { repository in
+            settings = try repository.updateSettings { $0.deckFlavor = flavor }
+            try sync(repository)
+        }
     }
 
     /// Changes and saves settings. A failed save keeps the old settings.

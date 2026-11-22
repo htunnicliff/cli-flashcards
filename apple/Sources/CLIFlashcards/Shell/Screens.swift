@@ -91,62 +91,6 @@ struct ReviewSummary: View {
     }
 }
 
-struct DecksScreen: View {
-    let model: AppModel
-
-    var body: some View {
-        List {
-            Section {
-                ForEach(model.decks) { stored in
-                    NavigationLink(value: stored.id) {
-                        DeckRow(stored: stored)
-                    }
-                }
-            } footer: {
-                Text(model.notice ?? "\(model.decks.count) decks, bundled with the app.")
-            }
-        }
-        .navigationDestination(for: String.self) { id in
-            if let stored = model.decks.first(where: { $0.id == id }) {
-                // The deck browser lands in #81.
-                List {
-                    ValueRow(title: "Options", value: "\(visibleOptions(stored))")
-                    if stored.deck.variant != "default" {
-                        ValueRow(title: "Platform", value: flavorLabel(stored.deck.variant))
-                    }
-                }
-                .navigationTitle(stored.deck.tool)
-            }
-        }
-    }
-}
-
-func visibleOptions(_ stored: StoredDeck) -> Int {
-    stored.deck.options.filter { !$0.hidden }.count
-}
-
-struct DeckRow: View {
-    let stored: StoredDeck
-
-    var body: some View {
-        HStack {
-            Text(stored.deck.tool)
-                .font(.mono(.body).weight(.medium))
-            if stored.deck.variant != "default" {
-                Text(flavorLabel(stored.deck.variant))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            Text("\(visibleOptions(stored)) options")
-                .foregroundStyle(.secondary)
-                #if !os(Android)
-                .monospacedDigit()
-                #endif
-        }
-    }
-}
-
 struct StatsScreen: View {
     let model: AppModel
 
