@@ -91,27 +91,6 @@ struct ReviewSummary: View {
     }
 }
 
-struct StatsScreen: View {
-    let model: AppModel
-
-    var body: some View {
-        let reviews = model.repository?.reviewCount() ?? 0
-        if reviews == 0 {
-            EmptyState(
-                title: "No Reviews Yet",
-                message: "Your streak, retention and forecast appear here after your first review.",
-                systemImage: "chart.bar"
-            )
-            // The same background as the grouped lists on the other tabs.
-            .background(groupedBackground.ignoresSafeArea())
-        } else {
-            List {
-                ValueRow(title: "Reviews", value: "\(reviews)")
-            }
-        }
-    }
-}
-
 /// The background grouped lists sit on.
 var groupedBackground: Color {
     #if os(iOS)
@@ -121,35 +100,6 @@ var groupedBackground: Color {
     #else
     Color.clear
     #endif
-}
-
-struct SettingsScreen: View {
-    let model: AppModel
-
-    var body: some View {
-        let theme = Binding(get: { model.settings.theme }, set: { v in model.updateSettings { $0.theme = v } })
-        let motion = Binding(get: { model.settings.motion }, set: { v in model.updateSettings { $0.motion = v } })
-        Form {
-            Section {
-                Picker("Theme", selection: theme) {
-                    Text("System").tag(AppTheme.system)
-                    Text("Light").tag(AppTheme.light)
-                    Text("Dark").tag(AppTheme.dark)
-                }
-                Picker("Motion", selection: motion) {
-                    Text("System").tag(MotionPreference.system)
-                    Text("Reduce").tag(MotionPreference.reduce)
-                    Text("Full").tag(MotionPreference.full)
-                }
-            } header: {
-                Text("Appearance")
-            } footer: {
-                if let error = model.saveError {
-                    Text(error).foregroundStyle(.red)
-                }
-            }
-        }
-    }
 }
 
 /// A row with a label on the left and a value on the right.
