@@ -20,7 +20,9 @@ struct ReviewScreen: View {
                 Section {
                     ReviewSummary(queue: queue)
                         .listRowBackground(Color.clear)
+                        #if !os(Android)
                         .listRowInsets(EdgeInsets(top: Space.s2, leading: 0, bottom: Space.s2, trailing: 0))
+                        #endif
                 }
                 let today = todayRows(queue)
                 if !today.isEmpty {
@@ -58,7 +60,9 @@ struct ReviewSummary: View {
             VStack(spacing: Space.s1) {
                 Text("\(total)")
                     .font(.system(size: 64, weight: .bold, design: .rounded))
+                    #if !os(Android)
                     .monospacedDigit()
+                    #endif
                 Text(total == 1 ? "card to study" : "cards to study")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -72,7 +76,9 @@ struct ReviewSummary: View {
                     .padding(.vertical, Space.s1)
             }
             .buttonStyle(.borderedProminent)
+            #if !os(Android)
             .controlSize(.large)
+            #endif
             .disabled(total == 0)
         }
         .frame(maxWidth: .infinity)
@@ -128,7 +134,9 @@ struct DeckRow: View {
             Spacer()
             Text("\(visibleOptions(stored)) options")
                 .foregroundStyle(.secondary)
+                #if !os(Android)
                 .monospacedDigit()
+                #endif
         }
     }
 }
@@ -205,7 +213,9 @@ struct ValueRow: View {
             Spacer()
             Text(value)
                 .foregroundStyle(.secondary)
+                #if !os(Android)
                 .monospacedDigit()
+                #endif
         }
     }
 }
