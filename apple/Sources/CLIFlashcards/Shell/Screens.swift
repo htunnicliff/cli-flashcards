@@ -12,37 +12,60 @@ struct ReviewScreen: View {
         List {
             if let error = model.loadError {
                 Section {
-                    Label("Couldn’t open saved progress: \(error)", systemImage: "exclamationmark.triangle")
+                    Text("Couldn’t open saved progress: \(error)")
                         .foregroundStyle(.red)
                 }
             }
             if let queue = model.queue {
                 Section {
-                    VStack(alignment: .leading, spacing: Space.s1) {
-                        Text("\(queue.items.count)")
-                            .font(.system(size: 56, weight: .bold, design: .rounded))
-                            .monospacedDigit()
-                        Text(queue.items.count == 1 ? "card to study" : "cards to study")
-                            .font(.title3)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, Space.s2)
-                    Button {
-                        // The review session lands in #80.
-                    } label: {
-                        Text("Start review")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, Space.s1)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(queue.items.isEmpty)
+                    ReviewSummary(queue: queue)
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets(top: Space.s2, leading: 0, bottom: Space.s2, trailing: 0))
                 }
                 Section("Today") {
-                    ValueRow(title: "New cards left", value: "\(queue.today.newLeft)", systemImage: "sparkles")
+                    ValueRow(title: "Learning", value: count(queue, .learning))
+                    ValueRow(title: "Reviews due", value: count(queue, .review))
+                    ValueRow(title: "New", value: count(queue, .new))
+                    ValueRow(title: "Done today", value: "\(queue.today.reviewsDone + queue.today.newDone)")
                 }
             }
         }
+    }
+
+    private func count(_ queue: StudyQueue, _ kind: QueueKind) -> String {
+        "\(queue.items.filter { $0.kind == kind }.count)"
+    }
+}
+
+/// The count of cards to study and the button that starts a session, set on
+/// the list background rather than in a cell.
+struct ReviewSummary: View {
+    let queue: StudyQueue
+
+    var body: some View {
+        let total = queue.items.count
+        VStack(spacing: Space.s4) {
+            VStack(spacing: Space.s1) {
+                Text("\(total)")
+                    .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                    .monospacedDigit()
+                Text(total == 1 ? "card to study" : "cards to study")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Button {
+                // The review session lands in #80.
+            } label: {
+                Text(total == 0 ? "All caught up" : "Start Review")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Space.s1)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(total == 0)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -53,20 +76,49 @@ struct DecksScreen: View {
         List {
             Section {
                 ForEach(model.decks) { stored in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(stored.deck.tool)
-                            .font(.mono(.body).weight(.semibold))
-                        Text(flavorLabel(stored.deck.variant))
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                    NavigationLink(value: stored.id) {
+                        DeckRow(stored: stored)
                     }
-                    .padding(.vertical, 2)
                 }
             } footer: {
-                if let notice = model.notice {
-                    Text(notice)
-                }
+                Text(model.notice ?? "\(model.decks.count) decks, bundled with the app.")
             }
+        }
+        .navigationDestination(for: String.self) { id in
+            if let stored = model.decks.first(where: { $0.id == id }) {
+                // The deck browser lands in #81.
+                List {
+                    ValueRow(title: "Options", value: "\(visibleOptions(stored))")
+                    if stored.deck.variant != "default" {
+                        ValueRow(title: "Flavor", value: flavorLabel(stored.deck.variant))
+                    }
+                }
+                .navigationTitle(stored.deck.tool)
+            }
+        }
+    }
+}
+
+func visibleOptions(_ stored: StoredDeck) -> Int {
+    stored.deck.options.filter { !$0.hidden }.count
+}
+
+struct DeckRow: View {
+    let stored: StoredDeck
+
+    var body: some View {
+        HStack {
+            Text(stored.deck.tool)
+                .font(.mono(.body).weight(.medium))
+            if stored.deck.variant != "default" {
+                Text(flavorLabel(stored.deck.variant))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Text("\(visibleOptions(stored))")
+                .foregroundStyle(.secondary)
+                .monospacedDigit()
         }
     }
 }
@@ -75,12 +127,16 @@ struct StatsScreen: View {
     let model: AppModel
 
     var body: some View {
-        List {
-            Section("All time") {
-                ValueRow(
-                    title: "Reviews", value: "\(model.repository?.reviewCount() ?? 0)",
-                    systemImage: "checkmark.circle"
-                )
+        let reviews = model.repository?.reviewCount() ?? 0
+        if reviews == 0 {
+            EmptyState(
+                title: "No Reviews Yet",
+                message: "Your streak, retention and forecast appear here after your first review.",
+                systemImage: "chart.bar"
+            )
+        } else {
+            List {
+                ValueRow(title: "Reviews", value: "\(reviews)")
             }
         }
     }
@@ -119,15 +175,39 @@ struct SettingsScreen: View {
 struct ValueRow: View {
     var title: String
     var value: String
-    var systemImage: String
 
     var body: some View {
         HStack {
-            Label(title, systemImage: systemImage)
+            Text(title)
             Spacer()
             Text(value)
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
         }
+    }
+}
+
+/// A centred placeholder for a screen with nothing to show yet, like
+/// `ContentUnavailableView` (which Skip doesn't provide).
+struct EmptyState: View {
+    var title: String
+    var message: String
+    var systemImage: String
+
+    var body: some View {
+        VStack(spacing: Space.s3) {
+            Image(systemName: systemImage)
+                .font(.system(size: 44))
+                .foregroundStyle(.secondary)
+            Text(title)
+                .font(.title2.weight(.bold))
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding(Space.s8)
+        .frame(maxWidth: 420)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

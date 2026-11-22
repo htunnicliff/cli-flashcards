@@ -29,7 +29,7 @@ struct RootView: View {
         Sections(model: model)
             .environment(\.frost, frost)
             .environment(\.reducedMotion, reducedMotion(settings.motion, system: systemReduceMotion))
-            .tint(frost.accent)
+            .tint(frost.tint)
             .preferredColorScheme(settings.theme == .system ? nil : (dark ? .dark : .light))
             #if os(macOS)
             .frame(minWidth: 640, minHeight: 480)

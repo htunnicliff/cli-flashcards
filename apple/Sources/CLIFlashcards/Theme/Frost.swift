@@ -72,6 +72,10 @@ struct Frost: Equatable {
     /// Solid surfaces: no blur and no colour wash.
     var solid = false
 
+    /// The app's tint for system controls. Dark mode uses a deeper blue than
+    /// `accent` so white labels on filled buttons stay readable.
+    var tint: Color { isDark ? Color(argb: 0xFF3F68DE) : accent }
+
     var card: Color { solid ? surface : glassCard }
     var chrome: Color { solid ? surface : glassChrome }
     var rim: Color { solid ? border : glassRim }

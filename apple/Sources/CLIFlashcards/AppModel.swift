@@ -30,10 +30,10 @@ enum AppSection: String, CaseIterable, Hashable, Identifiable {
         }
         #else
         switch self {
-        case .review: "rectangle.on.rectangle.angled"
+        case .review: "rectangle.stack"
         case .decks: "square.stack.3d.up"
-        case .stats: "chart.xyaxis.line"
-        case .settings: "slider.horizontal.3"
+        case .stats: "chart.bar"
+        case .settings: "gearshape"
         }
         #endif
     }
