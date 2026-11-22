@@ -214,7 +214,7 @@ struct ProgressCounts: View {
 
     func count(_ label: String, _ value: Int, _ color: Color) -> some View {
         HStack(spacing: Space.s1) {
-            Text("\(value)").fontWeight(.semibold).foregroundStyle(color).monospacedDigit()
+            Text("\(value)").fontWeight(.semibold).foregroundStyle(color).tabularDigits()
             Text(label).foregroundStyle(.secondary)
         }
     }
@@ -235,7 +235,7 @@ struct GradeButtons: View {
                 } label: {
                     VStack(spacing: 2) {
                         Text(ratingLabels[rating] ?? "").font(.subheadline.weight(.semibold))
-                        Text(intervals[rating] ?? "").font(.caption).monospacedDigit().opacity(0.8)
+                        Text(intervals[rating] ?? "").font(.caption).tabularDigits().opacity(0.8)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 2)
