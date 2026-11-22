@@ -1,0 +1,45 @@
+name: Skip scaffold (temporary)
+
+# One-off: generates the Skip project with `skip init` on a Mac and commits it
+# back to this branch, since Skip's project generator needs macOS. Deleted once
+# the project is in.
+on:
+  push:
+    branches: [claude/project-thread-7ev6xh]
+    paths: [.github/workflows/skip-scaffold.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  scaffold:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Skip
+        run: |
+          brew install skiptools/skip/skip || brew install skip
+          skip version
+          xcodebuild -version
+          swift --version
+
+      - name: Show skip init help
+        run: skip init --help || true
+
+      - name: Generate project
+        run: |
+          skip init --native-app --appid=dev.seafarer.cliflashcards apple CLIFlashcards 2>&1 | tee /tmp/skip-init.log
+          rm -rf apple/.git
+          find apple -maxdepth 3 -not -path '*/.build*' | sort
+
+      - name: Commit generated project
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          mkdir -p apple
+          cp /tmp/skip-init.log apple/skip-init.log
+          git add apple
+          git commit -m "Generate the Skip project with skip init"
+          git push
