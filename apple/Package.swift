@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "apple",
     defaultLocalization: "en",
-    platforms: [.iOS(.v17), .macOS(.v14)],
+    platforms: [.iOS(.v18), .macOS(.v15)],
     products: [
         .library(name: "CLIFlashcards", type: .dynamic, targets: ["CLIFlashcards"]),
     ],

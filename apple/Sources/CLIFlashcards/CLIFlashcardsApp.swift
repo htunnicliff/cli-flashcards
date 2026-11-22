@@ -5,18 +5,13 @@ import SwiftUI
 /// A logger for the CLIFlashcards module.
 let logger: Logger = Logger(subsystem: "dev.seafarer.cliflashcards", category: "CLIFlashcards")
 
-/// The shared top-level view for the app, loaded from the platform-specific App delegates below.
-///
-/// The default implementation merely loads the `ContentView` for the app and logs a message.
+/// The shared top-level view for the app, loaded by each platform's entry point.
 /* SKIP @bridge */public struct CLIFlashcardsRootView : View {
     /* SKIP @bridge */public init() {
     }
 
     public var body: some View {
-        ContentView()
-            .task {
-                logger.info("Skip app logs are viewable in the Xcode console for iOS; Android logs can be viewed in Studio or using adb logcat")
-            }
+        RootView()
     }
 }
 

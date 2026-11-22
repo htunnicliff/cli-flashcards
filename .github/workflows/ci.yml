@@ -256,7 +256,11 @@ jobs:
         if: matrix.name == 'Android'
         run: |
           skip android sdk install
-          skip export --debug -d build/export
+          # Skip writes compiler errors to a log file, not the job output.
+          if ! skip export --debug -d build/export; then
+            grep -hE "(error|warning: unavailable):" /tmp/skip-export-*.txt | sort -u | head -100
+            exit 1
+          fi
           ls -la build/export
 
       - if: matrix.name == 'Android'
